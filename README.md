@@ -65,3 +65,6 @@ Možné akce:
 - Odpočinek
 - Použití itemu (např. heal)
 Když je hráč napaden objeví se timer kdy může hráč uhnout, blokovat nebo nic.
+
+## Ukládání
+Když se hráč poprve napojí, tak obdrží nějaké ID, pak hráč bude hrát a měnit stav na serveru pod tímto ID. Hráč si toto ID může zobrazit a uložit. Ale když hráč načte toto ID, tak se jen zkopírují data uložená pod tímto ID do aktuálního ID. Tímto způsobem můžeme ukládat data na serveru, tak aby si je hráči nemohli upravovat a umožníme hráčům si ukládat herní stav bez nutnosti přihlášení. Také si více hráčů může načíst 1 ID a pokračovat ze stejnoho starting pointu.
