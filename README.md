@@ -1,5 +1,5 @@
 # 2025-p3a-webgame-bursagroh
-2025-p3a-webgame-bursagroh created by GitHub Classroom
+Odkaz na figmu: https://www.figma.com/design/Mtsedc7KYgaIreFrquDKqu/bursagroh-team-library?node-id=3313-2&t=raORM9mkjraROVin-1
 
 ## Klíčové nápady
 - RPG
