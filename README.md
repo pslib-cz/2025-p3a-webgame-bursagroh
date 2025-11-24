@@ -9,14 +9,11 @@ Odkaz na figmu: https://www.figma.com/design/Mtsedc7KYgaIreFrquDKqu/bursagroh-te
 - Random generované opuštěné budovy (náhodný počet pater, náhodná mostra, náhodný loot)
 
 ## Centrální budovy
-- Centrální market = obchodování s ostatními hráči
 - Banka = uschovna peněz a věcí
 - Restaurace = vydělávání peněz pomocí minihry
 - Důl = dělání suroviny
 - Kovárna = místo na crafting itemů
 
-### Centrální market
-Místo kde hráč položí nabídku na prodej či nákup za určitou cenu. Ostatní hráči mohou nabídky příjmout a uskutečnit trade.
 
 ### Banka
 Uložiště pro peníze a věci, které se neztratí po smrti hráče.
@@ -49,9 +46,6 @@ Když se hráč pohne na políčko schody, tak se přesune do příslušného pa
 ### Gameplay v restauraci
 Minihra bude spočívat ve skládání burgerů - server vybere předgenerovaný burger z databáze a úkol hráče bude jej poskládat, za což bude odměněn. Nejlepší výsledky se budou ukládat a budou veřejně dostupné - nejlepší čas bude odměněn ještě lépe.
 Minihra bude moci být opakována do nekonečna - ze začátku totiž hra počítá, že hráč nemá žádné peníze nebo itemy - restaurace bude tedy první možnost si peníze vydělat.
-
-### Gameplay v centrálním marketu
-Jenom UI obchod, kde hráč může vystavit nabídku nebo poptávku. Dále hráč může vystavené nabídky příjmout.
 
 ### Gameplay v bance
 Jenom UI s inventářem hráče a banky. Hráč může libovolně přetahovat itemy, pokud se mu vejdou do inventáře.
