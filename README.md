@@ -1,6 +1,10 @@
 # 2025-p3a-webgame-bursagroh
 Odkaz na figmu: https://www.figma.com/design/Mtsedc7KYgaIreFrquDKqu/bursagroh-team-library?node-id=3313-2&t=raORM9mkjraROVin-1
 
+## Rozdělení
+Šimon Bursa - backend
+Filip Groh - frontend
+
 ## Klíčové nápady
 - RPG
 - 2D
