@@ -75,41 +75,49 @@ Když je hráč napaden objeví se timer kdy může hráč uhnout, blokovat nebo
 Když se hráč poprve napojí, tak obdrží nějaké ID, pak hráč bude hrát a měnit stav na serveru pod tímto ID. Hráč si toto ID může zobrazit a uložit. Ale když hráč načte toto ID, tak se jen zkopírují data uložená pod tímto ID do aktuálního ID. Tímto způsobem můžeme ukládat data na serveru, tak aby si je hráči nemohli upravovat a umožníme hráčům si ukládat herní stav bez nutnosti přihlášení. Také si více hráčů může načíst 1 ID a pokračovat ze stejnoho starting pointu.
 
 ## Endpointy (návrh)
-Save
+###Save
+
 GET api/Save/{PlayerId}
-	- SaveString
 	- vygeneruje nove PlayerId
-Load
+###Load
 POST api/Load/{SaveString}
 	- nacte data ze savestringu
 
-Player
+###Player
 GET api/Player/Generate
 	- PlayerId
 
 GET api/Player/{PlayerID}
+
 PUT api/Player/{PlayerID} - edit penez po minihre idk
 
-Bank
+###Bank
 GET api/Bank/{PlayerID}
+
 GET api/Bank/Item/{BankID}
 
-Building
+###Building
 GET api/Building/{PlayerID} 
+
 GET api/Building/Floor/{BuildingID}
 
-Blacksmith
+###Blacksmith
 GET api/Blacksmith/{PlayerID}
+
 GET api/Blacksmith/Player/{id}
+
 GET api/Blacksmith/Crafting/{id} 
 
-Recipe
+
+###Recipe
 GET api/Recipe/{id}
+
 GET api/Recipe/Ingredience
 
-Mine
+###Mine
 GET api/Mine/{MineID}
 	- vracet parametr depth range
+	
 GET api/Mine/{MineID}/Data
 
 
