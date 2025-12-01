@@ -3,6 +3,7 @@ Odkaz na figmu: https://www.figma.com/design/Mtsedc7KYgaIreFrquDKqu/bursagroh-te
 
 ## Rozdělení
 Šimon Bursa - backend
+
 Filip Groh - frontend
 
 ## Klíčové nápady
