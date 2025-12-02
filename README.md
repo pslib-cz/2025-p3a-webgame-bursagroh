@@ -78,33 +78,67 @@ Když se hráč poprve napojí, tak obdrží nějaké ID, pak hráč bude hrát 
 
 ### Save
 GET    api/Save/{PlayerId}  
-POST   api/Load/{SaveString}
+ - vrátí SaveString
 
+### Load
+POST   api/Load/{SaveString}
+ - Načte hráče pomocí SaveString
+ - Vygeneruje nové PlayerID
+	- jelikož hra nebude mít multiplayer, tak nemusíme pevně svázat hráče s PlayerID, z pohledu databáse bude jednodušší prostě "naklonovat" data do nového PlayerID, to znamená jeden save = jedno PlayerID
+	
 ### Player
 GET    api/Player/Generate  
+ - vrací PlayerID
 GET    api/Player/{PlayerID}  
-PUT    api/Player/{PlayerID}
+ - vrací data o hráči
+GET    api/Player/{PlayerID}/Inventory
+  - získá inventář hráče
+GET    api/Player/{PlayerID}/Inventory/{ItemID}
+ - získá informace o daném itemu
 
 ### Bank
 GET    api/Bank/{PlayerID}  
-GET    api/Bank/Item/{BankID}
+vrátí bank data
+GET    api/Bank/{PlayerID}/Item
+vrátí seznam itemů
+GET    api/Bank/{PlayerID}/Item/{ItemID}
+vrátí konkrétní data o itemu
 
 ### Building
 GET    api/Building/{PlayerID}  
-GET    api/Building/Floor/{BuildingID}
+vrací seznam budov pro daného hráče (aby každý hráč měl později jiné rozpoložení pater vevnitř + znal buildingID)
+GET    api/Building/{BuildingID}/Floor/{Level}
+generuje nové patro
+první patro 0 (?)
 
-### Blacksmith
-GET    api/Blacksmith/{PlayerID}  
-GET    api/Blacksmith/Player/{id}  
-GET    api/Blacksmith/Crafting/{id}
+### Blueprint
+GET    api/Blueprint
+vrátí seznam blueprintů
+GET    api/Blueprint/{BlueprintID}
+vrátí data o konkrétním blueprintu
+GET    api/Blueprint/{BlueprintID}/Crafting
+vrátí seznam věcí potřebných ke kraftění
 
 ### Recipe
+GET   api/Recipe
+vrátí seznam receptů
 GET    api/Recipe/{id}  
-GET    api/Recipe/Ingredience
+vrátí konkrétní informace o receptu
+GET    api/Recipe/{id}/Ingredience
+vrátí potřebné ingredience k receptu
+POST  api/Recipe/{id}/BestTime
+přepíše BestTime daného receptu (pokud je lepší)
+
 
 ### Mine
-GET    api/Mine/{MineID}  
-GET    api/Mine/{MineID}/Data
+GET    api/Mine/{PlayerID}  
+vygeneruje nový důl pokud neexistuje
+GET    api/Mine/{MineID}/Layer/{Depth}
+ - vrátí “layer” dolu (2d array mine blocků)
+
+### Enemy
+GET api/Enemy
+ - seznam enemáků
 
 
 
