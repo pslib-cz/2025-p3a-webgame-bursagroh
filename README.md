@@ -98,41 +98,41 @@ GET    api/Player/{PlayerID}/Inventory/{ItemID}
 
 ### Bank
 GET    api/Bank/{PlayerID}  
-vrátí bank data
+ - vrátí bank data
 GET    api/Bank/{PlayerID}/Item
-vrátí seznam itemů
+ - vrátí seznam itemů
 GET    api/Bank/{PlayerID}/Item/{ItemID}
-vrátí konkrétní data o itemu
+ - vrátí konkrétní data o itemu
 
 ### Building
 GET    api/Building/{PlayerID}  
-vrací seznam budov pro daného hráče (aby každý hráč měl později jiné rozpoložení pater vevnitř + znal buildingID)
+ - vrací seznam budov pro daného hráče (aby každý hráč měl později jiné rozpoložení pater vevnitř + znal buildingID)
 GET    api/Building/{BuildingID}/Floor/{Level}
-generuje nové patro
-první patro 0 (?)
+ - generuje nové patro
+ - první patro 0 (?)
 
 ### Blueprint
 GET    api/Blueprint
-vrátí seznam blueprintů
+ - vrátí seznam blueprintů
 GET    api/Blueprint/{BlueprintID}
-vrátí data o konkrétním blueprintu
+ - vrátí data o konkrétním blueprintu
 GET    api/Blueprint/{BlueprintID}/Crafting
-vrátí seznam věcí potřebných ke kraftění
+ - vrátí seznam věcí potřebných ke kraftění
 
 ### Recipe
 GET   api/Recipe
-vrátí seznam receptů
+ - vrátí seznam receptů
 GET    api/Recipe/{id}  
-vrátí konkrétní informace o receptu
+ - vrátí konkrétní informace o receptu
 GET    api/Recipe/{id}/Ingredience
-vrátí potřebné ingredience k receptu
+ - vrátí potřebné ingredience k receptu
 POST  api/Recipe/{id}/BestTime
-přepíše BestTime daného receptu (pokud je lepší)
+ - přepíše BestTime daného receptu (pokud je lepší)
 
 
 ### Mine
 GET    api/Mine/{PlayerID}  
-vygeneruje nový důl pokud neexistuje
+ - vygeneruje nový důl pokud neexistuje
 GET    api/Mine/{MineID}/Layer/{Depth}
  - vrátí “layer” dolu (2d array mine blocků)
 
