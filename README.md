@@ -126,8 +126,13 @@ GET    api/Recipe/{id}
  - vrátí konkrétní informace o receptu
 GET    api/Recipe/{id}/Ingredience
  - vrátí potřebné ingredience k receptu
-POST  api/Recipe/{id}/BestTime
- - přepíše BestTime daného receptu (pokud je lepší)
+POST  api/Recipe/{PlayerID}/Start
+ - start time co se tyce minihry (aby se to hur falsovalo)
+POST  api/Recipe/{PlayerID}/End
+ - vypocet (end - start)
+ - pokud lepsi jak besttime tak prepise
+ 
+
 
 
 ### Mine
