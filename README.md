@@ -1,5 +1,6 @@
 # 2025-p3a-webgame-bursagroh
 Odkaz na figmu: https://www.figma.com/design/Mtsedc7KYgaIreFrquDKqu/bursagroh-team-library?node-id=3313-2&t=raORM9mkjraROVin-1
+Odkaz na příběh: https://gemini.google.com/share/24ba23099813
 
 ## Rozdělení
 Šimon Bursa - backend
@@ -18,7 +19,6 @@ Filip Groh - frontend
 - Restaurace = vydělávání peněz pomocí minihry
 - Důl = dělání suroviny
 - Kovárna = místo na crafting itemů
-
 
 ### Banka
 Uložiště pro peníze a věci, které se neztratí po smrti hráče.
