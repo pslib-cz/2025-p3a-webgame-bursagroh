@@ -44,6 +44,36 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        [HttpGet("ScreenTypes")]
+        public ActionResult<IEnumerable<string>> GetScreenTypes()
+        {
+            string[] screenTypes = Enum.GetNames<ScreenTypes>();
+            return Ok(screenTypes);
+        }
+
+        [HttpPatch("{id}/move-screen")]
+        public async Task<ActionResult> MoveScreen(Guid id, [FromBody] ScreenTypes newScreenType)
+        {
+            Player? player = await context.Players.FindAsync(id);
+
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            if (player.ScreenType == newScreenType)
+            {
+                return Ok(player);
+            }
+
+            player.ScreenType = newScreenType;
+            await context.SaveChangesAsync();
+
+            return Ok(player);
+        }
+
+
+
         [HttpGet("{id}/Inventory")]
         public ActionResult<InventoryItem> GetPlayerInventory(Guid id)
         {
