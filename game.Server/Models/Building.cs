@@ -21,12 +21,10 @@ namespace game.Server.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int BuildingId { get; set; }
         public Guid PlayerId { get; set; }
-        public int PositionX { get; set; }
-        public int PositionY { get; set; }
         public BuildingTypes BuildingType { get; set; }
-        public int Height { get; set; }
-        public int ReachedHeight { get; set; }
-        public bool IsBossDefeated { get; set; } = false;
+        public int? Height { get; set; }
+        public int? ReachedHeight { get; set; }
+        public bool? IsBossDefeated { get; set; } = false;
 
         public Player Player = null!;
     }

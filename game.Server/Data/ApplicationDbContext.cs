@@ -11,6 +11,8 @@ namespace game.Server.Data
     {
         public DbSet<Player> Players { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<Building> Buildings { get; set; }
+
         public DbSet<ItemInstance> ItemInstances { get; set; }
 
         public DbSet<InventoryItem> InventoryItems { get; set; }

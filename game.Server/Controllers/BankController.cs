@@ -28,5 +28,9 @@ namespace game.Server.Controllers
             List<InventoryItem> items = bankItems.ToList();
             return Ok(items);
         }
+
+
+
+
     }
 }

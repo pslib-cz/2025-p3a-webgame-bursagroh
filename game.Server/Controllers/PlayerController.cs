@@ -25,6 +25,18 @@ namespace game.Server.Controllers
             };
 
             context.Players.Add(player);
+
+            Building building = new Building
+            {
+                PlayerId = player.PlayerId,
+                PositionX = 0,
+                PositionY = 0,
+                BuildingType = BuildingTypes.Road
+            };
+
+            context.Buildings.Add(building);
+
+
             await context.SaveChangesAsync();
 
             context.SaveChanges();
@@ -51,7 +63,7 @@ namespace game.Server.Controllers
             return Ok(screenTypes);
         }
 
-        [HttpPatch("{id}/move-screen")]
+        [HttpPatch("{id}/Action/move-screen")]
         public async Task<ActionResult> MoveScreen(Guid id, [FromBody] ScreenTypes newScreenType)
         {
             Player? player = await context.Players.FindAsync(id);
@@ -72,7 +84,22 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        [HttpPatch("{id}/Action/move")]
+        public async Task<ActionResult> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
+        {
+            Player? player = await context.Players.FindAsync(id);
 
+            if (player == null)
+            {
+                return NotFound();
+            }
+
+            player.PositionX = request.NewPositionX;
+            player.PositionY = request.NewPositionY;
+
+            await context.SaveChangesAsync();
+            return Ok(player);
+        }
 
         [HttpGet("{id}/Inventory")]
         public ActionResult<InventoryItem> GetPlayerInventory(Guid id)
