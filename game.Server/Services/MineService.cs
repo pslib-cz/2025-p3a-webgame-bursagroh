@@ -1,5 +1,6 @@
 using game.Server.Data;
 using game.Server.Models;
+// Important: Include the DTO namespace
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
@@ -7,40 +8,50 @@ namespace game.Server.Services
     public class MineService
     {
         private readonly ApplicationDbContext _context;
-        private const int LayerSize = 20; // Define the size of your 1D block array
+        private const int LayerSize = 8;
 
         public MineService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<MineBlock>> GetOrGenerateLayerBlocksAsync(int mineId, int depth)
+        public async Task<List<BlockDTO>> GetOrGenerateLayerBlocksAsync(int mineId, int depth)
         {
-            // 1. Try to find the existing layer
             var existingLayer = await _context.MineLayers
                 .Where(ml => ml.MineId == mineId && ml.Depth == depth)
                 .Include(ml => ml.MineBlocks)
-                .ThenInclude(mb => mb.Block) // Include the Block definition for the data
+                    .ThenInclude(mb => mb.Block)
                 .FirstOrDefaultAsync();
 
-            // 2. If layer and blocks exist, return them immediately
             if (existingLayer != null && existingLayer.MineBlocks.Any())
             {
-                // Ensure the blocks are sorted by Index to represent the 1D array
-                return existingLayer.MineBlocks.OrderBy(mb => mb.Index).ToList();
+                return existingLayer.MineBlocks
+                    .OrderBy(mb => mb.Index)
+                    .Select(mb => new BlockDTO
+                    {
+                        BlockId = mb.Block.BlockId,
+                        BlockType = mb.Block.BlockType.ToString(),
+                        ItemId = mb.Block.ItemId,
+                        MinAmount = mb.Block.MinAmount,
+                        MaxAmount = mb.Block.MaxAmount
+                    })
+                    .ToList();
             }
 
-            // 3. If layer exists but has no blocks, or if the layer doesn't exist, generate a new layer and blocks
+
+            var mineExists = await _context.Mines.AnyAsync(m => m.MineId == mineId);
+            if (!mineExists)
+            {
+                return Exception("lol");
+            }
 
             MineLayer layer;
             if (existingLayer != null)
             {
-                // Layer exists, but blocks don't (shouldn't happen, but good check)
                 layer = existingLayer;
             }
             else
             {
-                // Layer does not exist, create a new one
                 layer = new MineLayer
                 {
                     MineId = mineId,
@@ -50,35 +61,39 @@ namespace game.Server.Services
                 _context.MineLayers.Add(layer);
             }
 
-            // Get all Block definitions for generation (assuming IDs 1 and 2 exist from seed)
             var availableBlocks = await _context.Blocks.ToListAsync();
 
             if (!availableBlocks.Any())
             {
-                throw new InvalidOperationException("No Block definitions found to generate a layer.");
+                throw new Exception("Lol");
             }
 
-            // Generate the 1D array of blocks
             var random = new Random();
+            var generatedBlockDTOs = new List<BlockDTO>();
+
             for (int i = 0; i < LayerSize; i++)
             {
-                // Simple generation: pick a Block definition randomly
                 var blockDefinition = availableBlocks[random.Next(availableBlocks.Count)];
 
                 var mineBlock = new MineBlock
                 {
-                    MineLayer = layer, // Link back to the new layer instance
+                    MineLayer = layer,
                     BlockId = blockDefinition.BlockId,
-                    Index = i // The position in the 1D array
+                    Index = i
                 };
                 layer.MineBlocks.Add(mineBlock);
+                generatedBlockDTOs.Add(new BlockDTO
+                {
+                    BlockId = blockDefinition.BlockId,
+                    BlockType = blockDefinition.BlockType.ToString(),
+                    ItemId = blockDefinition.ItemId,
+                    MinAmount = blockDefinition.MinAmount,
+                    MaxAmount = blockDefinition.MaxAmount
+                });
             }
-
-            // Save the newly generated layer and blocks to the database
             await _context.SaveChangesAsync();
 
-            // Return the newly generated blocks
-            return layer.MineBlocks.OrderBy(mb => mb.Index).ToList();
+            return generatedBlockDTOs;
         }
     }
 }

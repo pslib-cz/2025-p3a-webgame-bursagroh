@@ -22,36 +22,39 @@ namespace game.Server.Controllers
         /// </summary>
         /// <param name="mineId">The ID of the Mine instance.</param>
         /// <param name="depth">The depth of the layer to retrieve/generate.</param>
-        /// <returns>A 1D array (List) of MineBlock instances.</returns>
+        /// <returns>A 1D array (List) of BlockDTOs, length 8.</returns>
         [HttpGet("layer/{mineId}/{depth}")]
         public async Task<IActionResult> GetLayerBlocks(int mineId, int depth)
         {
             if (mineId <= 0 || depth < 0)
             {
-                return BadRequest("Invalid Mine ID or Depth.");
+                return BadRequest("Invalid Mine ID or Depth. Both must be non-negative.");
             }
 
             try
             {
+                // The service returns the list of DTOs
                 var blocks = await _mineService.GetOrGenerateLayerBlocksAsync(mineId, depth);
 
-                // You might want to return a DTO instead of the full entity,
-                // but for simplicity, we return the generated list.
+                // Returns 200 OK with the List<BlockDTO>
                 return Ok(blocks);
             }
             catch (InvalidOperationException ex)
             {
-                return StatusCode(500, ex.Message);
+                // Typically used for business logic errors like "Mine does not exist"
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while processing the request: " + ex.Message);
+                // Catch all other unexpected errors
+                return StatusCode(500, "An internal server error occurred: " + ex.Message);
             }
         }
 
         [HttpGet("test")]
-        public async Task<IActionResult> Get(int mineId, int depth)
+        public IActionResult GetTestEndpoint()
         {
+            // Removed parameters since they were unused in the original Get() signature
             return Ok(context.Mines.ToArray());
         }
     }
