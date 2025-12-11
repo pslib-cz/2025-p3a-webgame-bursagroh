@@ -1,6 +1,5 @@
 using game.Server.Data;
 using game.Server.Models;
-// Important: Include the DTO namespace
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services

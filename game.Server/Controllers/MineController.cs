@@ -19,7 +19,7 @@ namespace game.Server.Controllers
             this.context = context;
         }
 
-        [HttpGet("layer/{mineId}/{depth}")]
+        [HttpGet("/{mineId}/Layer/{depth}")]
         public async Task<IActionResult> GetLayerBlocks(int mineId, int depth)
         {
             if (mineId <= 0 || depth < 0)
@@ -35,10 +35,6 @@ namespace game.Server.Controllers
             catch (InvalidOperationException ex)
             {
                 return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "An internal server error occurred: " + ex.Message);
             }
         }
 

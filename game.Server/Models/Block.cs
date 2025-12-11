@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace game.Server.Models
 {
-    // Placeholder for the BlockType enum
     public enum BlockType
     {
         Empty,
@@ -17,7 +16,6 @@ namespace game.Server.Models
 
     }
 
-    // The Block entity
     public class Block
     {
         [Key]

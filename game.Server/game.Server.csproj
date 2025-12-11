@@ -10,9 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\**" />
     <Compile Remove="NewFolder\**" />
+    <Content Remove="DTOs\**" />
     <Content Remove="NewFolder\**" />
+    <EmbeddedResource Remove="DTOs\**" />
     <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="DTOs\**" />
     <None Remove="NewFolder\**" />
   </ItemGroup>
 
@@ -37,7 +41,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
     <Folder Include="Migrations\" />
   </ItemGroup>
 
