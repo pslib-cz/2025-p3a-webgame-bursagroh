@@ -1,4 +1,5 @@
 using game.Server.Data;
+using game.Server.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -15,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+builder.Services.AddScoped<MineService>();
 
 var app = builder.Build();
 

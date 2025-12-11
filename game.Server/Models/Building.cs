@@ -20,6 +20,8 @@ namespace game.Server.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int BuildingId { get; set; }
+        public int PositionX { get; set; }
+        public int PositionY { get; set; }
         public Guid PlayerId { get; set; }
         public BuildingTypes BuildingType { get; set; }
         public int? Height { get; set; }

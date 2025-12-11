@@ -3,18 +3,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace game.Server.Models
 {
-    public class InventoryItem
+    public class Mine
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int InventoryItemId { get; set; }
-
+        public int MineId { get; set; }
         public Guid PlayerId { get; set; }
 
-        public int ItemInstanceId { get; set; }
-
-        public bool IsInBank { get; set; } = false;
-
-        public Player Player { get; set; } = null!;
+        public ICollection<MineLayer> MineLayers { get; set; } = new List<MineLayer>();
     }
 }
