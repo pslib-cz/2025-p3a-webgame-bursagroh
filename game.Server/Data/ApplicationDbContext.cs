@@ -74,16 +74,13 @@ namespace game.Server.Data
                 });
             });
 
-            // You need to add seeding for the Items that your Blocks reference.
             modelBuilder.Entity<Item>().HasData(
-                // Assuming you have an 'Item' model with properties like ItemId and Name
-                new Item { ItemId = 101, Name = "Stone Resource" },
-                new Item { ItemId = 202, Name = "Ore Resource" }
+                new Item { ItemId = 1, Name = "Stone" },
+                new Item { ItemId = 2, Name = "Iron Ore" }
             );
-            // --- Block Seeding comes after this ---
             modelBuilder.Entity<Block>().HasData(
-                new Block { BlockId = 1, BlockType = BlockType.Stone, ItemId = 101, MinAmount = 1, MaxAmount = 3 },
-                new Block { BlockId = 2, BlockType = BlockType.Ore, ItemId = 202, MinAmount = 1, MaxAmount = 1 }
+                new Block { BlockId = 1, BlockType = BlockType.Rock, ItemId = 1, MinAmount = 1, MaxAmount = 3 },
+                new Block { BlockId = 2, BlockType = BlockType.Iron_Ore, ItemId = 2, MinAmount = 1, MaxAmount = 1 }
             );
         }
 

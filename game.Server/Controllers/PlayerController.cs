@@ -16,12 +16,13 @@ namespace game.Server.Controllers
         }
 
         [HttpPost("Generate")]
-        public async Task<Player> Generate([FromBody] string name)
+        public async Task<Player> Generate([FromBody] GeneratePlayerRequest name)
         {
             Player player = new Player { 
                 PlayerId = Guid.NewGuid(), 
-                Name = name, 
-                Seed = new Random().Next() 
+                Name = name.Name, 
+                Seed = new Random().Next(),
+                ScreenType = ScreenTypes.City
             };
 
             context.Players.Add(player);
@@ -36,7 +37,7 @@ namespace game.Server.Controllers
 
             context.Buildings.Add(building);
 
-
+        
             await context.SaveChangesAsync();
 
             context.SaveChanges();
@@ -64,7 +65,7 @@ namespace game.Server.Controllers
         }
 
         [HttpPatch("{id}/Action/move-screen")]
-        public async Task<ActionResult> MoveScreen(Guid id, [FromBody] ScreenTypes newScreenType)
+        public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest newScreenType)
         {
             Player? player = await context.Players.FindAsync(id);
 
@@ -73,12 +74,12 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-            if (player.ScreenType == newScreenType)
+            if (player.ScreenType == newScreenType.NewScreenType)
             {
                 return Ok(player);
             }
 
-            player.ScreenType = newScreenType;
+            player.ScreenType = newScreenType.NewScreenType;
             await context.SaveChangesAsync();
 
             return Ok(player);

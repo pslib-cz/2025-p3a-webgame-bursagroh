@@ -6,9 +6,15 @@ namespace game.Server.Models
     // Placeholder for the BlockType enum
     public enum BlockType
     {
-        Ore,
-        Stone,
-        Wood
+        Empty,
+        Rock,
+        Wooden_Frame,
+        Iron_Ore,
+        Copper_Ore,
+        Silver_Ore,
+        Gold_Ore,
+        Unobtanium_Ore
+
     }
 
     // The Block entity
@@ -23,6 +29,8 @@ namespace game.Server.Models
 
         [ForeignKey("ItemId")]
         public Item Item { get; set; } = null!;
+
+        public int changeOfGenerating = 1;
 
         public int MinAmount { get; set; }
         public int MaxAmount { get; set; }

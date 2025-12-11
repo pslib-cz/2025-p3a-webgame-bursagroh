@@ -42,7 +42,7 @@ namespace game.Server.Services
             var mineExists = await _context.Mines.AnyAsync(m => m.MineId == mineId);
             if (!mineExists)
             {
-                return Exception("lol");
+                throw new Exception("Lol");
             }
 
             MineLayer layer;
