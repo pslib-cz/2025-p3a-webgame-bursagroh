@@ -14,34 +14,24 @@ namespace game.Server.Services
             _context = context;
         }
 
-        public async Task<List<BlockDTO>> GetOrGenerateLayerBlocksAsync(int mineId, int depth)
+        public async Task<List<MineBlock>> GetOrGenerateLayerBlocksAsync(int mineId, int depth)
         {
             var existingLayer = await _context.MineLayers
                 .Where(ml => ml.MineId == mineId && ml.Depth == depth)
-                .Include(ml => ml.MineBlocks)
-                    .ThenInclude(mb => mb.Block)
+                .Include(ml => ml.MineBlocks).ThenInclude(mb => mb.Block) 
                 .FirstOrDefaultAsync();
 
             if (existingLayer != null && existingLayer.MineBlocks.Any())
             {
                 return existingLayer.MineBlocks
                     .OrderBy(mb => mb.Index)
-                    .Select(mb => new BlockDTO
-                    {
-                        BlockId = mb.Block.BlockId,
-                        BlockType = mb.Block.BlockType.ToString(),
-                        ItemId = mb.Block.ItemId,
-                        MinAmount = mb.Block.MinAmount,
-                        MaxAmount = mb.Block.MaxAmount
-                    })
-                    .ToList();
+                    .ToList(); 
             }
-
 
             var mineExists = await _context.Mines.AnyAsync(m => m.MineId == mineId);
             if (!mineExists)
             {
-                throw new Exception("Lol");
+                throw new InvalidOperationException("");
             }
 
             MineLayer layer;
@@ -64,11 +54,11 @@ namespace game.Server.Services
 
             if (!availableBlocks.Any())
             {
-                throw new Exception("Lol");
+                throw new InvalidOperationException("");
             }
 
             var random = new Random();
-            var generatedBlockDTOs = new List<BlockDTO>();
+            var generatedMineBlocks = new List<MineBlock>();
 
             for (int i = 0; i < LayerSize; i++)
             {
@@ -78,21 +68,16 @@ namespace game.Server.Services
                 {
                     MineLayer = layer,
                     BlockId = blockDefinition.BlockId,
+                    Block = blockDefinition,
                     Index = i
                 };
                 layer.MineBlocks.Add(mineBlock);
-                generatedBlockDTOs.Add(new BlockDTO
-                {
-                    BlockId = blockDefinition.BlockId,
-                    BlockType = blockDefinition.BlockType.ToString(),
-                    ItemId = blockDefinition.ItemId,
-                    MinAmount = blockDefinition.MinAmount,
-                    MaxAmount = blockDefinition.MaxAmount
-                });
-            }
-            await _context.SaveChangesAsync();
 
-            return generatedBlockDTOs;
+                generatedMineBlocks.Add(mineBlock);
+            }
+
+            await _context.SaveChangesAsync();
+            return generatedMineBlocks;
         }
     }
 }

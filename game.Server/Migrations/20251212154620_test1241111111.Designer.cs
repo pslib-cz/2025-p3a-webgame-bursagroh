@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using game.Server.Data;
 
@@ -10,9 +11,11 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251212154620_test1241111111")]
+    partial class test1241111111
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.1");
@@ -55,38 +58,6 @@ namespace game.Server.Migrations
                             BlockId = 2,
                             BlockType = 3,
                             ItemId = 2,
-                            MaxAmount = 1,
-                            MinAmount = 1
-                        },
-                        new
-                        {
-                            BlockId = 3,
-                            BlockType = 4,
-                            ItemId = 3,
-                            MaxAmount = 1,
-                            MinAmount = 1
-                        },
-                        new
-                        {
-                            BlockId = 4,
-                            BlockType = 5,
-                            ItemId = 4,
-                            MaxAmount = 1,
-                            MinAmount = 1
-                        },
-                        new
-                        {
-                            BlockId = 5,
-                            BlockType = 6,
-                            ItemId = 5,
-                            MaxAmount = 1,
-                            MinAmount = 1
-                        },
-                        new
-                        {
-                            BlockId = 6,
-                            BlockType = 7,
-                            ItemId = 6,
                             MaxAmount = 1,
                             MinAmount = 1
                         });
@@ -214,6 +185,8 @@ namespace game.Server.Migrations
 
                     b.HasKey("InventoryItemId");
 
+                    b.HasIndex("PlayerId");
+
                     b.ToTable("InventoryItems");
 
                     b.HasData(
@@ -267,7 +240,7 @@ namespace game.Server.Migrations
                             Damage = 0,
                             ItemType = 0,
                             MaxDurability = 0,
-                            Name = "Rock",
+                            Name = "Stone",
                             Weight = 0
                         },
                         new
@@ -277,42 +250,6 @@ namespace game.Server.Migrations
                             ItemType = 0,
                             MaxDurability = 0,
                             Name = "Iron Ore",
-                            Weight = 0
-                        },
-                        new
-                        {
-                            ItemId = 3,
-                            Damage = 0,
-                            ItemType = 0,
-                            MaxDurability = 0,
-                            Name = "Copper Ore",
-                            Weight = 0
-                        },
-                        new
-                        {
-                            ItemId = 4,
-                            Damage = 0,
-                            ItemType = 0,
-                            MaxDurability = 0,
-                            Name = "Silver Ore",
-                            Weight = 0
-                        },
-                        new
-                        {
-                            ItemId = 5,
-                            Damage = 0,
-                            ItemType = 0,
-                            MaxDurability = 0,
-                            Name = "Gold Ore",
-                            Weight = 0
-                        },
-                        new
-                        {
-                            ItemId = 6,
-                            Damage = 0,
-                            ItemType = 0,
-                            MaxDurability = 0,
-                            Name = "Unobtainium Ore",
                             Weight = 0
                         });
                 });
@@ -483,6 +420,17 @@ namespace game.Server.Migrations
                     b.Navigation("Floor");
                 });
 
+            modelBuilder.Entity("game.Server.Models.InventoryItem", b =>
+                {
+                    b.HasOne("game.Server.Models.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Player");
+                });
+
             modelBuilder.Entity("game.Server.Models.Item", b =>
                 {
                     b.HasOne("game.Server.Models.ItemInstance", null)
@@ -493,7 +441,7 @@ namespace game.Server.Migrations
             modelBuilder.Entity("game.Server.Models.MineBlock", b =>
                 {
                     b.HasOne("game.Server.Models.Block", "Block")
-                        .WithMany()
+                        .WithMany("MineBlocks")
                         .HasForeignKey("BlockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -518,6 +466,11 @@ namespace game.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Mine");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Block", b =>
+                {
+                    b.Navigation("MineBlocks");
                 });
 
             modelBuilder.Entity("game.Server.Models.Building", b =>

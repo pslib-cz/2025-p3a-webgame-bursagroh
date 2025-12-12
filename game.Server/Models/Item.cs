@@ -21,6 +21,6 @@ namespace game.Server.Models
         public int Weight { get; set; }
         public int Damage { get; set; }
         public int MaxDurability { get; set; }
-        public ICollection<Item>? Items { get; set; }
+
     }
 }

@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
-using game.Server.Models;
 using game.Server.Data;
+using game.Server.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Controllers
 {
@@ -16,34 +17,59 @@ namespace game.Server.Controllers
         }
 
         [HttpPost("Generate")]
-        public async Task<Player> Generate([FromBody] GeneratePlayerRequest name)
+        public async Task<Player> Generate([FromBody] GeneratePlayerRequest request)
         {
-            Player player = new Player { 
-                PlayerId = Guid.NewGuid(), 
-                Name = name.Name, 
-                Seed = new Random().Next(),
-                ScreenType = ScreenTypes.City
+            Player player = new Player
+            {
+                PlayerId = Guid.NewGuid(),
+                Name = request.Name,
+                ScreenType = ScreenTypes.City,
+                Money = 0,
+                BankBalance = 0,
+                Capacity = 10,
+                Seed = new Random().Next()
             };
-
-            context.Players.Add(player);
 
             Building building = new Building
             {
                 PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
                 PositionX = 0,
                 PositionY = 0,
-                BuildingType = BuildingTypes.Road
+                IsBossDefeated = false
             };
 
+            context.Players.Add(player);
             context.Buildings.Add(building);
-
-        
             await context.SaveChangesAsync();
 
-            context.SaveChanges();
+            Floor floor = new Floor
+            {
+                BuildingId = building.BuildingId, 
+                Level = 1
+            };
+
+            context.Floors.Add(floor);
+            await context.SaveChangesAsync();
+
+            FloorItem floorItem = new FloorItem
+            {
+                FloorId = floor.FloorId,
+                PositionX = 0,
+                PositionY = 0,
+                FloorItemType = FloorItemType.Player
+            };
+
+            context.FloorItems.Add(floorItem);
+            await context.SaveChangesAsync();
+
+            player.BuildingId = building.BuildingId;
+            player.FloorItemId = floorItem.FloorItemId;
+
+            context.Players.Update(player);
+            await context.SaveChangesAsync();
 
             return player;
-
         }
 
         [HttpGet("{id}")]
@@ -95,8 +121,28 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-            player.PositionX = request.NewPositionX;
-            player.PositionY = request.NewPositionY;
+            FloorItem? currentPositionItem = await context.FloorItems.Where(fi => fi.FloorItemId == player.FloorItemId).FirstOrDefaultAsync();
+
+            if (currentPositionItem == null)
+            {
+                return NotFound();
+            }
+
+            if (currentPositionItem.PositionX == request.NewPositionX && currentPositionItem.PositionY == request.NewPositionY)
+            {
+                return Ok(currentPositionItem);
+            }
+
+            bool isAdjacent = (Math.Abs(request.NewPositionX - currentPositionItem.PositionX) +
+                       Math.Abs(request.NewPositionY - currentPositionItem.PositionY)) == 1; //ukradeno
+
+            if (!isAdjacent)
+            {
+                return BadRequest("move > 1");
+            }
+
+            currentPositionItem.PositionX = request.NewPositionX;
+            currentPositionItem.PositionY = request.NewPositionY;
 
             await context.SaveChangesAsync();
             return Ok(player);
