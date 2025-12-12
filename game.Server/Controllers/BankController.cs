@@ -64,7 +64,6 @@ namespace game.Server.Controllers
         [HttpPatch("{id}/Action/move")] 
         public async Task<IActionResult> MoveInventoryItem(Guid id, [FromBody] MoveInventoryItemRequest request)
         {
-            // 1. Validate Request
             if (request.InventoryItemId <= 0)
             {
                 return BadRequest();
