@@ -61,43 +61,32 @@ namespace game.Server.Controllers
             return Ok(player.BankBalance);
         }
 
-        [HttpPatch("{id}/Action/move")] // {id} represents the PlayerId
+        [HttpPatch("{id}/Action/move")] 
         public async Task<IActionResult> MoveInventoryItem(Guid id, [FromBody] MoveInventoryItemRequest request)
         {
             // 1. Validate Request
             if (request.InventoryItemId <= 0)
             {
-                return BadRequest("Invalid InventoryItemId specified.");
+                return BadRequest();
             }
 
-            // 2. Find the Inventory Item and Check Ownership
-            // Use SingleOrDefaultAsync to find the specific item.
             InventoryItem? item = await context.InventoryItems
                 .Where(i => i.InventoryItemId == request.InventoryItemId)
                 .SingleOrDefaultAsync();
 
             if (item == null)
             {
-                return NotFound($"Inventory item with ID {request.InventoryItemId} not found.");
+                return NotFound();
             }
 
-            // Crucial security check: Ensure the item belongs to the player making the request
             if (item.PlayerId != id)
             {
-                // Return 403 Forbidden or 404 NotFound to prevent enumeration attacks
                 return Forbid();
             }
 
-            // 3. Perform the Toggle (NOT operation)
-            // Toggling the IsInBank status moves it to the other location.
             item.IsInBank = !item.IsInBank;
 
-            // 4. Save Changes
-            // EF Core is tracking the 'item', so saving changes persists the toggle.
             await context.SaveChangesAsync();
-
-            // 5. Return Success
-            // Return the updated item to show its new status and location.
             return Ok(item);
         }
     }
