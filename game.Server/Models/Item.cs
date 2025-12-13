@@ -7,7 +7,9 @@ namespace game.Server.Models
     {
         Sword,
         Axe,
-        Healing_Potion
+        Pickaxe,
+        Potion,
+        Block
     }
 
     public class Item
@@ -21,6 +23,7 @@ namespace game.Server.Models
         public int Weight { get; set; }
         public int Damage { get; set; }
         public int MaxDurability { get; set; }
+        public int ChangeOfGenerating { get; set; }
 
     }
 }

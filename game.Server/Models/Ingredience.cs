@@ -12,7 +12,8 @@ namespace game.Server.Models
         BunDown,
         Tomato,
         Sauce,
-        Bacon
+        Bacon,
+        Cheese
     }
 
     public class Ingredience
