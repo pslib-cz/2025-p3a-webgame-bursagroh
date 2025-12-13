@@ -2,6 +2,7 @@
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace game.Server.Controllers
 {
@@ -111,6 +112,9 @@ namespace game.Server.Controllers
             await context.SaveChangesAsync();
 
             TimeSpan duration = activeRecipeTime.EndTime - activeRecipeTime.StartTime;
+
+            Player? player = await context.Players.FindAsync(request.PlayerId);
+            player.Money += 20;
 
             return Ok(new 
             { 

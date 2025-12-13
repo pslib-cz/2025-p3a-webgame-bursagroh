@@ -33,7 +33,7 @@ namespace game.Server.Controllers
             Building building = new Building
             {
                 PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
+                BuildingType = BuildingTypes.City,
                 PositionX = 0,
                 PositionY = 0,
                 IsBossDefeated = false
@@ -74,7 +74,7 @@ namespace game.Server.Controllers
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Player>> GetPlayer(Guid id) {
-            Player? player = await context.Players.FindAsync(id);
+            Player? player = await context.Players .Include(p => p.FloorItem).FirstOrDefaultAsync(p => p.PlayerId == id);
 
             if (player == null) {
                 return NotFound();
@@ -90,7 +90,7 @@ namespace game.Server.Controllers
             return Ok(screenTypes);
         }
 
-        [HttpPatch("{id}/Action/move-screen")]
+        [HttpPatch("{id}/Action/move-screen")] //asi hodim do services
         public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest newScreenType)
         {
             Player? player = await context.Players.FindAsync(id);
@@ -100,8 +100,101 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-            if (player.ScreenType == newScreenType.NewScreenType)
+            bool screenTypeIsChanging = player.ScreenType != newScreenType.NewScreenType;
+
+            if (newScreenType.NewScreenType == ScreenTypes.Mine)
             {
+                Building? mineBuilding = await context.Buildings
+                    .Where(b => b.PlayerId == player.PlayerId && b.BuildingType == BuildingTypes.Mine)
+                    .FirstOrDefaultAsync();
+
+                if (mineBuilding == null)
+                {
+                    mineBuilding = new Building
+                    {
+                        PlayerId = player.PlayerId,
+                        BuildingType = BuildingTypes.Mine,
+                        PositionX = 0, //jelikoz jeste nemam udelanou generaci mapy tak je vse na 0,0, sorry jako
+                        PositionY = 0
+                    };
+                    context.Buildings.Add(mineBuilding);
+                    await context.SaveChangesAsync();
+                }
+
+                Floor? floor = await context.Floors
+                    .Where(f => f.BuildingId == mineBuilding.BuildingId && f.Level == 1)
+                    .FirstOrDefaultAsync();
+
+                if (floor == null)
+                {
+                    floor = new Floor { BuildingId = mineBuilding.BuildingId, Level = 1 };
+                    context.Floors.Add(floor);
+                    await context.SaveChangesAsync();
+                }
+
+                FloorItem? playerFloorItem = await context.FloorItems
+                    .Where(fi => fi.FloorId == floor.FloorId && fi.FloorItemType == FloorItemType.Player)
+                    .FirstOrDefaultAsync();
+
+                if (playerFloorItem == null)
+                {
+                    playerFloorItem = new FloorItem
+                    {
+                        FloorId = floor.FloorId,
+                        PositionX = 0,
+                        PositionY = 0,
+                        FloorItemType = FloorItemType.Player
+                    };
+                    context.FloorItems.Add(playerFloorItem);
+                    await context.SaveChangesAsync();
+                }
+
+                player.BuildingId = mineBuilding.BuildingId;
+                player.FloorItemId = playerFloorItem.FloorItemId; 
+                player.ScreenType = ScreenTypes.Mine;
+
+                await context.SaveChangesAsync();
+                return Ok(player);
+            }
+
+            if (newScreenType.NewScreenType == ScreenTypes.City)
+            {
+                Building? cityBuilding = await context.Buildings
+                    .Where(b => b.PlayerId == player.PlayerId && b.BuildingType == BuildingTypes.City)
+                    .FirstOrDefaultAsync();
+
+                Floor? floor = await context.Floors
+                    .Where(f => f.BuildingId == cityBuilding.BuildingId && f.Level == 1)
+                    .FirstOrDefaultAsync();
+
+                if (floor == null)
+                {
+                    floor = new Floor { BuildingId = cityBuilding.BuildingId, Level = 1 };
+                    context.Floors.Add(floor);
+                    await context.SaveChangesAsync();
+                }
+                FloorItem? playerFloorItem = await context.FloorItems
+                    .Where(fi => fi.FloorId == floor.FloorId && fi.FloorItemType == FloorItemType.Player)
+                    .FirstOrDefaultAsync();
+
+                if (playerFloorItem == null)
+                {
+                    playerFloorItem = new FloorItem
+                    {
+                        FloorId = floor.FloorId,
+                        PositionX = 0,
+                        PositionY = 0,
+                        FloorItemType = FloorItemType.Player
+                    };
+                    context.FloorItems.Add(playerFloorItem);
+                    await context.SaveChangesAsync();
+                }
+
+                player.BuildingId = cityBuilding.BuildingId; 
+                player.FloorItemId = playerFloorItem.FloorItemId;
+                player.ScreenType = ScreenTypes.City;
+
+                await context.SaveChangesAsync();
                 return Ok(player);
             }
 

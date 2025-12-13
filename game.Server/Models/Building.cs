@@ -7,7 +7,7 @@ namespace game.Server.Models
     public enum BuildingTypes
     {
         Fountain,
-        Road,
+        City,
         Bank,
         Restaurant,
         Mine,

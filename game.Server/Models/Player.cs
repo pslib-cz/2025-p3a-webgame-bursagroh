@@ -23,6 +23,7 @@ namespace game.Server.Models
         public int Money { get; set; }
         [JsonIgnore]
         public int BankBalance { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ScreenTypes ScreenType { get; set; } = ScreenTypes.City;
         public int? BuildingId { get; set; }
         //[ForeignKey("BuildingId")]
