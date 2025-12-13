@@ -1,4 +1,4 @@
-﻿using game.Server.Data; // Předpoklad pro GameContext
+﻿using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +13,6 @@ namespace game.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        // Konstruktor pro Dependency Injection
         public BuildingController(ApplicationDbContext context)
         {
             _context = context;
@@ -33,7 +32,7 @@ namespace game.Server.Controllers
 
             if (buildings == null || buildings.Count == 0)
             {
-                return NotFound($"Pro hráče s ID: {playerId} nebyly nalezeny žádné budovy.");
+                return NotFound();
             }
 
             return Ok(buildings);

@@ -12,27 +12,19 @@ namespace game.Server.Data
         public DbSet<Player> Players { get; set; }
         public DbSet<Item> Items { get; set; }
         public DbSet<Building> Buildings { get; set; }
-
-
-
         public DbSet<ItemInstance> ItemInstances { get; set; }
-
         public DbSet<InventoryItem> InventoryItems { get; set; }
-
         public DbSet<Mine> Mines { get; set; }
         public DbSet<MineLayer> MineLayers { get; set; }
         public DbSet<MineBlock> MineBlocks { get; set; }
         public DbSet<Block> Blocks { get; set; }
-
         public DbSet<Floor> Floors { get; set; }
-
         public DbSet<FloorItem> FloorItems { get; set; }
-
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<Ingredience> Ingrediences { get; set; }
-
         public DbSet<RecipeTime> RecipeTimes { get; set; }
-
+        public DbSet<Blueprint> Blueprints { get; set; }
+        public DbSet<Crafting> Craftings { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -83,17 +75,10 @@ namespace game.Server.Data
                 });
             });
 
+                    
 
-            modelBuilder.Entity<InventoryItem>(entity =>
-            {
-                entity.HasData(new InventoryItem
-                {
-                    InventoryItemId = 52,
-                    PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
-                    IsInBank = true,
-                    ItemInstanceId = 85
-                });
-            });
+
+            
 
             modelBuilder.Entity<Mine>(entity =>
             {
@@ -262,6 +247,20 @@ namespace game.Server.Data
                 new Block { BlockId = 6, BlockType = BlockType.Gold_Ore,       ItemId = 6, MinAmount = 1, MaxAmount = 1 },
                 new Block { BlockId = 7, BlockType = BlockType.Unobtanium_Ore, ItemId = 7, MinAmount = 1, MaxAmount = 1 }
             );
+
+            modelBuilder.Entity<Blueprint>(entity =>
+            {
+                entity.HasData(
+                    new Blueprint { BlueprintId = 1, ItemId = 10, Price = 5 }
+                );
+            });
+
+            modelBuilder.Entity<Crafting>(entity =>
+            {
+                entity.HasData(
+                    new Crafting { CraftingId = 1, BlueprintId = 1, ItemId = 1, Amount = 3 }
+                );
+            });
         }   
     }
 }

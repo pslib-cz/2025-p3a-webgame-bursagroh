@@ -11,8 +11,6 @@ namespace game.Server.Models
         public int ItemId { get; set; }
         public int Amount { get; set; }
 
-        public Blueprint Blueprint { get; set; } = null!;
-        public Item Item { get; set; } = null!;
 
     }
 }
