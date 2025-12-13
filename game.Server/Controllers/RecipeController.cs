@@ -47,25 +47,35 @@ namespace game.Server.Controllers
         [HttpPatch("{recipeId}/Action/start")]
         public async Task<ActionResult> StartRecipe(int recipeId, [FromBody] StartRecipeRequest request)
         {
-            var recipe = await context.Recipes.AnyAsync(r => r.RecipeId == recipeId);
+            var recipeExists = await context.Recipes.AnyAsync(r => r.RecipeId == recipeId);
 
-            if (!recipe)
+            if (!recipeExists)
             {
-                return NotFound();
+                return NotFound("Recept nenalezen.");
             }
 
+            var activeRecipeTime = await context.RecipeTimes
+                .FirstOrDefaultAsync(rt => rt.RecipeId == recipeId
+                                        && rt.PlayerId == request.PlayerId
+                                        && rt.EndTime == null); 
+
+            if (activeRecipeTime != null)
+            {
+                return Conflict("uz to bezi");
+            }
             RecipeTime newRecipeTime = new RecipeTime
             {
                 RecipeId = recipeId,
                 PlayerId = request.PlayerId,
                 StartTime = DateTime.UtcNow,
-                EndTime = DateTime.UtcNow
+                EndTime = null
             };
 
             context.RecipeTimes.Add(newRecipeTime);
             await context.SaveChangesAsync();
 
-            return Ok();
+
+            return NoContent();
         }
 
         [HttpPatch("{recipeId}/Action/end")]
@@ -100,7 +110,7 @@ namespace game.Server.Controllers
             RecipeTime? activeRecipeTime = await context.RecipeTimes
                 .Where(rt => rt.RecipeId == recipeId && rt.PlayerId == request.PlayerId)
                 .OrderByDescending(rt => rt.StartTime)
-                .FirstOrDefaultAsync(rt => rt.StartTime == rt.EndTime); 
+                .FirstOrDefaultAsync(rt => rt.EndTime == null); 
 
             if (activeRecipeTime == null)
             {
@@ -111,14 +121,20 @@ namespace game.Server.Controllers
             activeRecipeTime.EndTime = endTime;
             await context.SaveChangesAsync();
 
-            TimeSpan duration = activeRecipeTime.EndTime - activeRecipeTime.StartTime;
+            TimeSpan? duration = activeRecipeTime.EndTime - activeRecipeTime.StartTime;
 
             Player? player = await context.Players.FindAsync(request.PlayerId);
-            player.Money += 20;
+            if (player != null)
+            {
+
+                player.Money += 20;
+                await context.SaveChangesAsync();
+            }
 
             return Ok(new 
             { 
-                DurationSeconds = duration.TotalSeconds
+                Duration = duration,
+                player.Money
             });
         }
 
