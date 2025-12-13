@@ -145,7 +145,7 @@ namespace game.Server.Controllers
             currentPositionItem.PositionY = request.NewPositionY;
 
             await context.SaveChangesAsync();
-            return Ok(player);
+            return Ok(currentPositionItem);
         }
 
         [HttpGet("{id}/Inventory")]

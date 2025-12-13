@@ -28,8 +28,8 @@ namespace game.Server.Models
         //[ForeignKey("BuildingId")]
         //public Building? Building { get; set; }
         public int? FloorItemId { get; set; }
-        //[ForeignKey("FloorItemId")]
-        //public FloorItem? FloorItem { get; set; }
+        [ForeignKey("FloorItemId")]
+        public FloorItem? FloorItem { get; set; }
         public int Capacity { get; set; } = 10;
         public int Seed { get; set; } = 0;
     }

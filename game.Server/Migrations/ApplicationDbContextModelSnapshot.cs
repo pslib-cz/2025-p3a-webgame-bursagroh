@@ -17,6 +17,39 @@ namespace game.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.1");
 
+            modelBuilder.Entity("RecipeTime", b =>
+                {
+                    b.Property<int>("RecipeTimeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("PlayerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("RecipeTimeId");
+
+                    b.ToTable("RecipeTimes");
+
+                    b.HasData(
+                        new
+                        {
+                            RecipeTimeId = 1,
+                            EndTime = new DateTime(2025, 12, 13, 11, 0, 0, 0, DateTimeKind.Utc),
+                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
+                            RecipeId = 1,
+                            StartTime = new DateTime(2025, 12, 13, 10, 0, 0, 0, DateTimeKind.Utc)
+                        });
+                });
+
             modelBuilder.Entity("game.Server.Models.Block", b =>
                 {
                     b.Property<int>("BlockId")
@@ -194,6 +227,51 @@ namespace game.Server.Migrations
                             FloorItemType = 0,
                             PositionX = 0,
                             PositionY = 0
+                        });
+                });
+
+            modelBuilder.Entity("game.Server.Models.Ingredience", b =>
+                {
+                    b.Property<int>("IngredienceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("IngredienceType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RecipeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("IngredienceId");
+
+                    b.HasIndex("RecipeId");
+
+                    b.ToTable("Ingrediences");
+
+                    b.HasData(
+                        new
+                        {
+                            IngredienceId = 1,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 1
+                        },
+                        new
+                        {
+                            IngredienceId = 2,
+                            IngredienceType = 0,
+                            Order = 2,
+                            RecipeId = 1
+                        },
+                        new
+                        {
+                            IngredienceId = 3,
+                            IngredienceType = 3,
+                            Order = 3,
+                            RecipeId = 1
                         });
                 });
 
@@ -435,6 +513,8 @@ namespace game.Server.Migrations
 
                     b.HasKey("PlayerId");
 
+                    b.HasIndex("FloorItemId");
+
                     b.ToTable("Players");
 
                     b.HasData(
@@ -447,6 +527,28 @@ namespace game.Server.Migrations
                             Name = "Seeded Player",
                             ScreenType = 0,
                             Seed = 252
+                        });
+                });
+
+            modelBuilder.Entity("game.Server.Models.Recipe", b =>
+                {
+                    b.Property<int>("RecipeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("RecipeId");
+
+                    b.ToTable("Recipes");
+
+                    b.HasData(
+                        new
+                        {
+                            RecipeId = 1,
+                            Name = "Hamburger"
                         });
                 });
 
@@ -481,6 +583,15 @@ namespace game.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Floor");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Ingredience", b =>
+                {
+                    b.HasOne("game.Server.Models.Recipe", null)
+                        .WithMany("Ingrediences")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("game.Server.Models.Item", b =>
@@ -520,6 +631,15 @@ namespace game.Server.Migrations
                     b.Navigation("Mine");
                 });
 
+            modelBuilder.Entity("game.Server.Models.Player", b =>
+                {
+                    b.HasOne("game.Server.Models.FloorItem", "FloorItem")
+                        .WithMany()
+                        .HasForeignKey("FloorItemId");
+
+                    b.Navigation("FloorItem");
+                });
+
             modelBuilder.Entity("game.Server.Models.Building", b =>
                 {
                     b.Navigation("Floors");
@@ -538,6 +658,11 @@ namespace game.Server.Migrations
             modelBuilder.Entity("game.Server.Models.MineLayer", b =>
                 {
                     b.Navigation("MineBlocks");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Recipe", b =>
+                {
+                    b.Navigation("Ingrediences");
                 });
 #pragma warning restore 612, 618
         }

@@ -26,6 +26,8 @@ namespace game.Server.Models
         public int PositionX { get; set; }
         public int PositionY { get; set; }
 
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public FloorItemType FloorItemType { get; set; }
     }
 }

@@ -1,16 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace game.Server.Models
+public class RecipeTime
 {
-    public class RecipeTime
-    {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int RecipeId { get; set; }
-        public Guid PlayerId { get; set; }
-        public DateTime Time { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int RecipeTimeId { get; set; }
+    public int RecipeId { get; set; }
+    public Guid PlayerId { get; set; }
+    public DateTime StartTime { get; set; }
+    public DateTime EndTime { get; set; }
+    public double Duration => (EndTime - StartTime).TotalSeconds;
 
-        public Player Player { get; set; } = null!;
-    }
 }

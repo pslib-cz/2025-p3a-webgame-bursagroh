@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace game.Server.Models
 {
@@ -7,7 +8,8 @@ namespace game.Server.Models
     {
         Meat,
         Salad,
-        Bun,
+        BunUp,
+        BunDown,
         Tomato,
         Sauce,
         Bacon
@@ -20,8 +22,8 @@ namespace game.Server.Models
         public int IngredienceId { get; set; }
         public int RecipeId { get; set; }
         public int Order { get; set; }
-        public IngredienceTypes IngredienceType { get; set; }   
 
-        public Recipe Recipe { get; set; } = null!;
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public IngredienceTypes IngredienceType { get; set; }
     }
 }

@@ -26,6 +26,11 @@ namespace game.Server.Data
 
         public DbSet<FloorItem> FloorItems { get; set; }
 
+        public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<Ingredience> Ingrediences { get; set; }
+
+        public DbSet<RecipeTime> RecipeTimes { get; set; }
+
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -106,6 +111,28 @@ namespace game.Server.Data
             });
 
 
+            modelBuilder.Entity<Recipe>(entity =>
+            {
+                entity.HasData(
+                    new Recipe { RecipeId = 1, Name = "Hamburger"}
+                );
+            });
+
+            modelBuilder.Entity<Ingredience>(entity =>
+            {
+                entity.HasData(
+                    new Ingredience { RecipeId = 1, IngredienceId = 1, Order = 1, IngredienceType = IngredienceTypes.BunUp },
+                    new Ingredience { RecipeId = 1, IngredienceId = 2, Order = 2, IngredienceType = IngredienceTypes.Meat },
+                    new Ingredience { RecipeId = 1, IngredienceId = 3, Order = 3, IngredienceType = IngredienceTypes.BunDown }
+                );
+            });
+
+            modelBuilder.Entity<RecipeTime>(entity =>
+            {
+                entity.HasData(
+                    new RecipeTime { RecipeTimeId = 1, RecipeId = 1, StartTime = new DateTime(2025, 12, 13, 10, 0, 0, DateTimeKind.Utc), EndTime = new DateTime(2025, 12, 13, 11, 0, 0, DateTimeKind.Utc), PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0") }
+                );
+            });
 
             modelBuilder.Entity<Item>().HasData(
                 new Item { ItemId = 1, Name = "Rock" },
