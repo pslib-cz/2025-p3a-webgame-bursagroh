@@ -100,7 +100,6 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-            bool screenTypeIsChanging = player.ScreenType != newScreenType.NewScreenType;
 
             if (newScreenType.NewScreenType == ScreenTypes.Mine)
             {
@@ -115,7 +114,7 @@ namespace game.Server.Controllers
                         PlayerId = player.PlayerId,
                         BuildingType = BuildingTypes.Mine,
                         PositionX = 0, //jelikoz jeste nemam udelanou generaci mapy tak je vse na 0,0, sorry jako
-                        PositionY = 0
+                        PositionY = 0 //ona se i tak cela tahle generace budov se bude delat na generovani mapy a ne tady
                     };
                     context.Buildings.Add(mineBuilding);
                     await context.SaveChangesAsync();
