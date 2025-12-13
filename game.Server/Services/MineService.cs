@@ -19,7 +19,7 @@ namespace game.Server.Services
         {
             var existingLayer = await _context.MineLayers
                 .Where(ml => ml.MineId == mineId && ml.Depth == depth)
-                .Include(ml => ml.MineBlocks).ThenInclude(mb => mb.Block).ThenInclude(b => b.Item) // Include Item for ChangeOfGenerating
+                .Include(ml => ml.MineBlocks).ThenInclude(mb => mb.Block).ThenInclude(b => b.Item) 
                 .FirstOrDefaultAsync();
 
             if (existingLayer != null && existingLayer.MineBlocks.Any())
@@ -32,7 +32,6 @@ namespace game.Server.Services
             var mineExists = await _context.Mines.AnyAsync(m => m.MineId == mineId);
             if (!mineExists)
             {
-                // Better error message is helpful!
                 throw new InvalidOperationException($"Mine with ID {mineId} does not exist.");
             }
 
@@ -52,9 +51,8 @@ namespace game.Server.Services
                 _context.MineLayers.Add(layer);
             }
 
-            // --- Updated Block Retrieval to include Item ---
             var availableBlocks = await _context.Blocks
-                .Include(b => b.Item) // Ensure Item and its ChangeOfGenerating is available
+                .Include(b => b.Item) 
                 .ToListAsync();
 
             if (!availableBlocks.Any())
@@ -62,14 +60,7 @@ namespace game.Server.Services
                 throw new InvalidOperationException("No block definitions available to generate mine layer.");
             }
 
-            // --- Weighted Random Selection Logic ---
             var totalWeight = availableBlocks.Sum(b => b.Item.ChangeOfGenerating);
-
-            if (totalWeight <= 0)
-            {
-                // Handle case where all weights are 0 or less
-                throw new InvalidOperationException("Total weight for block generation is zero or less. Check 'ChangeOfGenerating' values.");
-            }
 
 
             var random = new Random();
@@ -77,13 +68,13 @@ namespace game.Server.Services
 
             for (int i = 0; i < LayerSize; i++)
             {
-                // 1. Pick a random number between 0 and totalWeight - 1
+               
                 var randomNumber = random.Next(totalWeight);
 
                 Block blockDefinition = null!;
                 var runningWeight = 0;
 
-                // 2. Iterate through blocks, adding up the weights until runningWeight exceeds randomNumber
+                
                 foreach (var block in availableBlocks)
                 {
                     runningWeight += block.Item.ChangeOfGenerating;
@@ -94,14 +85,11 @@ namespace game.Server.Services
                     }
                 }
 
-                // Should not happen if logic is correct and totalWeight > 0
                 if (blockDefinition == null)
                 {
-                    // Fallback to a default or first block if selection somehow fails
                     blockDefinition = availableBlocks.First();
                 }
 
-                // Use the selected blockDefinition to create the MineBlock
                 var mineBlock = new MineBlock
                 {
                     MineLayer = layer,
