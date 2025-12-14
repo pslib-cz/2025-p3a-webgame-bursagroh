@@ -1,10 +1,11 @@
 import type { GenericGET } from ".."
+import type { Building } from "../models/building"
 
-export interface APIPlayerGetById extends GenericGET {
+export interface APIGetBuildings extends GenericGET {
     params: {
-        id: string
+        playerId: string
     }
     res: {
-        200: Player
+        200: Array<Building>
     }
 }

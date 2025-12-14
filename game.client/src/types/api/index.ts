@@ -1,4 +1,5 @@
-import type { APIPlayerGenerate, APIPlayerGetById } from "./controllers/player"
+import type { APIGetBuildings } from "./controllers/building"
+import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerMove } from "./controllers/player"
 
 export interface GenericGET {
     params: Record<string, string>
@@ -53,17 +54,17 @@ export interface GenericAPI {
 
 export interface API extends GenericAPI {
     get: {
-        "/api/Player/{id}": APIPlayerGetById
+        "/api/Player/{playerId}": APIPlayerGetById
+        "/api/Building/{playerId}": APIGetBuildings
     }
     post: {
         "/api/Player/generate": APIPlayerGenerate
-        "idk": APIPlayerGenerate
     }
     put: {
 
     }
     patch: {
-
+        "/api/Player/{playerId}/Action/move": APIPlayerMove
     }
     delete: {
 

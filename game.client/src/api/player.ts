@@ -12,5 +12,13 @@ export const generatePlayerMutation = (playerName?: string) =>
 export const getPlayerQuery = (playerId: string) =>
     queryOptions({
         queryKey: ["player", playerId],
-        queryFn: () => api.get("/api/Player/{id}", { playerId }, {}),
+        queryFn: () => api.get("/api/Player/{playerId}", { playerId }, {}),
+    })
+
+export const updatePlayerPositionMutation = (playerId: string, positionX: number, positionY: number) =>
+    mutationOptions({
+        mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { positionX, positionY }),
+        onSuccess(data) {
+            queryClient.setQueryData(["player", playerId], data)
+        },
     })

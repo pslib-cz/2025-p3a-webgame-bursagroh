@@ -1,8 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { api } from ".";
 
-export const getPlayerQuery = (playerId: string) =>
+export const getBuildingsQuery = (playerId: string) =>
     queryOptions({
-        queryKey: ["player", playerId],
-        queryFn: () => api.get("/api/Player/{id}", { playerId }, {}),
+        queryKey: ["player", playerId, "buildings"],
+        queryFn: () => api.get("/api/Building/{playerId}", { playerId }, {}),
     })
