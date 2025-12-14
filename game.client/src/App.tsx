@@ -1,35 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import SVGDisplay from "./components/SVGDisplay"
+import Tile from "./components/SVG/Tile"
 
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    return (
+        <>
+            <SVGDisplay width={"99vw"} height={"99vh"}>
+                {/* {Array.from({length: 1}).map((_, rowIndex) =>
+                    Array.from({length: 1}).map((_, columnIndex) => (
+                        <Tile key={`${rowIndex - 5}-${columnIndex - 5}`} width={1} height={1} x={columnIndex - 5} y={rowIndex - 5} tileType="bank" />
+                    ))
+                )} */}
+                <Tile width={1} height={1} x={0} y={0} tileType="bank" />
+            </SVGDisplay>
+        </>
+    )
 }
 
 export default App
