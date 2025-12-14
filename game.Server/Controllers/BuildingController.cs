@@ -20,7 +20,7 @@ namespace game.Server.Controllers
 
 
         [HttpGet("{playerId}")]
-        public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId)
+        public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int? top, [FromQuery] int? left, [FromQuery] int? width, [FromQuery] int? height)
         {
             bool playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
             if (!playerExists)
@@ -28,13 +28,19 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-            List<Building> buildings = await _context.Buildings.Where(b => b.PlayerId == playerId).ToListAsync();
+            IQueryable<Building> query = _context.Buildings.Where(b => b.PlayerId == playerId);
 
-            if (buildings == null || buildings.Count == 0)
+            if (top.HasValue && left.HasValue && width.HasValue && height.HasValue)
             {
-                return NotFound();
+                int minX = left.Value;
+                int maxX = left.Value + width.Value;
+                int minY = top.Value;
+                int maxY = top.Value + height.Value;
+
+                query = query.Where(b => b.PositionX >= minX && b.PositionX <= maxX && b.PositionY >= minY && b.PositionY <= maxY);
             }
 
+            List<Building> buildings = await query.ToListAsync();
             return Ok(buildings);
         }
     }
