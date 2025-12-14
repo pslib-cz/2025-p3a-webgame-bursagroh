@@ -79,8 +79,80 @@ namespace game.Server.Controllers
             {
                 PlayerId = player.PlayerId,
                 BuildingType = BuildingTypes.Blacksmith,
+                PositionX = -1,
+                PositionY = 0,
+                IsBossDefeated = false
+            };
+
+            Building road1 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
+                PositionX = 1,
+                PositionY = 0,
+                IsBossDefeated = false
+            };
+
+            Building road2 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
+                PositionX = -1,
+                PositionY = 0,
+                IsBossDefeated = false
+            };
+
+            Building road3 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
                 PositionX = 0,
-                PositionY = 2,
+                PositionY = 1,
+                IsBossDefeated = false
+            };
+
+            Building road4 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
+                PositionX = 1,
+                PositionY = 1,
+                IsBossDefeated = false
+            };
+
+            Building road5 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
+                PositionX = -1,
+                PositionY = -1,
+                IsBossDefeated = false
+            };
+
+            Building road6 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
+                PositionX = 1,
+                PositionY = -1,
+                IsBossDefeated = false
+            };
+
+            Building road7 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
+                PositionX = -1,
+                PositionY = 1,
+                IsBossDefeated = false
+            };
+
+            Building road8 = new Building 
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Road,
+                PositionX = 0,
+                PositionY = -1,
                 IsBossDefeated = false
             };
 
@@ -92,6 +164,15 @@ namespace game.Server.Controllers
             context.Buildings.Add(bank);
             context.Buildings.Add(blacksmith);
             context.Buildings.Add(restaurant);
+
+            context.Buildings.Add(road1);
+            context.Buildings.Add(road2);
+            context.Buildings.Add(road3);
+            context.Buildings.Add(road4);
+            context.Buildings.Add(road5);
+            context.Buildings.Add(road6);
+            context.Buildings.Add(road7);
+            context.Buildings.Add(road8);
 
             await context.SaveChangesAsync();
 
