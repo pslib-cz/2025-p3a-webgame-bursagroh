@@ -1,5 +1,5 @@
 import type { APIGetBuildings } from "./controllers/building"
-import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerMove } from "./controllers/player"
+import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
 
 export interface GenericGET {
     params: Record<string, string>
@@ -65,6 +65,7 @@ export interface API extends GenericAPI {
     }
     patch: {
         "/api/Player/{playerId}/Action/move": APIPlayerMove
+        "/api/Player/{playerId}/Action/move-screen": APIPlayerMoveScreen
     }
     delete: {
 

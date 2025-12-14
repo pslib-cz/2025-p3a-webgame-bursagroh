@@ -1,5 +1,5 @@
 import type { GenericPOST, GenericGET, GenericPATCH } from ".."
-import type { Player } from "../models/player"
+import type { Player, ScreenType } from "../models/player"
 
 export interface APIPlayerGenerate extends GenericPOST {
     body: {
@@ -24,8 +24,20 @@ export interface APIPlayerMove extends GenericPATCH {
         playerId: string
     }
     body: {
-        positionX: number
-        positionY: number
+        newPositionX: number
+        newPositionY: number
+    }
+    res: {
+        200: Player
+    }
+}
+
+export interface APIPlayerMoveScreen extends GenericPATCH {
+    params: {
+        playerId: string
+    }
+    body: {
+        newScreenType: ScreenType
     }
     res: {
         200: Player

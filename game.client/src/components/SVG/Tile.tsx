@@ -1,6 +1,10 @@
 import React from "react"
 import type { AssetProps, TileType } from "../../types"
 import TileSelector from "./TileSelector"
+import { useMutation } from "@tanstack/react-query"
+import { updatePlayerPositionMutation, updatePlayerScreenMutation } from "../../api/player"
+import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import type { ScreenType } from "../../types/api/models/player"
 
 type TileProps = {
     tileType: TileType
@@ -8,8 +12,41 @@ type TileProps = {
 } & AssetProps
 
 const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected = false}) => {
-    const handleClick = () => {
-        
+    const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
+
+    let screenType: ScreenType
+    switch (tileType) {
+        case "bank":
+            screenType = "Bank"
+            break
+        case "blacksmith":
+            screenType = "Bank"
+            break
+        case "mine":
+            screenType = "Bank"
+            break
+        case "restaurant":
+            screenType = "Bank"
+            break
+        default:
+            screenType = "City"
+            break
+    }
+
+    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, screenType))
+
+    const handleClick = async () => {
+        await updatePlayerPositionAsync()
+
+        switch (tileType) {
+            case "bank":
+            case "blacksmith":
+            case "mine":
+            case "restaurant":
+                updatePlayerScreenAsync()
+                break
+        }
     }
 
     return (
