@@ -39,8 +39,18 @@ namespace game.Server.Controllers
                 IsBossDefeated = false
             };
 
+            Building building2 = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Mine,
+                PositionX = 2,
+                PositionY = 0,
+                IsBossDefeated = false
+            };
+
             context.Players.Add(player);
             context.Buildings.Add(building);
+            context.Buildings.Add(building2);
             await context.SaveChangesAsync();
 
             Floor floor = new Floor
@@ -113,7 +123,7 @@ namespace game.Server.Controllers
                     {
                         PlayerId = player.PlayerId,
                         BuildingType = BuildingTypes.Mine,
-                        PositionX = 0, //jelikoz jeste nemam udelanou generaci mapy tak je vse na 0,0, sorry jako
+                        PositionX = 2, //jelikoz jeste nemam udelanou generaci mapy tak je vse na 0,0, sorry jako
                         PositionY = 0 //ona se i tak cela tahle generace budov se bude delat na generovani mapy a ne tady
                     };
                     context.Buildings.Add(mineBuilding);
