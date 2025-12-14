@@ -39,7 +39,16 @@ namespace game.Server.Controllers
                 IsBossDefeated = false
             };
 
-            Building building2 = new Building
+            Building fountain = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Fountain,
+                PositionX = 0,
+                PositionY = 0,
+                IsBossDefeated = false
+            };
+
+            Building mine = new Building
             {
                 PlayerId = player.PlayerId,
                 BuildingType = BuildingTypes.Mine,
@@ -48,9 +57,42 @@ namespace game.Server.Controllers
                 IsBossDefeated = false
             };
 
+            Building bank = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Bank,
+                PositionX = -2,
+                PositionY = 0,
+                IsBossDefeated = false
+            };
+
+            Building restaurant = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Restaurant,
+                PositionX = 0,
+                PositionY = -2,
+                IsBossDefeated = false
+            };
+
+            Building blacksmith = new Building
+            {
+                PlayerId = player.PlayerId,
+                BuildingType = BuildingTypes.Blacksmith,
+                PositionX = 0,
+                PositionY = 2,
+                IsBossDefeated = false
+            };
+
             context.Players.Add(player);
+
             context.Buildings.Add(building);
-            context.Buildings.Add(building2);
+            context.Buildings.Add(fountain);
+            context.Buildings.Add(mine);
+            context.Buildings.Add(bank);
+            context.Buildings.Add(blacksmith);
+            context.Buildings.Add(restaurant);
+
             await context.SaveChangesAsync();
 
             Floor floor = new Floor
@@ -214,40 +256,51 @@ namespace game.Server.Controllers
         }
 
         [HttpPatch("{id}/Action/move")]
-        public async Task<ActionResult> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
+        public async Task<ActionResult<Player>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
-            Player? player = await context.Players.FindAsync(id);
+            Player? player = await context.Players
+                .Include(p => p.FloorItem)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
 
             if (player == null)
             {
                 return NotFound();
             }
 
-            FloorItem? currentPositionItem = await context.FloorItems.Where(fi => fi.FloorItemId == player.FloorItemId).FirstOrDefaultAsync();
+            FloorItem? currentPositionItem = player.FloorItem;
 
             if (currentPositionItem == null)
             {
-                return NotFound();
+                if (player.FloorItemId.HasValue)
+                {
+                    currentPositionItem = await context.FloorItems.Where(fi => fi.FloorItemId == player.FloorItemId).FirstOrDefaultAsync();
+                }
+
+                if (currentPositionItem == null)
+                {
+                    return BadRequest();
+                }
             }
 
             if (currentPositionItem.PositionX == request.NewPositionX && currentPositionItem.PositionY == request.NewPositionY)
             {
-                return Ok(currentPositionItem);
+                return Ok(player);
             }
 
             bool isAdjacent = (Math.Abs(request.NewPositionX - currentPositionItem.PositionX) +
-                       Math.Abs(request.NewPositionY - currentPositionItem.PositionY)) == 1; //ukradeno
+                               Math.Abs(request.NewPositionY - currentPositionItem.PositionY)) == 1;
 
             if (!isAdjacent)
             {
-                return BadRequest("move > 1");
+                return BadRequest("move > 1: Only adjacent moves are allowed.");
             }
 
+            // 4. Aktualizace pozice
             currentPositionItem.PositionX = request.NewPositionX;
             currentPositionItem.PositionY = request.NewPositionY;
 
             await context.SaveChangesAsync();
-            return Ok(currentPositionItem);
+            return Ok(player);
         }
 
         [HttpGet("{id}/Inventory")]

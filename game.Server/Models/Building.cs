@@ -13,7 +13,10 @@ namespace game.Server.Models
         Mine,
         Blacksmith,
         Abandoned,
-        AbandonedTrap
+        AbandonedTrap,
+        Road,
+        RoadVertical,
+        RoadHorizontal
     }
 
     public class Building
