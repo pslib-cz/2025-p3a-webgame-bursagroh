@@ -27,7 +27,7 @@ export const updatePlayerPositionMutation = (playerId: string, newPositionX: num
 export const updatePlayerScreenMutation = (playerId: string, newScreenType: ScreenType) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move-screen", { playerId }, {}, { newScreenType }),
-        async onSuccess() {
-            await queryClient.invalidateQueries({queryKey: ["playerScreen", playerId]})
+        onSuccess(data) {
+            queryClient.setQueryData(["player", playerId], data)
         },
     })

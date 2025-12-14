@@ -11,7 +11,7 @@ type TileProps = {
     isSelected?: boolean
 } & AssetProps
 
-const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected = false}) => {
+const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected = false }) => {
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
 
@@ -21,13 +21,13 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
             screenType = "Bank"
             break
         case "blacksmith":
-            screenType = "Bank"
+            screenType = "Blacksmith"
             break
         case "mine":
-            screenType = "Bank"
+            screenType = "Mine"
             break
         case "restaurant":
-            screenType = "Bank"
+            screenType = "Restaurant"
             break
         default:
             screenType = "City"
@@ -37,14 +37,15 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, screenType))
 
     const handleClick = async () => {
-        await updatePlayerPositionAsync()
-
         switch (tileType) {
             case "bank":
             case "blacksmith":
-            case "mine":
             case "restaurant":
-                updatePlayerScreenAsync()
+            case "mine":
+                await updatePlayerScreenAsync()
+                break
+            default:
+                await updatePlayerPositionAsync()
                 break
         }
     }

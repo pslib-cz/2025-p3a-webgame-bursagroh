@@ -6,7 +6,7 @@ const Game = () => {
     const {playerId} = React.useContext(PlayerIdContext)!
 
     if (playerId === null) {
-        return <div>Loading player...</div>
+        return <div>Loading...</div>
     }
 
     return (

@@ -1,4 +1,5 @@
 import type { APIGetBuildings } from "./controllers/building"
+import type { APIGenerateMine, APIGetMineLayers } from "./controllers/mine"
 import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
 
 export interface GenericGET {
@@ -56,6 +57,8 @@ export interface API extends GenericAPI {
     get: {
         "/api/Player/{playerId}": APIPlayerGetById
         "/api/Building/{playerId}": APIGetBuildings
+        "/api/Mine/Generate": APIGenerateMine
+        "/api/Mine/{mineId}/Layer/{layer}": APIGetMineLayers
     }
     post: {
         "/api/Player/generate": APIPlayerGenerate

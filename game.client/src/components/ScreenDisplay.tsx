@@ -9,6 +9,7 @@ import RestaurantScreen from "./Screens/Restaurant"
 import MineScreen from "./Screens/Mine"
 import CityScreen from "./Screens/City"
 import { PlayerIdContext } from "../providers/PlayerIdProvider"
+import styles from "./screenDisplay.module.css"
 
 const ScreenDisplay = () => {
     const playerId = React.useContext(PlayerIdContext)!.playerId!
@@ -24,8 +25,10 @@ const ScreenDisplay = () => {
 
     if (isSuccess) {
         return (
-            <div>
-                <CityScreen />
+            <div className={styles["screen-display"]}>
+                <ConditionalDisplay visible={data.screenType === "City"}>
+                    <CityScreen />
+                </ConditionalDisplay>
                 <ConditionalDisplay visible={data.screenType === "Bank"}>
                     <BankScreen />
                 </ConditionalDisplay>
