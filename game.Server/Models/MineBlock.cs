@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace game.Server.Models
 {
@@ -8,16 +9,17 @@ namespace game.Server.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MineBlockId { get; set; }
-        public int MineLayerId { get; set; }
 
+        public int MineLayerId { get; set; }
         [ForeignKey("MineLayerId")]
-        public MineLayer MineLayer { get; set; } = null!;
+        [JsonIgnore]
+        public MineLayer? MineLayer { get; set; }
 
         public int Index { get; set; }
 
         public int BlockId { get; set; }
 
         [ForeignKey("BlockId")]
-        public Block Block { get; set; } = null!;
+        public Block Block { get; set; } = null!; 
     }
 }

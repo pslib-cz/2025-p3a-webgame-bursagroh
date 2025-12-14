@@ -19,48 +19,50 @@ namespace game.Server.Controllers
             this.context = context;
         }
 
-        [HttpGet("/{mineId}/Layer/{depth}")]
-        public async Task<IActionResult> GetLayerBlocks(int mineId, int depth)
+        [HttpGet("Blocks")]
+        public async Task<ActionResult<List<Block>>> GetAllBlocks()
         {
-            if (mineId <= 0 || depth < 0)
+            List<Block> blocks = await context.Blocks.Include(b => b.Item).ToListAsync();
+
+            if (blocks == null || blocks.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(blocks);
+        }
+
+        [HttpGet("Generate")]
+        public async Task<IActionResult> GetMine()
+        {
+            Mine mine = new Mine
+            {
+                MineId = new Random().Next()
+            };
+
+            context.Mines.Add(mine);
+            await context.SaveChangesAsync();
+
+            return Ok(mine);
+        }
+
+        [HttpGet("{mineId}/Layer/{layer}")]
+        public async Task<ActionResult<List<MineBlock>>> GetLayerBlocks(int mineId, int layer) 
+        {
+            if (mineId <= 0 || layer < 0)
             {
                 return BadRequest();
             }
 
             try
             {
-                var blocks = await _mineService.GetOrGenerateLayerBlocksAsync(mineId, depth);
+                var blocks = await _mineService.GetOrGenerateLayerBlocksAsync(mineId, layer);
                 return Ok(blocks);
             }
             catch (InvalidOperationException ex)
             {
                 return NotFound(ex.Message);
             }
-        }
-
-        [HttpGet("{playerId}")]
-        public async Task<IActionResult> GetMine(Guid playerId)
-        {
-            if (playerId == Guid.Empty)
-            {
-                return BadRequest();
-            }
-
-            Mine mine = new Mine
-            {
-                PlayerId = playerId,
-                MineId = new Random().Next()
-            };
-
-            context.Mines.Add(mine);
-
-            return Ok(mine);
-        }
-
-        [HttpGet("test")]
-        public IActionResult GetTestEndpoint()
-        {
-            return Ok(context.Mines.ToArray());
         }
     }
 }

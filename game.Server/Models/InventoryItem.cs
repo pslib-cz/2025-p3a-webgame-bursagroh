@@ -14,7 +14,5 @@ namespace game.Server.Models
         public int ItemInstanceId { get; set; }
 
         public bool IsInBank { get; set; } = false;
-
-        public Player Player { get; set; } = null!;
     }
 }

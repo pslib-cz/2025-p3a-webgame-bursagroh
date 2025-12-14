@@ -1,6 +1,7 @@
-using game.Server.Data;
+﻿using game.Server.Data;
 using game.Server.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace game.Server.Services
 {
@@ -14,34 +15,24 @@ namespace game.Server.Services
             _context = context;
         }
 
-        public async Task<List<BlockDTO>> GetOrGenerateLayerBlocksAsync(int mineId, int depth)
+        public async Task<List<MineBlock>> GetOrGenerateLayerBlocksAsync(int mineId, int depth)
         {
             var existingLayer = await _context.MineLayers
                 .Where(ml => ml.MineId == mineId && ml.Depth == depth)
-                .Include(ml => ml.MineBlocks)
-                    .ThenInclude(mb => mb.Block)
+                .Include(ml => ml.MineBlocks).ThenInclude(mb => mb.Block).ThenInclude(b => b.Item) 
                 .FirstOrDefaultAsync();
 
             if (existingLayer != null && existingLayer.MineBlocks.Any())
             {
                 return existingLayer.MineBlocks
                     .OrderBy(mb => mb.Index)
-                    .Select(mb => new BlockDTO
-                    {
-                        BlockId = mb.Block.BlockId,
-                        BlockType = mb.Block.BlockType.ToString(),
-                        ItemId = mb.Block.ItemId,
-                        MinAmount = mb.Block.MinAmount,
-                        MaxAmount = mb.Block.MaxAmount
-                    })
                     .ToList();
             }
-
 
             var mineExists = await _context.Mines.AnyAsync(m => m.MineId == mineId);
             if (!mineExists)
             {
-                throw new Exception("Lol");
+                throw new InvalidOperationException($"Mine with ID {mineId} does not exist.");
             }
 
             MineLayer layer;
@@ -60,39 +51,59 @@ namespace game.Server.Services
                 _context.MineLayers.Add(layer);
             }
 
-            var availableBlocks = await _context.Blocks.ToListAsync();
+            var availableBlocks = await _context.Blocks
+                .Include(b => b.Item) 
+                .ToListAsync();
 
             if (!availableBlocks.Any())
             {
-                throw new Exception("Lol");
+                throw new InvalidOperationException("No block definitions available to generate mine layer.");
             }
 
+            var totalWeight = availableBlocks.Sum(b => b.Item.ChangeOfGenerating);
+
+
             var random = new Random();
-            var generatedBlockDTOs = new List<BlockDTO>();
+            var generatedMineBlocks = new List<MineBlock>();
 
             for (int i = 0; i < LayerSize; i++)
             {
-                var blockDefinition = availableBlocks[random.Next(availableBlocks.Count)];
+               
+                var randomNumber = random.Next(totalWeight);
+
+                Block blockDefinition = null!;
+                var runningWeight = 0;
+
+                
+                foreach (var block in availableBlocks)
+                {
+                    runningWeight += block.Item.ChangeOfGenerating;
+                    if (randomNumber < runningWeight)
+                    {
+                        blockDefinition = block;
+                        break;
+                    }
+                }
+
+                if (blockDefinition == null)
+                {
+                    blockDefinition = availableBlocks.First();
+                }
 
                 var mineBlock = new MineBlock
                 {
                     MineLayer = layer,
                     BlockId = blockDefinition.BlockId,
+                    Block = blockDefinition,
                     Index = i
                 };
                 layer.MineBlocks.Add(mineBlock);
-                generatedBlockDTOs.Add(new BlockDTO
-                {
-                    BlockId = blockDefinition.BlockId,
-                    BlockType = blockDefinition.BlockType.ToString(),
-                    ItemId = blockDefinition.ItemId,
-                    MinAmount = blockDefinition.MinAmount,
-                    MaxAmount = blockDefinition.MaxAmount
-                });
-            }
-            await _context.SaveChangesAsync();
 
-            return generatedBlockDTOs;
+                generatedMineBlocks.Add(mineBlock);
+            }
+
+            await _context.SaveChangesAsync();
+            return generatedMineBlocks;
         }
     }
 }
