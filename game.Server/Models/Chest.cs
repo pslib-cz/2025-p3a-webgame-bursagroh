@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace game.Server.Models
 {
-    public class Mine
+    public class Chest
     {
         [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int MineId { get; set; }
+        public int ChestId { get; set; }
+        public int FloorItemId { get; set; }
     }
 }

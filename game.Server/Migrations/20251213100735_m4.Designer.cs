@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using game.Server.Data;
 
@@ -10,9 +11,11 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251213100735_m4")]
+    partial class m4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.1");
@@ -23,7 +26,7 @@ namespace game.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("EndTime")
+                    b.Property<DateTime>("EndTime")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("PlayerId")
@@ -32,7 +35,7 @@ namespace game.Server.Migrations
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("StartTime")
+                    b.Property<DateTime>("StartTime")
                         .HasColumnType("TEXT");
 
                     b.HasKey("RecipeTimeId");
@@ -133,31 +136,6 @@ namespace game.Server.Migrations
                         });
                 });
 
-            modelBuilder.Entity("game.Server.Models.Blueprint", b =>
-                {
-                    b.Property<int>("BlueprintId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Price")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("BlueprintId");
-
-                    b.ToTable("Blueprints");
-
-                    b.HasData(
-                        new
-                        {
-                            BlueprintId = 1,
-                            ItemId = 10,
-                            Price = 5
-                        });
-                });
-
             modelBuilder.Entity("game.Server.Models.Building", b =>
                 {
                     b.Property<int>("BuildingId")
@@ -198,37 +176,6 @@ namespace game.Server.Migrations
                             PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
                             PositionX = 0,
                             PositionY = 0
-                        });
-                });
-
-            modelBuilder.Entity("game.Server.Models.Crafting", b =>
-                {
-                    b.Property<int>("CraftingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("BlueprintId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ItemId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("CraftingId");
-
-                    b.HasIndex("BlueprintId");
-
-                    b.ToTable("Craftings");
-
-                    b.HasData(
-                        new
-                        {
-                            CraftingId = 1,
-                            Amount = 3,
-                            BlueprintId = 1,
-                            ItemId = 1
                         });
                 });
 
@@ -728,6 +675,15 @@ namespace game.Server.Migrations
                     b.HasKey("InventoryItemId");
 
                     b.ToTable("InventoryItems");
+
+                    b.HasData(
+                        new
+                        {
+                            InventoryItemId = 52,
+                            IsInBank = true,
+                            ItemInstanceId = 85,
+                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0")
+                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Item", b =>
@@ -1296,15 +1252,6 @@ namespace game.Server.Migrations
                     b.Navigation("Item");
                 });
 
-            modelBuilder.Entity("game.Server.Models.Crafting", b =>
-                {
-                    b.HasOne("game.Server.Models.Blueprint", null)
-                        .WithMany("Craftings")
-                        .HasForeignKey("BlueprintId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("game.Server.Models.Floor", b =>
                 {
                     b.HasOne("game.Server.Models.Building", "Building")
@@ -1380,11 +1327,6 @@ namespace game.Server.Migrations
                         .HasForeignKey("FloorItemId");
 
                     b.Navigation("FloorItem");
-                });
-
-            modelBuilder.Entity("game.Server.Models.Blueprint", b =>
-                {
-                    b.Navigation("Craftings");
                 });
 
             modelBuilder.Entity("game.Server.Models.Building", b =>

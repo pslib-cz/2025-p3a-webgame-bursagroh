@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace game.Server.Models
 {
@@ -21,17 +22,14 @@ namespace game.Server.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int BlockId { get; set; }
-
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public BlockType BlockType { get; set; }
         public int ItemId { get; set; }
 
         [ForeignKey("ItemId")]
         public Item Item { get; set; } = null!;
 
-        public int changeOfGenerating = 1;
-
         public int MinAmount { get; set; }
         public int MaxAmount { get; set; }
-        public ICollection<MineBlock> MineBlocks { get; set; } = new List<MineBlock>();
     }
 }

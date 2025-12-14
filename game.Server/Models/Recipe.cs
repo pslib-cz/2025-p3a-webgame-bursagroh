@@ -8,9 +8,8 @@ namespace game.Server.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RecipeId { get; set; }
-        public string? Name { get; set; }
-        public Guid PlayerId { get; set; }
-
-        public Player Player { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public ICollection<Ingredience> Ingrediences { get; set; } = new List<Ingredience>();
     }
 }
+

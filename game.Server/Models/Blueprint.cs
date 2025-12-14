@@ -11,9 +11,7 @@ namespace game.Server.Models
         public int ItemId { get; set; }
         public int Price { get; set; }
 
-        public Item Item { get; set; } = null!;
+        public ICollection<Crafting> Craftings { get; set; }
 
-        public ICollection<Crafting> Craftings { get; set; } = new List<Crafting>();
-        public ICollection<BlueprintPlayer> PlayersBlueprints { get; set; } = new List<BlueprintPlayer>();
     }
 }

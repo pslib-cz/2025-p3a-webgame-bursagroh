@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using game.Server.Data;
 
@@ -10,9 +11,11 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251213140526_n")]
+    partial class n
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.1");
@@ -23,7 +26,7 @@ namespace game.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("EndTime")
+                    b.Property<DateTime>("EndTime")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("PlayerId")
@@ -32,7 +35,7 @@ namespace game.Server.Migrations
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime?>("StartTime")
+                    b.Property<DateTime>("StartTime")
                         .HasColumnType("TEXT");
 
                     b.HasKey("RecipeTimeId");
@@ -219,6 +222,8 @@ namespace game.Server.Migrations
                     b.HasKey("CraftingId");
 
                     b.HasIndex("BlueprintId");
+
+                    b.HasIndex("ItemId");
 
                     b.ToTable("Craftings");
 
@@ -1298,11 +1303,21 @@ namespace game.Server.Migrations
 
             modelBuilder.Entity("game.Server.Models.Crafting", b =>
                 {
-                    b.HasOne("game.Server.Models.Blueprint", null)
+                    b.HasOne("game.Server.Models.Blueprint", "Blueprint")
                         .WithMany("Craftings")
                         .HasForeignKey("BlueprintId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("game.Server.Models.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blueprint");
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("game.Server.Models.Floor", b =>
