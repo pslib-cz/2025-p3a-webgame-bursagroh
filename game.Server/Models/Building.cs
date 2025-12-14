@@ -24,7 +24,8 @@ namespace game.Server.Models
         public Guid PlayerId { get; set; }
         public int PositionX { get; set; }
         public int PositionY { get; set; }
-        
+
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public BuildingTypes BuildingType { get; set; }
         public int? Height { get; set; }
         public int? ReachedHeight { get; set; }
