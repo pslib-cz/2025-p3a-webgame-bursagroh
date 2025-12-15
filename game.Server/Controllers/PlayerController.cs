@@ -79,8 +79,8 @@ namespace game.Server.Controllers
             {
                 PlayerId = player.PlayerId,
                 BuildingType = BuildingTypes.Blacksmith,
-                PositionX = -1,
-                PositionY = 0,
+                PositionX = 0,
+                PositionY = 2,
                 IsBossDefeated = false
             };
 
