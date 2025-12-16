@@ -2,6 +2,7 @@ using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace game.Server.Controllers
 {
@@ -27,7 +28,12 @@ namespace game.Server.Controllers
                 Money = 0,
                 BankBalance = 0,
                 Capacity = 10,
-                Seed = new Random().Next()
+                Seed = new Random().Next(),
+
+                PositionX = 0,
+                PositionY = 0,
+                SubPositionX = 0,
+                SubPositionY = 0
             };
 
             var fixedBuildings = new List<Building>
@@ -77,8 +83,6 @@ namespace game.Server.Controllers
             context.FloorItems.Add(floorItem);
             await context.SaveChangesAsync();
 
-            player.BuildingId = centralBuilding.BuildingId;
-            player.FloorItemId = floorItem.FloorItemId;
 
             context.Players.Update(player);
             await context.SaveChangesAsync();
@@ -88,7 +92,7 @@ namespace game.Server.Controllers
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Player>> GetPlayer(Guid id) {
-            Player? player = await context.Players .Include(p => p.FloorItem).FirstOrDefaultAsync(p => p.PlayerId == id);
+            Player? player = await context.Players.Where(p => p.PlayerId == id).FirstOrDefaultAsync(p => p.PlayerId == id);
 
             if (player == null) {
                 return NotFound();
@@ -114,103 +118,6 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-
-            if (newScreenType.NewScreenType == ScreenTypes.Mine)
-            {
-                Building? mineBuilding = await context.Buildings
-                    .Where(b => b.PlayerId == player.PlayerId && b.BuildingType == BuildingTypes.Mine)
-                    .FirstOrDefaultAsync();
-
-                if (mineBuilding == null)
-                {
-                    mineBuilding = new Building
-                    {
-                        PlayerId = player.PlayerId,
-                        BuildingType = BuildingTypes.Mine,
-                        PositionX = 2, //jelikoz jeste nemam udelanou generaci mapy tak je vse na 0,0, sorry jako
-                        PositionY = 0 //ona se i tak cela tahle generace budov se bude delat na generovani mapy a ne tady
-                    };
-                    context.Buildings.Add(mineBuilding);
-                    await context.SaveChangesAsync();
-                }
-
-                Floor? floor = await context.Floors
-                    .Where(f => f.BuildingId == mineBuilding.BuildingId && f.Level == 1)
-                    .FirstOrDefaultAsync();
-
-                if (floor == null)
-                {
-                    floor = new Floor { BuildingId = mineBuilding.BuildingId, Level = 1 };
-                    context.Floors.Add(floor);
-                    await context.SaveChangesAsync();
-                }
-
-                FloorItem? playerFloorItem = await context.FloorItems
-                    .Where(fi => fi.FloorId == floor.FloorId && fi.FloorItemType == FloorItemType.Player)
-                    .FirstOrDefaultAsync();
-
-                if (playerFloorItem == null)
-                {
-                    playerFloorItem = new FloorItem
-                    {
-                        FloorId = floor.FloorId,
-                        PositionX = 0,
-                        PositionY = 0,
-                        FloorItemType = FloorItemType.Player
-                    };
-                    context.FloorItems.Add(playerFloorItem);
-                    await context.SaveChangesAsync();
-                }
-
-                player.BuildingId = mineBuilding.BuildingId;
-                player.FloorItemId = playerFloorItem.FloorItemId; 
-                player.ScreenType = ScreenTypes.Mine;
-
-                await context.SaveChangesAsync();
-                return Ok(player);
-            }
-
-            if (newScreenType.NewScreenType == ScreenTypes.City)
-            {
-                Building? cityBuilding = await context.Buildings
-                    .Where(b => b.PlayerId == player.PlayerId && b.BuildingType == BuildingTypes.City)
-                    .FirstOrDefaultAsync();
-
-                Floor? floor = await context.Floors
-                    .Where(f => f.BuildingId == cityBuilding.BuildingId && f.Level == 1)
-                    .FirstOrDefaultAsync();
-
-                if (floor == null)
-                {
-                    floor = new Floor { BuildingId = cityBuilding.BuildingId, Level = 1 };
-                    context.Floors.Add(floor);
-                    await context.SaveChangesAsync();
-                }
-                FloorItem? playerFloorItem = await context.FloorItems
-                    .Where(fi => fi.FloorId == floor.FloorId && fi.FloorItemType == FloorItemType.Player)
-                    .FirstOrDefaultAsync();
-
-                if (playerFloorItem == null)
-                {
-                    playerFloorItem = new FloorItem
-                    {
-                        FloorId = floor.FloorId,
-                        PositionX = 0,
-                        PositionY = 0,
-                        FloorItemType = FloorItemType.Player
-                    };
-                    context.FloorItems.Add(playerFloorItem);
-                    await context.SaveChangesAsync();
-                }
-
-                player.BuildingId = cityBuilding.BuildingId; 
-                player.FloorItemId = playerFloorItem.FloorItemId;
-                player.ScreenType = ScreenTypes.City;
-
-                await context.SaveChangesAsync();
-                return Ok(player);
-            }
-
             player.ScreenType = newScreenType.NewScreenType;
             await context.SaveChangesAsync();
 
@@ -220,46 +127,37 @@ namespace game.Server.Controllers
         [HttpPatch("{id}/Action/move")]
         public async Task<ActionResult<Player>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
-            Player? player = await context.Players
-                .Include(p => p.FloorItem)
-                .FirstOrDefaultAsync(p => p.PlayerId == id);
+            Player? player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
 
             if (player == null)
             {
                 return NotFound();
             }
 
-            FloorItem? currentPositionItem = player.FloorItem;
+            if (player.ScreenType == ScreenTypes.City) {
+                bool isAdjacent = (Math.Abs(request.NewPositionX - player.PositionX) +
+                               Math.Abs(request.NewPositionY - player.PositionY)) == 1;
 
-            if (currentPositionItem == null)
-            {
-                if (player.FloorItemId.HasValue)
+                if (!isAdjacent)
                 {
-                    currentPositionItem = await context.FloorItems.Where(fi => fi.FloorItemId == player.FloorItemId).FirstOrDefaultAsync();
+                    return BadRequest("move > 1: Only adjacent moves are allowed.");
                 }
 
-                if (currentPositionItem == null)
+                player.PositionX = request.NewPositionX;
+                player.PositionY = request.NewPositionY;
+            } else {
+                bool isAdjacent = (Math.Abs((request.NewPositionX - player.SubPositionX)) +
+                               Math.Abs(request.NewPositionY - player.SubPositionY)) == 1;
+
+                if (!isAdjacent)
                 {
-                    return BadRequest();
+                    return BadRequest("move > 1: Only adjacent moves are allowed.");
                 }
+
+                player.SubPositionX = request.NewPositionX;
+                player.SubPositionY = request.NewPositionY;
             }
 
-            if (currentPositionItem.PositionX == request.NewPositionX && currentPositionItem.PositionY == request.NewPositionY)
-            {
-                return Ok(player);
-            }
-
-            bool isAdjacent = (Math.Abs(request.NewPositionX - currentPositionItem.PositionX) +
-                               Math.Abs(request.NewPositionY - currentPositionItem.PositionY)) == 1;
-
-            if (!isAdjacent)
-            {
-                return BadRequest("move > 1: Only adjacent moves are allowed.");
-            }
-
-            // 4. Aktualizace pozice
-            currentPositionItem.PositionX = request.NewPositionX;
-            currentPositionItem.PositionY = request.NewPositionY;
 
             await context.SaveChangesAsync();
             return Ok(player);
