@@ -20,28 +20,67 @@ namespace game.Server.Controllers
 
 
         [HttpGet("{playerId}")]
-        public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int? top, [FromQuery] int? left, [FromQuery] int? width, [FromQuery] int? height)
+        public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
         {
-            bool playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
-            if (!playerExists)
+            var player = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
+            if (!player) return NotFound();
+
+            int minX = left;
+            int maxX = left + width;
+            int minY = top;
+            int maxY = top + height;
+
+            var existingBuildings = await _context.Buildings
+                .Where(b => b.PlayerId == playerId &&
+                            b.PositionX >= minX && b.PositionX <= maxX &&
+                            b.PositionY >= minY && b.PositionY <= maxY)
+                .ToListAsync();
+
+            var mapGenerator = new MapGeneratorService();
+            var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY);
+
+            var newBuildings = proceduralBuildings
+                .Where(pb => !existingBuildings.Any(eb => eb.PositionX == pb.PositionX && eb.PositionY == pb.PositionY))
+                .ToList();
+
+            if (newBuildings.Any())
             {
-                return NotFound();
+                _context.Buildings.AddRange(newBuildings);
+                await _context.SaveChangesAsync();
+                existingBuildings.AddRange(newBuildings);
             }
 
-            IQueryable<Building> query = _context.Buildings.Where(b => b.PlayerId == playerId);
+            return Ok(existingBuildings);
+        }
 
-            if (top.HasValue && left.HasValue && width.HasValue && height.HasValue)
+        [HttpGet("{buildingId}/Interior")]
+        public async Task<ActionResult<IEnumerable<Floor>>> GetBuildingInterior( int buildingId, [FromQuery] Guid playerId, [FromQuery] int floors = 1)
+        {
+            var player = await _context.Players.FindAsync(playerId);
+            if (player == null) return NotFound("Player not found.");
+
+            var existingFloors = await _context.Floors
+                .Where(f => f.BuildingId == buildingId)
+                .Include(f => f.FloorItems)
+                .ToListAsync();
+
+            if (existingFloors.Count < floors)
             {
-                int minX = left.Value;
-                int maxX = left.Value + width.Value;
-                int minY = top.Value;
-                int maxY = top.Value + height.Value;
+                var mapGenerator = new MapGeneratorService();
+                int seed = buildingId + player.Seed;
 
-                query = query.Where(b => b.PositionX >= minX && b.PositionX <= maxX && b.PositionY >= minY && b.PositionY <= maxY);
+                var newFloors = mapGenerator.GenerateInterior(buildingId, seed, floors);
+                var floorsToAdd = newFloors.Where(nf => !existingFloors.Any(ef => ef.Level == nf.Level)).ToList();
+
+                if (floorsToAdd.Any())
+                {
+                    _context.Floors.AddRange(floorsToAdd);
+                    await _context.SaveChangesAsync();
+                    existingFloors.AddRange(floorsToAdd);
+                }
             }
 
-            List<Building> buildings = await query.ToListAsync();
-            return Ok(buildings);
+            return Ok(existingFloors.OrderBy(f => f.Level));
         }
     }
 }
