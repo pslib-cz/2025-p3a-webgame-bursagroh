@@ -33,7 +33,7 @@ namespace game.Server.Controllers
                 PositionX = 0,
                 PositionY = 0,
                 SubPositionX = 0,
-                SubPositionY = 0
+                SubPositionY = 0,
             };
 
             var fixedBuildings = new List<Building>
@@ -85,13 +85,19 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
+            if (player.ScreenType == ScreenTypes.Floor)
+            {
+                player.FloorId = null;
+            }
+
             player.ScreenType = newScreenType.NewScreenType;
+
             await context.SaveChangesAsync();
 
             return Ok(player);
         }
 
-        [HttpPatch("{id}/Action/move")]
+        [HttpPatch("{id}/Action/move")] //predelat, tohle je fakt hnus, ale funguje to
         public async Task<ActionResult<Player>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
             Player? player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
@@ -101,9 +107,10 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-            if (player.ScreenType == ScreenTypes.City) {
+            if (player.ScreenType == ScreenTypes.City)
+            {
                 bool isAdjacent = (Math.Abs(request.NewPositionX - player.PositionX) +
-                               Math.Abs(request.NewPositionY - player.PositionY)) == 1;
+                                Math.Abs(request.NewPositionY - player.PositionY)) == 1;
 
                 if (!isAdjacent)
                 {
@@ -112,9 +119,36 @@ namespace game.Server.Controllers
 
                 player.PositionX = request.NewPositionX;
                 player.PositionY = request.NewPositionY;
-            } else {
+            }
+            else if (player.ScreenType == ScreenTypes.Floor)
+            {
+                if (request.NewFloorId.HasValue && request.NewFloorId != player.FloorId)
+                {
+                    var floorExists = await context.Floors.AnyAsync(f => f.FloorId == request.NewFloorId);
+                    if (!floorExists)
+                    {
+                        return BadRequest("Target floor does not exist.");
+                    }
+                    player.FloorId = request.NewFloorId;
+                }
+                else
+                {
+                    bool isAdjacent = (Math.Abs(request.NewPositionX - player.SubPositionX) +
+                                    Math.Abs(request.NewPositionY - player.SubPositionY)) == 1;
+
+                    if (!isAdjacent)
+                    {
+                        return BadRequest("move > 1");
+                    }
+
+                    player.SubPositionX = request.NewPositionX;
+                    player.SubPositionY = request.NewPositionY;
+                }
+            }
+            else
+            {
                 bool isAdjacent = (Math.Abs((request.NewPositionX - player.SubPositionX)) +
-                               Math.Abs(request.NewPositionY - player.SubPositionY)) == 1;
+                                Math.Abs(request.NewPositionY - player.SubPositionY)) == 1;
 
                 if (!isAdjacent)
                 {
@@ -124,7 +158,6 @@ namespace game.Server.Controllers
                 player.SubPositionX = request.NewPositionX;
                 player.SubPositionY = request.NewPositionY;
             }
-
 
             await context.SaveChangesAsync();
             return Ok(player);

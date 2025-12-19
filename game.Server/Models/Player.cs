@@ -37,6 +37,7 @@ namespace game.Server.Models
 
         public int SubPositionX { get; set; }
         public int SubPositionY { get; set; }
+        public int? FloorId { get; set; } = null!;
 
         public int Capacity { get; set; } = 10;
         public int Seed { get; set; } = 0;

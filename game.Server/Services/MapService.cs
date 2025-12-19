@@ -25,6 +25,8 @@ public class MapGeneratorService
                     BuildingType = type,
                     PositionX = x,
                     PositionY = y,
+                    Height = 5,
+                    ReachedHeight = 0,
                     IsBossDefeated = false
                 });
             }
@@ -39,6 +41,7 @@ public class MapGeneratorService
         for (int i = 0; i < floorCount; i++)
         {
             Random rng = new Random(combinedSeed + i);
+            bool isLastFloor = (i == floorCount - 1);
 
             var floor = new Floor
             {
@@ -49,41 +52,57 @@ public class MapGeneratorService
 
             floor.FloorItems.Add(new FloorItem
             {
-                PositionX = 3,
-                PositionY = 3,
+                PositionX = 2,
+                PositionY = 2,
                 FloorItemType = FloorItemType.Stair
             });
+
+            if (!isLastFloor)
+            {
+                floor.FloorItems.Add(new FloorItem
+                {
+                    PositionX = 5,
+                    PositionY = 2,
+                    FloorItemType = FloorItemType.Stair
+                });
+            }
 
             int chestCount = rng.Next(1, 4);
             for (int c = 0; c < chestCount; c++)
             {
-                var item = new FloorItem
+                floor.FloorItems.Add(new FloorItem
                 {
                     PositionX = rng.Next(0, 8),
                     PositionY = rng.Next(0, 8),
                     FloorItemType = FloorItemType.Chest,
                     Chest = new Chest()
-                };
-                floor.FloorItems.Add(item);
+                });
             }
 
-            int enemyCount = rng.Next(2, 5); 
-            for (int e = 0; e < enemyCount; e++)
+            if (isLastFloor)
             {
-                var types = Enum.GetValues<EnemyType>();
-                var selectedType = (EnemyType)types.GetValue(rng.Next(types.Length));
-
-                var item = new FloorItem
+                floor.FloorItems.Add(new FloorItem
                 {
                     PositionX = rng.Next(0, 8),
                     PositionY = rng.Next(0, 8),
                     FloorItemType = FloorItemType.Enemy,
-                    Enemy = new Enemy
-                    {
-                        Health = selectedType == EnemyType.Dragon ? 100 : 20,
-                    }
-                };
-                floor.FloorItems.Add(item);
+                    Enemy = new Enemy { Health = 100}
+                });
+            }
+
+            int enemyCount = isLastFloor ? rng.Next(1, 3) : rng.Next(2, 5);
+            for (int e = 0; e < enemyCount; e++)
+            {
+                var randomEnemyPool = Enum.GetValues<EnemyType>().Where(t => t != EnemyType.Dragon).ToList();
+                var selectedType = randomEnemyPool[rng.Next(randomEnemyPool.Count)];
+
+                floor.FloorItems.Add(new FloorItem
+                {
+                    PositionX = rng.Next(0, 8),
+                    PositionY = rng.Next(0, 8),
+                    FloorItemType = FloorItemType.Enemy,
+                    Enemy = new Enemy { Health = 20}
+                });
             }
 
             floors.Add(floor);
