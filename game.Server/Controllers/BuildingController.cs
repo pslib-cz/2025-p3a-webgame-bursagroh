@@ -1,6 +1,6 @@
 ﻿using game.Server.Data;
 using game.Server.Models;
-using game.Server.Services; // Ensure your MapGeneratorService is in this namespace
+using game.Server.Services; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
