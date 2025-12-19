@@ -26,6 +26,9 @@ namespace game.Server.Data
         public DbSet<Blueprint> Blueprints { get; set; }
         public DbSet<Crafting> Craftings { get; set; }
 
+        public DbSet<Enemy> Enemies { get; set; }
+        public DbSet<Chest> Chests { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }

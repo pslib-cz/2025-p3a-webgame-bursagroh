@@ -1,8 +1,11 @@
 ﻿using game.Server.Data;
 using game.Server.Models;
+using game.Server.Services; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace game.Server.Controllers
@@ -18,30 +21,88 @@ namespace game.Server.Controllers
             _context = context;
         }
 
-
         [HttpGet("{playerId}")]
-        public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int? top, [FromQuery] int? left, [FromQuery] int? width, [FromQuery] int? height)
+        public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
         {
-            bool playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
-            if (!playerExists)
+            var playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
+            if (!playerExists) return NotFound();
+
+            int minX = left;
+            int maxX = left + width;
+            int minY = top;
+            int maxY = top + height;
+
+            var existingBuildings = await _context.Buildings
+                .Where(b => b.PlayerId == playerId &&
+                            b.PositionX >= minX && b.PositionX <= maxX &&
+                            b.PositionY >= minY && b.PositionY <= maxY)
+                .ToListAsync();
+
+            var mapGenerator = new MapGeneratorService();
+            var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY);
+
+            var newBuildings = proceduralBuildings
+                .Where(pb => !existingBuildings.Any(eb => eb.PositionX == pb.PositionX && eb.PositionY == pb.PositionY))
+                .ToList();
+
+            if (newBuildings.Any())
             {
-                return NotFound();
+                _context.Buildings.AddRange(newBuildings);
+                await _context.SaveChangesAsync();
+                existingBuildings.AddRange(newBuildings);
             }
 
-            IQueryable<Building> query = _context.Buildings.Where(b => b.PlayerId == playerId);
+            return Ok(existingBuildings);
+        }
 
-            if (top.HasValue && left.HasValue && width.HasValue && height.HasValue)
+        [HttpGet("{buildingId}/Interior/{level}")]
+        public async Task<ActionResult<Floor>> GetSpecificFloor(int buildingId, int level)
+        {
+            var building = await _context.Buildings.FindAsync(buildingId);
+
+
+            if (building.Height.HasValue && level >= building.Height.Value)
             {
-                int minX = left.Value;
-                int maxX = left.Value + width.Value;
-                int minY = top.Value;
-                int maxY = top.Value + height.Value;
-
-                query = query.Where(b => b.PositionX >= minX && b.PositionX <= maxX && b.PositionY >= minY && b.PositionY <= maxY);
+                return BadRequest($"Building only has {building.Height} floors (Levels 0 to {building.Height - 1}). Level {level} is out of bounds.");
             }
 
-            List<Building> buildings = await query.ToListAsync();
-            return Ok(buildings);
+            var floorsBelowCount = await _context.Floors
+                .Where(f => f.BuildingId == buildingId && f.Level < level)
+                .CountAsync();
+
+            if (floorsBelowCount < level)
+            {
+                return BadRequest($"Cannot access floor {level} because floors below it have not been cleared or generated yet.");
+            }
+
+            var targetFloor = await _context.Floors
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.Chest)
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.Enemy)
+                .FirstOrDefaultAsync(f => f.BuildingId == buildingId && f.Level == level);
+
+            if (targetFloor != null)
+            {
+                return Ok(targetFloor);
+            }
+
+            var mapGenerator = new MapGeneratorService();
+            int combinedSeed = buildingId; //dodelat
+
+            var generatedFloors = mapGenerator.GenerateInterior(buildingId, combinedSeed, level + 1);
+            var newFloor = generatedFloors.FirstOrDefault(f => f.Level == level);
+
+            if (newFloor != null)
+            {
+                _context.Floors.Add(newFloor);
+                building.ReachedHeight = level;
+
+                await _context.SaveChangesAsync();
+                return Ok(newFloor);
+            }
+
+            return StatusCode(500, "Error generating floor.");
         }
     }
 }

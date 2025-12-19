@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251213095812_m3")]
-    partial class m3
+    [Migration("20251219172713_niggerr")]
+    partial class niggerr
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,7 @@ namespace game.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("EndTime")
+                    b.Property<DateTime?>("EndTime")
                         .HasColumnType("TEXT");
 
                     b.Property<Guid>("PlayerId")
@@ -35,7 +35,7 @@ namespace game.Server.Migrations
                     b.Property<int>("RecipeId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("StartTime")
+                    b.Property<DateTime?>("StartTime")
                         .HasColumnType("TEXT");
 
                     b.HasKey("RecipeTimeId");
@@ -136,6 +136,31 @@ namespace game.Server.Migrations
                         });
                 });
 
+            modelBuilder.Entity("game.Server.Models.Blueprint", b =>
+                {
+                    b.Property<int>("BlueprintId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Price")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("BlueprintId");
+
+                    b.ToTable("Blueprints");
+
+                    b.HasData(
+                        new
+                        {
+                            BlueprintId = 1,
+                            ItemId = 10,
+                            Price = 5
+                        });
+                });
+
             modelBuilder.Entity("game.Server.Models.Building", b =>
                 {
                     b.Property<int>("BuildingId")
@@ -177,6 +202,77 @@ namespace game.Server.Migrations
                             PositionX = 0,
                             PositionY = 0
                         });
+                });
+
+            modelBuilder.Entity("game.Server.Models.Chest", b =>
+                {
+                    b.Property<int>("ChestId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FloorItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ChestId");
+
+                    b.HasIndex("FloorItemId")
+                        .IsUnique();
+
+                    b.ToTable("Chests");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Crafting", b =>
+                {
+                    b.Property<int>("CraftingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BlueprintId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("CraftingId");
+
+                    b.HasIndex("BlueprintId");
+
+                    b.ToTable("Craftings");
+
+                    b.HasData(
+                        new
+                        {
+                            CraftingId = 1,
+                            Amount = 3,
+                            BlueprintId = 1,
+                            ItemId = 1
+                        });
+                });
+
+            modelBuilder.Entity("game.Server.Models.Enemy", b =>
+                {
+                    b.Property<int>("EnemyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FloorItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Health")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemInstanceId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("EnemyId");
+
+                    b.HasIndex("FloorItemId")
+                        .IsUnique();
+
+                    b.ToTable("Enemies");
                 });
 
             modelBuilder.Entity("game.Server.Models.Floor", b =>
@@ -283,6 +379,377 @@ namespace game.Server.Migrations
                             IngredienceType = 3,
                             Order = 3,
                             RecipeId = 1
+                        },
+                        new
+                        {
+                            IngredienceId = 4,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 2
+                        },
+                        new
+                        {
+                            IngredienceId = 5,
+                            IngredienceType = 0,
+                            Order = 2,
+                            RecipeId = 2
+                        },
+                        new
+                        {
+                            IngredienceId = 6,
+                            IngredienceType = 7,
+                            Order = 3,
+                            RecipeId = 2
+                        },
+                        new
+                        {
+                            IngredienceId = 7,
+                            IngredienceType = 3,
+                            Order = 4,
+                            RecipeId = 2
+                        },
+                        new
+                        {
+                            IngredienceId = 8,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 3
+                        },
+                        new
+                        {
+                            IngredienceId = 9,
+                            IngredienceType = 0,
+                            Order = 2,
+                            RecipeId = 3
+                        },
+                        new
+                        {
+                            IngredienceId = 10,
+                            IngredienceType = 6,
+                            Order = 3,
+                            RecipeId = 3
+                        },
+                        new
+                        {
+                            IngredienceId = 11,
+                            IngredienceType = 3,
+                            Order = 4,
+                            RecipeId = 3
+                        },
+                        new
+                        {
+                            IngredienceId = 12,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 4
+                        },
+                        new
+                        {
+                            IngredienceId = 13,
+                            IngredienceType = 1,
+                            Order = 2,
+                            RecipeId = 4
+                        },
+                        new
+                        {
+                            IngredienceId = 14,
+                            IngredienceType = 4,
+                            Order = 3,
+                            RecipeId = 4
+                        },
+                        new
+                        {
+                            IngredienceId = 15,
+                            IngredienceType = 5,
+                            Order = 4,
+                            RecipeId = 4
+                        },
+                        new
+                        {
+                            IngredienceId = 16,
+                            IngredienceType = 1,
+                            Order = 5,
+                            RecipeId = 4
+                        },
+                        new
+                        {
+                            IngredienceId = 17,
+                            IngredienceType = 3,
+                            Order = 6,
+                            RecipeId = 4
+                        },
+                        new
+                        {
+                            IngredienceId = 18,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 5
+                        },
+                        new
+                        {
+                            IngredienceId = 19,
+                            IngredienceType = 6,
+                            Order = 2,
+                            RecipeId = 5
+                        },
+                        new
+                        {
+                            IngredienceId = 20,
+                            IngredienceType = 1,
+                            Order = 3,
+                            RecipeId = 5
+                        },
+                        new
+                        {
+                            IngredienceId = 21,
+                            IngredienceType = 4,
+                            Order = 4,
+                            RecipeId = 5
+                        },
+                        new
+                        {
+                            IngredienceId = 22,
+                            IngredienceType = 3,
+                            Order = 5,
+                            RecipeId = 5
+                        },
+                        new
+                        {
+                            IngredienceId = 23,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 6
+                        },
+                        new
+                        {
+                            IngredienceId = 24,
+                            IngredienceType = 5,
+                            Order = 2,
+                            RecipeId = 6
+                        },
+                        new
+                        {
+                            IngredienceId = 25,
+                            IngredienceType = 0,
+                            Order = 3,
+                            RecipeId = 6
+                        },
+                        new
+                        {
+                            IngredienceId = 26,
+                            IngredienceType = 1,
+                            Order = 4,
+                            RecipeId = 6
+                        },
+                        new
+                        {
+                            IngredienceId = 27,
+                            IngredienceType = 3,
+                            Order = 5,
+                            RecipeId = 6
+                        },
+                        new
+                        {
+                            IngredienceId = 28,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 7
+                        },
+                        new
+                        {
+                            IngredienceId = 29,
+                            IngredienceType = 5,
+                            Order = 2,
+                            RecipeId = 7
+                        },
+                        new
+                        {
+                            IngredienceId = 30,
+                            IngredienceType = 4,
+                            Order = 3,
+                            RecipeId = 7
+                        },
+                        new
+                        {
+                            IngredienceId = 31,
+                            IngredienceType = 0,
+                            Order = 4,
+                            RecipeId = 7
+                        },
+                        new
+                        {
+                            IngredienceId = 32,
+                            IngredienceType = 6,
+                            Order = 5,
+                            RecipeId = 7
+                        },
+                        new
+                        {
+                            IngredienceId = 33,
+                            IngredienceType = 1,
+                            Order = 6,
+                            RecipeId = 7
+                        },
+                        new
+                        {
+                            IngredienceId = 34,
+                            IngredienceType = 3,
+                            Order = 7,
+                            RecipeId = 7
+                        },
+                        new
+                        {
+                            IngredienceId = 35,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 8
+                        },
+                        new
+                        {
+                            IngredienceId = 36,
+                            IngredienceType = 1,
+                            Order = 2,
+                            RecipeId = 8
+                        },
+                        new
+                        {
+                            IngredienceId = 37,
+                            IngredienceType = 0,
+                            Order = 3,
+                            RecipeId = 8
+                        },
+                        new
+                        {
+                            IngredienceId = 38,
+                            IngredienceType = 3,
+                            Order = 4,
+                            RecipeId = 8
+                        },
+                        new
+                        {
+                            IngredienceId = 39,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 9
+                        },
+                        new
+                        {
+                            IngredienceId = 40,
+                            IngredienceType = 0,
+                            Order = 2,
+                            RecipeId = 9
+                        },
+                        new
+                        {
+                            IngredienceId = 41,
+                            IngredienceType = 0,
+                            Order = 3,
+                            RecipeId = 9
+                        },
+                        new
+                        {
+                            IngredienceId = 42,
+                            IngredienceType = 0,
+                            Order = 4,
+                            RecipeId = 9
+                        },
+                        new
+                        {
+                            IngredienceId = 43,
+                            IngredienceType = 3,
+                            Order = 5,
+                            RecipeId = 9
+                        },
+                        new
+                        {
+                            IngredienceId = 44,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 10
+                        },
+                        new
+                        {
+                            IngredienceId = 45,
+                            IngredienceType = 5,
+                            Order = 2,
+                            RecipeId = 10
+                        },
+                        new
+                        {
+                            IngredienceId = 46,
+                            IngredienceType = 0,
+                            Order = 3,
+                            RecipeId = 10
+                        },
+                        new
+                        {
+                            IngredienceId = 47,
+                            IngredienceType = 6,
+                            Order = 4,
+                            RecipeId = 10
+                        },
+                        new
+                        {
+                            IngredienceId = 48,
+                            IngredienceType = 4,
+                            Order = 5,
+                            RecipeId = 10
+                        },
+                        new
+                        {
+                            IngredienceId = 49,
+                            IngredienceType = 3,
+                            Order = 6,
+                            RecipeId = 10
+                        },
+                        new
+                        {
+                            IngredienceId = 50,
+                            IngredienceType = 2,
+                            Order = 1,
+                            RecipeId = 11
+                        },
+                        new
+                        {
+                            IngredienceId = 51,
+                            IngredienceType = 1,
+                            Order = 2,
+                            RecipeId = 11
+                        },
+                        new
+                        {
+                            IngredienceId = 52,
+                            IngredienceType = 4,
+                            Order = 3,
+                            RecipeId = 11
+                        },
+                        new
+                        {
+                            IngredienceId = 53,
+                            IngredienceType = 7,
+                            Order = 4,
+                            RecipeId = 11
+                        },
+                        new
+                        {
+                            IngredienceId = 54,
+                            IngredienceType = 0,
+                            Order = 5,
+                            RecipeId = 11
+                        },
+                        new
+                        {
+                            IngredienceId = 55,
+                            IngredienceType = 6,
+                            Order = 6,
+                            RecipeId = 11
+                        },
+                        new
+                        {
+                            IngredienceId = 56,
+                            IngredienceType = 3,
+                            Order = 7,
+                            RecipeId = 11
                         });
                 });
 
@@ -304,15 +771,6 @@ namespace game.Server.Migrations
                     b.HasKey("InventoryItemId");
 
                     b.ToTable("InventoryItems");
-
-                    b.HasData(
-                        new
-                        {
-                            InventoryItemId = 52,
-                            IsInBank = true,
-                            ItemInstanceId = 85,
-                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0")
-                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Item", b =>
@@ -356,7 +814,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 1,
-                            ChangeOfGenerating = 5,
+                            ChangeOfGenerating = 20,
                             Damage = 0,
                             Description = "Wooden Frame",
                             ItemType = 4,
@@ -367,7 +825,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 2,
-                            ChangeOfGenerating = 1,
+                            ChangeOfGenerating = 80,
                             Damage = 0,
                             Description = "Rock",
                             ItemType = 4,
@@ -378,7 +836,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 3,
-                            ChangeOfGenerating = 5,
+                            ChangeOfGenerating = 15,
                             Damage = 0,
                             Description = "Copper Ore",
                             ItemType = 4,
@@ -389,7 +847,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 4,
-                            ChangeOfGenerating = 5,
+                            ChangeOfGenerating = 15,
                             Damage = 0,
                             Description = "Iron Ore",
                             ItemType = 4,
@@ -411,7 +869,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 6,
-                            ChangeOfGenerating = 20,
+                            ChangeOfGenerating = 10,
                             Damage = 0,
                             Description = "Gold Ore",
                             ItemType = 4,
@@ -422,7 +880,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 7,
-                            ChangeOfGenerating = 50,
+                            ChangeOfGenerating = 2,
                             Damage = 0,
                             Description = "Unobtainium Ore",
                             ItemType = 4,
@@ -757,13 +1215,10 @@ namespace game.Server.Migrations
                     b.Property<int>("BankBalance")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("BuildingId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("Capacity")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("FloorItemId")
+                    b.Property<int?>("FloorId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Money")
@@ -773,15 +1228,25 @@ namespace game.Server.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("PositionX")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PositionY")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("ScreenType")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Seed")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("PlayerId");
+                    b.Property<int>("SubPositionX")
+                        .HasColumnType("INTEGER");
 
-                    b.HasIndex("FloorItemId");
+                    b.Property<int>("SubPositionY")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PlayerId");
 
                     b.ToTable("Players");
 
@@ -793,8 +1258,12 @@ namespace game.Server.Migrations
                             Capacity = 10,
                             Money = 100,
                             Name = "Seeded Player",
+                            PositionX = 0,
+                            PositionY = 0,
                             ScreenType = 0,
-                            Seed = 252
+                            Seed = 252,
+                            SubPositionX = 0,
+                            SubPositionY = 0
                         });
                 });
 
@@ -816,7 +1285,57 @@ namespace game.Server.Migrations
                         new
                         {
                             RecipeId = 1,
-                            Name = "Hamburger"
+                            Name = "Classic Hamburger"
+                        },
+                        new
+                        {
+                            RecipeId = 2,
+                            Name = "Cheeseburger"
+                        },
+                        new
+                        {
+                            RecipeId = 3,
+                            Name = "Bacon Burger"
+                        },
+                        new
+                        {
+                            RecipeId = 4,
+                            Name = "Veggie Deluxe"
+                        },
+                        new
+                        {
+                            RecipeId = 5,
+                            Name = "BLT Sandwich"
+                        },
+                        new
+                        {
+                            RecipeId = 6,
+                            Name = "Chicken Sandwich"
+                        },
+                        new
+                        {
+                            RecipeId = 7,
+                            Name = "The Works Burger"
+                        },
+                        new
+                        {
+                            RecipeId = 8,
+                            Name = "Simple Salad Burger"
+                        },
+                        new
+                        {
+                            RecipeId = 9,
+                            Name = "Triple Meat Stack"
+                        },
+                        new
+                        {
+                            RecipeId = 10,
+                            Name = "Saucy Bacon Tomato Burger"
+                        },
+                        new
+                        {
+                            RecipeId = 11,
+                            Name = "Bacon Cheeseburger Deluxe"
                         });
                 });
 
@@ -829,6 +1348,33 @@ namespace game.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Chest", b =>
+                {
+                    b.HasOne("game.Server.Models.FloorItem", null)
+                        .WithOne("Chest")
+                        .HasForeignKey("game.Server.Models.Chest", "FloorItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("game.Server.Models.Crafting", b =>
+                {
+                    b.HasOne("game.Server.Models.Blueprint", null)
+                        .WithMany("Craftings")
+                        .HasForeignKey("BlueprintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("game.Server.Models.Enemy", b =>
+                {
+                    b.HasOne("game.Server.Models.FloorItem", null)
+                        .WithOne("Enemy")
+                        .HasForeignKey("game.Server.Models.Enemy", "FloorItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("game.Server.Models.Floor", b =>
@@ -899,13 +1445,9 @@ namespace game.Server.Migrations
                     b.Navigation("Mine");
                 });
 
-            modelBuilder.Entity("game.Server.Models.Player", b =>
+            modelBuilder.Entity("game.Server.Models.Blueprint", b =>
                 {
-                    b.HasOne("game.Server.Models.FloorItem", "FloorItem")
-                        .WithMany()
-                        .HasForeignKey("FloorItemId");
-
-                    b.Navigation("FloorItem");
+                    b.Navigation("Craftings");
                 });
 
             modelBuilder.Entity("game.Server.Models.Building", b =>
@@ -916,6 +1458,13 @@ namespace game.Server.Migrations
             modelBuilder.Entity("game.Server.Models.Floor", b =>
                 {
                     b.Navigation("FloorItems");
+                });
+
+            modelBuilder.Entity("game.Server.Models.FloorItem", b =>
+                {
+                    b.Navigation("Chest");
+
+                    b.Navigation("Enemy");
                 });
 
             modelBuilder.Entity("game.Server.Models.ItemInstance", b =>

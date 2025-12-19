@@ -25,12 +25,20 @@ namespace game.Server.Models
         public int BankBalance { get; set; }
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public ScreenTypes ScreenType { get; set; } = ScreenTypes.City;
-        public int? BuildingId { get; set; }
+        //public int? BuildingId { get; set; }
         //[ForeignKey("BuildingId")]
         //public Building? Building { get; set; }
-        public int? FloorItemId { get; set; }
-        [ForeignKey("FloorItemId")]
-        public FloorItem? FloorItem { get; set; }
+        //public int? FloorItemId { get; set; }
+        //[ForeignKey("FloorItemId")]
+        //public FloorItem? FloorItem { get; set; }
+
+        public int PositionX { get; set; }
+        public int PositionY { get; set; }
+
+        public int SubPositionX { get; set; }
+        public int SubPositionY { get; set; }
+        public int? FloorId { get; set; } = null!;
+
         public int Capacity { get; set; } = 10;
         public int Seed { get; set; } = 0;
     }
