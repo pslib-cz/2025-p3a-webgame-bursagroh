@@ -70,13 +70,13 @@ namespace game.Server.Controllers
         {
             if (mineId <= 0 || startLayer < 0 || endLayer < 0 || startLayer > endLayer)
             {
-                return BadRequest("Neplatné parametry pro rozsah vrstev. Ujistěte se, že ID dolu > 0, vrstvy >= 0 a startLayer <= endLayer.");
+                return BadRequest("invalid args");
             }
 
             const int MaxLayerRange = 20;
             if (endLayer - startLayer >= MaxLayerRange)
             {
-                return BadRequest($"Rozsah vrstev nesmí překročit {MaxLayerRange}.");
+                return BadRequest($"layers are over {MaxLayerRange}.");
             }
 
             try
