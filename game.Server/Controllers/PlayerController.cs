@@ -114,7 +114,7 @@ namespace game.Server.Controllers
 
                 if (!isAdjacent)
                 {
-                    return BadRequest("move > 1");
+                    return BadRequest("move > 1 nebo ses nepohnul");
                 }
 
                 player.PositionX = request.NewPositionX;
@@ -138,7 +138,7 @@ namespace game.Server.Controllers
 
                     if (!isAdjacent)
                     {
-                        return BadRequest("move > 1");
+                        return BadRequest("move > 1 nebo ses nepohnul");
                     }
 
                     player.SubPositionX = request.NewPositionX;
@@ -152,7 +152,7 @@ namespace game.Server.Controllers
 
                 if (!isAdjacent)
                 {
-                    return BadRequest("move > 1");
+                    return BadRequest("move > 1 nebo ses nepohnul");
                 }
 
                 player.SubPositionX = request.NewPositionX;
