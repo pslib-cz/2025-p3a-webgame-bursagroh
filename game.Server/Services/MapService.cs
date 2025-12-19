@@ -49,20 +49,41 @@ public class MapGeneratorService
 
             floor.FloorItems.Add(new FloorItem
             {
-                PositionX = rng.Next(0, 8),
-                PositionY = 0,
+                PositionX = 3,
+                PositionY = 3,
                 FloorItemType = FloorItemType.Stair
             });
 
             int chestCount = rng.Next(1, 4);
             for (int c = 0; c < chestCount; c++)
             {
-                floor.FloorItems.Add(new FloorItem
+                var item = new FloorItem
                 {
                     PositionX = rng.Next(0, 8),
-                    PositionY = rng.Next(1, 8),
-                    FloorItemType = FloorItemType.Chest
-                });
+                    PositionY = rng.Next(0, 8),
+                    FloorItemType = FloorItemType.Chest,
+                    Chest = new Chest()
+                };
+                floor.FloorItems.Add(item);
+            }
+
+            int enemyCount = rng.Next(2, 5); 
+            for (int e = 0; e < enemyCount; e++)
+            {
+                var types = Enum.GetValues<EnemyType>();
+                var selectedType = (EnemyType)types.GetValue(rng.Next(types.Length));
+
+                var item = new FloorItem
+                {
+                    PositionX = rng.Next(0, 8),
+                    PositionY = rng.Next(0, 8),
+                    FloorItemType = FloorItemType.Enemy,
+                    Enemy = new Enemy
+                    {
+                        Health = selectedType == EnemyType.Dragon ? 100 : 20,
+                    }
+                };
+                floor.FloorItems.Add(item);
             }
 
             floors.Add(floor);
