@@ -68,6 +68,7 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        
         [HttpGet("ScreenTypes")]
         public ActionResult<IEnumerable<string>> GetScreenTypes()
         {
@@ -75,6 +76,11 @@ namespace game.Server.Controllers
             return Ok(screenTypes);
         }
 
+        /// <remarks>
+        /// - zmena obrazovky
+        /// - pri vstupu do city resetuje i subposX a subposY na 0
+        /// - pokud je hrac v AbandonedTrap tak nemuze odejit z budovy
+        /// </remarks>
         [HttpPatch("{id}/Action/move-screen")]
         public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest newScreenType)
         {
@@ -125,6 +131,11 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        /// <remarks>
+        /// - pohyb 
+        /// - pokud je floorId na null, tak se meni PositionX a PositionY 
+        /// - jinak se meni patro a pozice jsou ignorovany 
+        /// </remarks>
         [HttpPatch("{id}/Action/move")]
         public async Task<ActionResult<Player>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
