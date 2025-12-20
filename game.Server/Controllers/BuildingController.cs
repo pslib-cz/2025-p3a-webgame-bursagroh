@@ -85,7 +85,7 @@ namespace game.Server.Controllers
 
             if ((building.BuildingType != BuildingTypes.Abandoned) && (building.BuildingType != BuildingTypes.AbandonedTrap))
             {
-                return BadRequest("Interior floors can only be accessed for Abandoned building types.");
+                return BadRequest("Interior floors can only be accessed for Abandoned or AbandonedTrap building types.");
             }
 
             if (building.Height.HasValue && level >= building.Height.Value)
@@ -99,7 +99,7 @@ namespace game.Server.Controllers
 
                 if (currentPlayerFloor == null || currentPlayerFloor.BuildingId != buildingId || currentPlayerFloor.Level != level - 1)
                 {
-                    return BadRequest($"Cannot generate floor {level} unless you are standing on floor {level - 1}.");
+                    return BadRequest($"Cannot generate floor {level} unless you are standing on floor {level - 1}. Do not forget that you have to use the player move endpoint to get assigned into the 0th level.");
                 }
             }
 
