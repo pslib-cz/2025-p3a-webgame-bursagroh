@@ -14,19 +14,17 @@ namespace game.Server.Services
         {
             _context = context;
         }
-
-        public async Task<List<MineBlock>> GetOrGenerateLayerBlocksAsync(int mineId, int depth)
+        public async Task<List<MineBlock>> GetOrGenerateLayersBlocksAsync(int mineId, int startDepth, int? endDepth = null)
         {
-            var existingLayer = await _context.MineLayers
-                .Where(ml => ml.MineId == mineId && ml.Depth == depth)
-                .Include(ml => ml.MineBlocks).ThenInclude(mb => mb.Block).ThenInclude(b => b.Item) 
-                .FirstOrDefaultAsync();
+            int actualEndDepth = endDepth.HasValue ? endDepth.Value : startDepth;
 
-            if (existingLayer != null && existingLayer.MineBlocks.Any())
+            if (startDepth > actualEndDepth)
             {
-                return existingLayer.MineBlocks
-                    .OrderBy(mb => mb.Index)
-                    .ToList();
+                throw new ArgumentException("Start depth cannot be greater than end depth.");
+            }
+            if (startDepth < 0)
+            {
+                throw new ArgumentException("Depth cannot be negative.");
             }
 
             var mineExists = await _context.Mines.AnyAsync(m => m.MineId == mineId);
@@ -35,25 +33,15 @@ namespace game.Server.Services
                 throw new InvalidOperationException($"Mine with ID {mineId} does not exist.");
             }
 
-            MineLayer layer;
-            if (existingLayer != null)
-            {
-                layer = existingLayer;
-            }
-            else
-            {
-                layer = new MineLayer
-                {
-                    MineId = mineId,
-                    Depth = depth,
-                    MineBlocks = new List<MineBlock>()
-                };
-                _context.MineLayers.Add(layer);
-            }
-
-            var availableBlocks = await _context.Blocks
-                .Include(b => b.Item) 
+            var existingLayers = await _context.MineLayers
+                .Where(ml => ml.MineId == mineId && ml.Depth >= startDepth && ml.Depth <= actualEndDepth)
+                .Include(ml => ml.MineBlocks)
+                    .ThenInclude(mb => mb.Block)
+                        .ThenInclude(b => b.Item)
                 .ToListAsync();
+
+            var allBlocks = new List<MineBlock>();
+            var availableBlocks = await _context.Blocks.Include(b => b.Item).ToListAsync();
 
             if (!availableBlocks.Any())
             {
@@ -61,49 +49,63 @@ namespace game.Server.Services
             }
 
             var totalWeight = availableBlocks.Sum(b => b.Item.ChangeOfGenerating);
-
-
             var random = new Random();
-            var generatedMineBlocks = new List<MineBlock>();
+            bool changesMade = false;
 
-            for (int i = 0; i < LayerSize; i++)
+            for (int depth = startDepth; depth <= actualEndDepth; depth++)
             {
-               
-                var randomNumber = random.Next(totalWeight);
+                var currentLayer = existingLayers.FirstOrDefault(ml => ml.Depth == depth);
 
-                Block blockDefinition = null!;
-                var runningWeight = 0;
-
-                
-                foreach (var block in availableBlocks)
+                if (currentLayer == null || !currentLayer.MineBlocks.Any())
                 {
-                    runningWeight += block.Item.ChangeOfGenerating;
-                    if (randomNumber < runningWeight)
+                    if (currentLayer == null)
                     {
-                        blockDefinition = block;
-                        break;
+                        currentLayer = new MineLayer
+                        {
+                            MineId = mineId,
+                            Depth = depth,
+                            MineBlocks = new List<MineBlock>()
+                        };
+                        _context.MineLayers.Add(currentLayer);
                     }
+
+                    for (int i = 0; i < LayerSize; i++)
+                    {
+                        var randomNumber = random.Next(totalWeight);
+                        Block blockDefinition = availableBlocks.First();
+                        var runningWeight = 0;
+
+                        foreach (var block in availableBlocks)
+                        {
+                            runningWeight += block.Item.ChangeOfGenerating;
+                            if (randomNumber < runningWeight)
+                            {
+                                blockDefinition = block;
+                                break;
+                            }
+                        }
+
+                        var mineBlock = new MineBlock
+                        {
+                            MineLayer = currentLayer,
+                            BlockId = blockDefinition.BlockId,
+                            Block = blockDefinition,
+                            Index = i
+                        };
+                        currentLayer.MineBlocks.Add(mineBlock);
+                    }
+                    changesMade = true;
                 }
 
-                if (blockDefinition == null)
-                {
-                    blockDefinition = availableBlocks.First();
-                }
-
-                var mineBlock = new MineBlock
-                {
-                    MineLayer = layer,
-                    BlockId = blockDefinition.BlockId,
-                    Block = blockDefinition,
-                    Index = i
-                };
-                layer.MineBlocks.Add(mineBlock);
-
-                generatedMineBlocks.Add(mineBlock);
+                allBlocks.AddRange(currentLayer.MineBlocks.OrderBy(mb => mb.Index));
             }
 
-            await _context.SaveChangesAsync();
-            return generatedMineBlocks;
+            if (changesMade)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return allBlocks;
         }
     }
 }

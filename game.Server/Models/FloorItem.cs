@@ -8,8 +8,8 @@ namespace game.Server.Models
     {
        Stair,
        Chest,
-       Player
-       
+       Item,
+       Enemy
     }
 
     public class FloorItem
@@ -25,6 +25,9 @@ namespace game.Server.Models
 
         public int PositionX { get; set; }
         public int PositionY { get; set; }
+
+        public Chest? Chest { get; set; }
+        public Enemy? Enemy { get; set; }
 
 
         [JsonConverter(typeof(JsonStringEnumConverter))]

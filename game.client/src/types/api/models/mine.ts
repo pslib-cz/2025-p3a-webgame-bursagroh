@@ -1,0 +1,25 @@
+export type BlockType = "Wooden_Frame" | "Rock" | "Copper_Ore" | "Iron_Ore" | "Gold_Ore" | "Silver_Ore" | "Unobtanium_Ore"
+
+export type MineLayer = {
+    mineBlockId: number
+    mineLayerId: number
+    index: number
+    blockId: number
+    block: {
+        blockId: number
+        blockType: BlockType
+        itemId: number
+        item: {
+            itemId: number
+            name: string
+            description: string | null
+            itemType: number
+            weight: number
+            damage: number
+            maxDurability: number
+            changeOfGenerating: number
+        }
+        minAmount: number
+        maxAmount: number
+    }
+}

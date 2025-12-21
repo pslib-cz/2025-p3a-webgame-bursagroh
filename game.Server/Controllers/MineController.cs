@@ -56,8 +56,37 @@ namespace game.Server.Controllers
 
             try
             {
-                var blocks = await _mineService.GetOrGenerateLayerBlocksAsync(mineId, layer);
+                var blocks = await _mineService.GetOrGenerateLayersBlocksAsync(mineId, layer);
                 return Ok(blocks);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet("{mineId}/Layers")]
+        public async Task<ActionResult<List<MineBlock>>> GetLayerBlocksRange(int mineId, [FromQuery] int startLayer, [FromQuery] int endLayer)
+        {
+            if (mineId <= 0 || startLayer < 0 || endLayer < 0 || startLayer > endLayer)
+            {
+                return BadRequest("invalid args");
+            }
+
+            const int MaxLayerRange = 20;
+            if (endLayer - startLayer >= MaxLayerRange)
+            {
+                return BadRequest($"layers are over {MaxLayerRange}.");
+            }
+
+            try
+            {
+                List<MineBlock> blocks = await _mineService.GetOrGenerateLayersBlocksAsync(mineId, startLayer, endLayer);
+                return Ok(blocks);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
             catch (InvalidOperationException ex)
             {

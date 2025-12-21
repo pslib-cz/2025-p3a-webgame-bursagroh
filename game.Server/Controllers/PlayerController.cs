@@ -2,6 +2,7 @@ using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace game.Server.Controllers
 {
@@ -27,177 +28,28 @@ namespace game.Server.Controllers
                 Money = 0,
                 BankBalance = 0,
                 Capacity = 10,
-                Seed = new Random().Next()
-            };
+                Seed = new Random().Next(),
 
-            Building building = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.City,
                 PositionX = 0,
                 PositionY = 0,
-                IsBossDefeated = false
+                SubPositionX = 0,
+                SubPositionY = 0,
             };
 
-            Building fountain = new Building
+            var fixedBuildings = new List<Building>
             {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Fountain,
-                PositionX = 0,
-                PositionY = 0,
-                IsBossDefeated = false
-            };
-
-            Building mine = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Mine,
-                PositionX = 2,
-                PositionY = 0,
-                IsBossDefeated = false
-            };
-
-            Building bank = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Bank,
-                PositionX = -2,
-                PositionY = 0,
-                IsBossDefeated = false
-            };
-
-            Building restaurant = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Restaurant,
-                PositionX = 0,
-                PositionY = -2,
-                IsBossDefeated = false
-            };
-
-            Building blacksmith = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Blacksmith,
-                PositionX = -1,
-                PositionY = 0,
-                IsBossDefeated = false
-            };
-
-            Building road1 = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = 1,
-                PositionY = 0,
-                IsBossDefeated = false
-            };
-
-            Building road2 = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = -1,
-                PositionY = 0,
-                IsBossDefeated = false
-            };
-
-            Building road3 = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = 0,
-                PositionY = 1,
-                IsBossDefeated = false
-            };
-
-            Building road4 = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = 1,
-                PositionY = 1,
-                IsBossDefeated = false
-            };
-
-            Building road5 = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = -1,
-                PositionY = -1,
-                IsBossDefeated = false
-            };
-
-            Building road6 = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = 1,
-                PositionY = -1,
-                IsBossDefeated = false
-            };
-
-            Building road7 = new Building
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = -1,
-                PositionY = 1,
-                IsBossDefeated = false
-            };
-
-            Building road8 = new Building 
-            {
-                PlayerId = player.PlayerId,
-                BuildingType = BuildingTypes.Road,
-                PositionX = 0,
-                PositionY = -1,
-                IsBossDefeated = false
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Fountain, PositionX = 0, PositionY = 0, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Mine, PositionX = 2, PositionY = 0, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Bank, PositionX = -2, PositionY = 0, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Restaurant, PositionX = 0, PositionY = -2, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Blacksmith, PositionX = 0, PositionY = 2, IsBossDefeated = false }
             };
 
             context.Players.Add(player);
-
-            context.Buildings.Add(building);
-            context.Buildings.Add(fountain);
-            context.Buildings.Add(mine);
-            context.Buildings.Add(bank);
-            context.Buildings.Add(blacksmith);
-            context.Buildings.Add(restaurant);
-
-            context.Buildings.Add(road1);
-            context.Buildings.Add(road2);
-            context.Buildings.Add(road3);
-            context.Buildings.Add(road4);
-            context.Buildings.Add(road5);
-            context.Buildings.Add(road6);
-            context.Buildings.Add(road7);
-            context.Buildings.Add(road8);
-
+            context.Buildings.AddRange(fixedBuildings);
             await context.SaveChangesAsync();
 
-            Floor floor = new Floor
-            {
-                BuildingId = building.BuildingId, 
-                Level = 1
-            };
 
-            context.Floors.Add(floor);
-            await context.SaveChangesAsync();
-
-            FloorItem floorItem = new FloorItem
-            {
-                FloorId = floor.FloorId,
-                PositionX = 0,
-                PositionY = 0,
-                FloorItemType = FloorItemType.Player
-            };
-
-            context.FloorItems.Add(floorItem);
-            await context.SaveChangesAsync();
-
-            player.BuildingId = building.BuildingId;
-            player.FloorItemId = floorItem.FloorItemId;
 
             context.Players.Update(player);
             await context.SaveChangesAsync();
@@ -207,7 +59,7 @@ namespace game.Server.Controllers
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Player>> GetPlayer(Guid id) {
-            Player? player = await context.Players .Include(p => p.FloorItem).FirstOrDefaultAsync(p => p.PlayerId == id);
+            Player? player = await context.Players.Where(p => p.PlayerId == id).FirstOrDefaultAsync(p => p.PlayerId == id);
 
             if (player == null) {
                 return NotFound();
@@ -216,6 +68,7 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        
         [HttpGet("ScreenTypes")]
         public ActionResult<IEnumerable<string>> GetScreenTypes()
         {
@@ -223,7 +76,12 @@ namespace game.Server.Controllers
             return Ok(screenTypes);
         }
 
-        [HttpPatch("{id}/Action/move-screen")] //asi hodim do services
+        /// <remarks>
+        /// - zmena obrazovky
+        /// - pri vstupu do city resetuje i subposX a subposY na 0
+        /// - pokud je hrac v AbandonedTrap tak nemuze odejit z budovy
+        /// </remarks>
+        [HttpPatch("{id}/Action/move-screen")]
         public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest newScreenType)
         {
             Player? player = await context.Players.FindAsync(id);
@@ -233,152 +91,127 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-
-            if (newScreenType.NewScreenType == ScreenTypes.Mine)
+            if (player.ScreenType == ScreenTypes.Floor && newScreenType.NewScreenType == ScreenTypes.City)
             {
-                Building? mineBuilding = await context.Buildings
-                    .Where(b => b.PlayerId == player.PlayerId && b.BuildingType == BuildingTypes.Mine)
-                    .FirstOrDefaultAsync();
+                var currentFloor = await context.Floors.FindAsync(player.FloorId);
 
-                if (mineBuilding == null)
+                if (currentFloor == null || currentFloor.Level != 0)
                 {
-                    mineBuilding = new Building
-                    {
-                        PlayerId = player.PlayerId,
-                        BuildingType = BuildingTypes.Mine,
-                        PositionX = 2, //jelikoz jeste nemam udelanou generaci mapy tak je vse na 0,0, sorry jako
-                        PositionY = 0 //ona se i tak cela tahle generace budov se bude delat na generovani mapy a ne tady
-                    };
-                    context.Buildings.Add(mineBuilding);
-                    await context.SaveChangesAsync();
+                    return BadRequest("You can only leave the building from the ground floor (Level 0).");
                 }
 
-                Floor? floor = await context.Floors
-                    .Where(f => f.BuildingId == mineBuilding.BuildingId && f.Level == 1)
-                    .FirstOrDefaultAsync();
-
-                if (floor == null)
+                if (player.SubPositionX != 0 || player.SubPositionY != 0)
                 {
-                    floor = new Floor { BuildingId = mineBuilding.BuildingId, Level = 1 };
-                    context.Floors.Add(floor);
-                    await context.SaveChangesAsync();
+                    return BadRequest("You must be at the entrance (0, 0) to leave the building.");
                 }
 
-                FloorItem? playerFloorItem = await context.FloorItems
-                    .Where(fi => fi.FloorId == floor.FloorId && fi.FloorItemType == FloorItemType.Player)
-                    .FirstOrDefaultAsync();
+                var building = await context.Buildings.FirstOrDefaultAsync(b =>
+                    b.PositionX == player.PositionX &&
+                    b.PositionY == player.PositionY &&
+                    b.PlayerId == id);
 
-                if (playerFloorItem == null)
+                if (building != null && building.BuildingType == BuildingTypes.AbandonedTrap)
                 {
-                    playerFloorItem = new FloorItem
-                    {
-                        FloorId = floor.FloorId,
-                        PositionX = 0,
-                        PositionY = 0,
-                        FloorItemType = FloorItemType.Player
-                    };
-                    context.FloorItems.Add(playerFloorItem);
-                    await context.SaveChangesAsync();
+                    return BadRequest("This building is a trap!");
                 }
 
-                player.BuildingId = mineBuilding.BuildingId;
-                player.FloorItemId = playerFloorItem.FloorItemId; 
-                player.ScreenType = ScreenTypes.Mine;
-
-                await context.SaveChangesAsync();
-                return Ok(player);
-            }
-
-            if (newScreenType.NewScreenType == ScreenTypes.City)
-            {
-                Building? cityBuilding = await context.Buildings
-                    .Where(b => b.PlayerId == player.PlayerId && b.BuildingType == BuildingTypes.City)
-                    .FirstOrDefaultAsync();
-
-                Floor? floor = await context.Floors
-                    .Where(f => f.BuildingId == cityBuilding.BuildingId && f.Level == 1)
-                    .FirstOrDefaultAsync();
-
-                if (floor == null)
-                {
-                    floor = new Floor { BuildingId = cityBuilding.BuildingId, Level = 1 };
-                    context.Floors.Add(floor);
-                    await context.SaveChangesAsync();
-                }
-                FloorItem? playerFloorItem = await context.FloorItems
-                    .Where(fi => fi.FloorId == floor.FloorId && fi.FloorItemType == FloorItemType.Player)
-                    .FirstOrDefaultAsync();
-
-                if (playerFloorItem == null)
-                {
-                    playerFloorItem = new FloorItem
-                    {
-                        FloorId = floor.FloorId,
-                        PositionX = 0,
-                        PositionY = 0,
-                        FloorItemType = FloorItemType.Player
-                    };
-                    context.FloorItems.Add(playerFloorItem);
-                    await context.SaveChangesAsync();
-                }
-
-                player.BuildingId = cityBuilding.BuildingId; 
-                player.FloorItemId = playerFloorItem.FloorItemId;
-                player.ScreenType = ScreenTypes.City;
-
-                await context.SaveChangesAsync();
-                return Ok(player);
+                player.FloorId = null;
             }
 
             player.ScreenType = newScreenType.NewScreenType;
+
+            if (newScreenType.NewScreenType == ScreenTypes.City)
+            {
+                player.SubPositionX = 0;
+                player.SubPositionY = 0;
+            }
+
             await context.SaveChangesAsync();
 
             return Ok(player);
         }
 
+        /// <remarks>
+        /// - pohyb 
+        /// - pokud je floorId na null, tak se meni PositionX a PositionY 
+        /// - jinak se meni patro a pozice jsou ignorovany 
+        /// </remarks>
         [HttpPatch("{id}/Action/move")]
         public async Task<ActionResult<Player>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
-            Player? player = await context.Players
-                .Include(p => p.FloorItem)
-                .FirstOrDefaultAsync(p => p.PlayerId == id);
+            Player? player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
+            if (player == null) return NotFound();
 
-            if (player == null)
+            if (player.ScreenType == ScreenTypes.Floor && request.NewFloorId.HasValue && request.NewFloorId != player.FloorId)
             {
-                return NotFound();
-            }
+                var currentFloor = await context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+                var targetFloor = await context.Floors.FirstOrDefaultAsync(f => f.FloorId == request.NewFloorId);
 
-            FloorItem? currentPositionItem = player.FloorItem;
-
-            if (currentPositionItem == null)
-            {
-                if (player.FloorItemId.HasValue)
+                if (player.FloorId != null)
                 {
-                    currentPositionItem = await context.FloorItems.Where(fi => fi.FloorItemId == player.FloorItemId).FirstOrDefaultAsync();
+                    if (targetFloor == null || currentFloor == null)
+                    {
+                        return BadRequest("Current or target floor doesn't exist.");
+                    }
+
+                    if (targetFloor.BuildingId != currentFloor.BuildingId)
+                    {
+                        return BadRequest("You can't move between buildings like this.");
+                    }
+
+                    int levelDifference = targetFloor.Level - currentFloor.Level;
+
+                    if (levelDifference == 1)
+                    {
+                        if (player.SubPositionX != 5 || player.SubPositionY != 2)
+                        {
+                            return BadRequest("You must be at position (5, 2) to move UP a floor.");
+                        }
+                    }
+                    else if (levelDifference == -1)
+                    {
+                        if (player.SubPositionX != 2 || player.SubPositionY != 2)
+                        {
+                            return BadRequest("You must be at position (2, 2) to move DOWN a floor.");
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("You can move only one floor at a time.");
+                    }
                 }
 
-                if (currentPositionItem == null)
-                {
-                    return BadRequest();
-                }
+                player.FloorId = request.NewFloorId;
+                await context.SaveChangesAsync();
+                return Ok(player); 
             }
 
-            if (currentPositionItem.PositionX == request.NewPositionX && currentPositionItem.PositionY == request.NewPositionY)
+            if (player.ScreenType == ScreenTypes.Floor && (request.NewPositionX < 0 || request.NewPositionX > 7 || request.NewPositionY < 0 || request.NewPositionY > 7))
             {
-                return Ok(player);
+                return BadRequest("Coordinates are out of bounds.");
             }
 
-            bool isAdjacent = (Math.Abs(request.NewPositionX - currentPositionItem.PositionX) +
-                               Math.Abs(request.NewPositionY - currentPositionItem.PositionY)) == 1;
+            int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
+            int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
+
+            bool isAdjacent = (Math.Abs(request.NewPositionX - currentX) +
+                               Math.Abs(request.NewPositionY - currentY)) == 1;
 
             if (!isAdjacent)
             {
-                return BadRequest("move > 1: Only adjacent moves are allowed.");
+                return BadRequest("Move must be exactly 1 square.");
             }
 
-            // 4. Aktualizace pozice
-            currentPositionItem.PositionX = request.NewPositionX;
-            currentPositionItem.PositionY = request.NewPositionY;
+            if (player.ScreenType == ScreenTypes.City)
+            {
+                player.PositionX = request.NewPositionX;
+                player.PositionY = request.NewPositionY;
+            }
+            else
+            {
+                player.SubPositionX = request.NewPositionX;
+                player.SubPositionY = request.NewPositionY;
+            }
 
             await context.SaveChangesAsync();
             return Ok(player);
