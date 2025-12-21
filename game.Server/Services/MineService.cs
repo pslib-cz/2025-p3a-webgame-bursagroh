@@ -14,7 +14,7 @@ namespace game.Server.Services
         {
             _context = context;
         }
-        public async Task<List<MineBlock>> GetOrGenerateLayersBlocksAsync(int mineId, int startDepth, int? endDepth = null)
+        public async Task<List<MineLayer>> GetOrGenerateLayersBlocksAsync(int mineId, int startDepth, int? endDepth = null)
         {
             int actualEndDepth = endDepth.HasValue ? endDepth.Value : startDepth;
 
@@ -33,20 +33,18 @@ namespace game.Server.Services
                 throw new InvalidOperationException($"Mine with ID {mineId} does not exist.");
             }
 
+            var availableBlocks = await _context.Blocks.Include(b => b.Item).ToListAsync();
+            if (!availableBlocks.Any())
+            {
+                throw new InvalidOperationException("No block definitions available to generate mine layer.");
+            }
+
             var existingLayers = await _context.MineLayers
                 .Where(ml => ml.MineId == mineId && ml.Depth >= startDepth && ml.Depth <= actualEndDepth)
                 .Include(ml => ml.MineBlocks)
                     .ThenInclude(mb => mb.Block)
                         .ThenInclude(b => b.Item)
                 .ToListAsync();
-
-            var allBlocks = new List<MineBlock>();
-            var availableBlocks = await _context.Blocks.Include(b => b.Item).ToListAsync();
-
-            if (!availableBlocks.Any())
-            {
-                throw new InvalidOperationException("No block definitions available to generate mine layer..");
-            }
 
             var totalWeight = availableBlocks.Sum(b => b.Item.ChangeOfGenerating);
             var random = new Random();
@@ -56,19 +54,21 @@ namespace game.Server.Services
             {
                 var currentLayer = existingLayers.FirstOrDefault(ml => ml.Depth == depth);
 
-                if (currentLayer == null || !currentLayer.MineBlocks.Any())
+                if (currentLayer == null)
                 {
-                    if (currentLayer == null)
+                    currentLayer = new MineLayer
                     {
-                        currentLayer = new MineLayer
-                        {
-                            MineId = mineId,
-                            Depth = depth,
-                            MineBlocks = new List<MineBlock>()
-                        };
-                        _context.MineLayers.Add(currentLayer);
-                    }
+                        MineId = mineId,
+                        Depth = depth,
+                        MineBlocks = new List<MineBlock>()
+                    };
+                    _context.MineLayers.Add(currentLayer);
+                    existingLayers.Add(currentLayer);
+                    changesMade = true;
+                }
 
+                if (!currentLayer.MineBlocks.Any())
+                {
                     for (int i = 0; i < LayerSize; i++)
                     {
                         var randomNumber = random.Next(totalWeight);
@@ -96,8 +96,6 @@ namespace game.Server.Services
                     }
                     changesMade = true;
                 }
-
-                allBlocks.AddRange(currentLayer.MineBlocks.OrderBy(mb => mb.Index));
             }
 
             if (changesMade)
@@ -105,7 +103,7 @@ namespace game.Server.Services
                 await _context.SaveChangesAsync();
             }
 
-            return allBlocks;
+            return existingLayers.OrderBy(l => l.Depth).ToList();
         }
     }
 }

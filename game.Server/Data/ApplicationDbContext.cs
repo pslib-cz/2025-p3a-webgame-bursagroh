@@ -37,6 +37,23 @@ namespace game.Server.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Player>()
+                .Navigation(p => p.Floor)
+                .AutoInclude();
+
+            // 2. Configure Floor to always include its FloorItems
+            modelBuilder.Entity<Floor>()
+                .Navigation(f => f.FloorItems)
+                .AutoInclude();
+
+            modelBuilder.Entity<FloorItem>()
+                .Navigation(fi => fi.Chest)
+                .AutoInclude();
+
+            modelBuilder.Entity<FloorItem>()
+                .Navigation(fi => fi.Enemy)
+                .AutoInclude();
+
             modelBuilder.Entity<Player>(entity =>
             {
                 entity.HasData(new Player
