@@ -45,7 +45,7 @@ namespace game.Server.Services
 
             if (!availableBlocks.Any())
             {
-                throw new InvalidOperationException("No block definitions available to generate mine layer.");
+                throw new InvalidOperationException("No block definitions available to generate mine layer..");
             }
 
             var totalWeight = availableBlocks.Sum(b => b.Item.ChangeOfGenerating);
