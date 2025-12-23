@@ -1,6 +1,6 @@
 import React from "react"
-import SVGDisplay from "../SVGDisplay"
-import Tile from "../SVG/Tile"
+import SVGDisplay from "../../components/SVGDisplay"
+import Tile from "../../components/SVG/Tile"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { useQuery } from "@tanstack/react-query"
 import { getBuildingsQuery } from "../../api/building"

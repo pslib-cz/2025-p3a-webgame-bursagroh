@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query"
-import styles from "./bank.module.css"
 import { updatePlayerScreenMutation } from "../../api/player"
 import React from "react"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
@@ -13,7 +12,7 @@ const BankScreen = () => {
     }
 
     return (
-        <div className={styles["bank"]}>
+        <div>
             Bank
             <button onClick={handleClick}>close</button>
         </div>

@@ -1,5 +1,5 @@
 import { Outlet } from "react-router"
-import Providers from "../providers"
+import Providers from "../../providers"
 
 const Layout = () => {
     return (

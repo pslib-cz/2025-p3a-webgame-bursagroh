@@ -9,6 +9,12 @@ export const generateMineQuery = () =>
 
 export const getMineLayerQuery = (mineId: number, layer: number) =>
     queryOptions({
-        queryKey: ["mine", mineId, "layer", layer],
-        queryFn: () => api.get("/api/Mine/{mineId}/Layer/{layer}", { mineId: mineId.toString(), layer: layer.toString() }, {}),
+        queryKey: ["mine", mineId, layer],
+        queryFn: () => api.get("/api/Mine/{mineId}/Layer/{layer}", {mineId, layer}, {}),
+    })
+
+export const getMineLayersQuery = (mineId: number, startLayer: number, endLayer: number) =>
+    queryOptions({
+        queryKey: ["mine", mineId, {startLayer, endLayer}],
+        queryFn: () => api.get("/api/Mine/{mineId}/Layers", {mineId}, {startLayer, endLayer}),
     })

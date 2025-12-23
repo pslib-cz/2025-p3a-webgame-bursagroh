@@ -1,38 +1,44 @@
-import type { APIGetBuildings } from "./controllers/building"
-import type { APIGenerateMine, APIGetMineLayers } from "./controllers/mine"
+import type { APIGetBuildingFloor, APIGetBuildings } from "./controllers/building"
+import type { APIGenerateMine, APIGetMineLayer, APIGetMineLayers } from "./controllers/mine"
 import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
 
+export type StringifyAble = string | number
+
+export type Param = Record<string, StringifyAble>
+export type Query = Record<string, StringifyAble>
+export type PossibleResponses = Record<number, object>
+
 export interface GenericGET {
-    params: Record<string, string>
-    query: Record<string, string>
-    res: Record<number, object>
+    params: Param
+    query: Query
+    res: PossibleResponses
 }
 
 export interface GenericPOST {
-    params: Record<string, string>
-    query: Record<string, string>
+    params: Param
+    query: Query
     body: object
-    res: Record<number, object>
+    res: PossibleResponses
 }
 
 export interface GenericPUT {
-    params: Record<string, string>
-    query: Record<string, string>
+    params: Param
+    query: Query
     body: object
-    res: Record<number, object>
+    res: PossibleResponses
 }
 
 export interface GenericPATCH {
-    params: Record<string, string>
-    query: Record<string, string>
+    params: Param
+    query: Query
     body: object
-    res: Record<number, object>
+    res: PossibleResponses
 }
 
 export interface GenericDELETE {
-    params: Record<string, string>
-    query: Record<string, string>
-    res: Record<number, object>
+    params: Param
+    query: Query
+    res: PossibleResponses
 }
 
 export interface GenericAPI {
@@ -57,8 +63,10 @@ export interface API extends GenericAPI {
     get: {
         "/api/Player/{playerId}": APIPlayerGetById
         "/api/Building/{playerId}": APIGetBuildings
+        "/api/Building/{buildingId}/Interior/{level}": APIGetBuildingFloor
         "/api/Mine/Generate": APIGenerateMine
-        "/api/Mine/{mineId}/Layer/{layer}": APIGetMineLayers
+        "/api/Mine/{mineId}/Layer/{layer}": APIGetMineLayer
+        "/api/Mine/{mineId}/Layers": APIGetMineLayers
     }
     post: {
         "/api/Player/generate": APIPlayerGenerate

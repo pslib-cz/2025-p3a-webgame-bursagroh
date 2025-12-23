@@ -1,18 +1,23 @@
 import { QueryClient } from "@tanstack/react-query"
-import type { API } from "../types/api"
+import type { API, Param, Query } from "../types/api"
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL as string
 
 export const queryClient = new QueryClient()
 
-const formatURL = (url: string, params: Record<string, string>, query: Record<string, string>) => {
+const formatURL = (url: string, params: Param, query: Query) => {
     let formattedURL = SERVER_URL + url
 
     for (const [key, value] of Object.entries(params)) {
         formattedURL = formattedURL.replace(`{${key}}`, encodeURIComponent(value))
     }
 
-    const queryString = new URLSearchParams(query).toString()
+    const onlyStringQuery: Record<string, string> = {}
+    for (const [key, value] of Object.entries(query)) {
+        onlyStringQuery[key] = value.toString()
+    }
+
+    const queryString = new URLSearchParams(onlyStringQuery).toString()
     if (queryString) {
         formattedURL += `?${queryString}`
     }

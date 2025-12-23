@@ -1,10 +1,9 @@
 import React from 'react'
-import { useMutation } from "@tanstack/react-query"
-import styles from "./restaurant.module.css"
-import { updatePlayerScreenMutation } from "../../api/player"
-import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { useMutation } from '@tanstack/react-query'
+import { updatePlayerScreenMutation } from '../../api/player'
 
-const RestaurantScreen = () => {
+const BlacksmithScreen = () => {
   const playerId = React.useContext(PlayerIdContext)!.playerId!
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
 
@@ -13,11 +12,11 @@ const RestaurantScreen = () => {
     }
 
     return (
-        <div className={styles["restaurant"]}>
-            Restaurant
+        <div>
+            Blacksmith
             <button onClick={handleClick}>close</button>
         </div>
     )
 }
 
-export default RestaurantScreen
+export default BlacksmithScreen
