@@ -3,6 +3,7 @@ using game.Server.Models;
 using game.Server.Services; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -56,14 +57,50 @@ namespace game.Server.Controllers
         }
 
         [HttpGet("{buildingId}/Interior/{level}")]
-        public async Task<ActionResult<Floor>> GetSpecificFloor(int buildingId, int level)
+        public async Task<ActionResult<Floor>> GetSpecificFloor(Guid playerId, int buildingId, int level)
         {
+            var player = await _context.Players.FindAsync(playerId);
+
+            if (player == null)
+            {
+                return NotFound("Player not found.");
+            }
+
             var building = await _context.Buildings.FindAsync(buildingId);
 
+            if (building == null || building.PlayerId != playerId)
+            {
+                return NotFound("Building not found for this player.");
+            }
+
+            if (player.PositionX != building.PositionX || player.PositionY != building.PositionY)
+            {
+                return BadRequest("Player is not at the building's location.");
+            }
+
+            if (player.ScreenType != ScreenTypes.Floor)
+            {
+                return BadRequest("Player must be in Floor screen to access interior floors.");
+            }
+
+            if ((building.BuildingType != BuildingTypes.Abandoned) && (building.BuildingType != BuildingTypes.AbandonedTrap))
+            {
+                return BadRequest("Interior floors can only be accessed for Abandoned or AbandonedTrap building types.");
+            }
 
             if (building.Height.HasValue && level >= building.Height.Value)
             {
                 return BadRequest($"Building only has {building.Height} floors (Levels 0 to {building.Height - 1}). Level {level} is out of bounds.");
+            }
+
+            if (level > 0)
+            {
+                var currentPlayerFloor = await _context.Floors.FindAsync(player.FloorId);
+
+                if (currentPlayerFloor == null || currentPlayerFloor.BuildingId != buildingId || currentPlayerFloor.Level != level - 1)
+                {
+                    return BadRequest($"Cannot generate floor {level} unless you are standing on floor {level - 1}. Do not forget that you have to use the player move endpoint to get assigned into the 0th level.");
+                }
             }
 
             var floorsBelowCount = await _context.Floors
@@ -87,10 +124,12 @@ namespace game.Server.Controllers
                 return Ok(targetFloor);
             }
 
-            var mapGenerator = new MapGeneratorService();
-            int combinedSeed = buildingId; //dodelat
+            int totalHeight = building.Height ?? 5;
 
-            var generatedFloors = mapGenerator.GenerateInterior(buildingId, combinedSeed, level + 1);
+            var mapGenerator = new MapGeneratorService();
+            int combinedSeed = buildingId + level;
+
+            var generatedFloors = mapGenerator.GenerateInterior(buildingId, combinedSeed, level + 1, totalHeight);
             var newFloor = generatedFloors.FirstOrDefault(f => f.Level == level);
 
             if (newFloor != null)

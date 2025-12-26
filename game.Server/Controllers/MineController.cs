@@ -32,7 +32,7 @@ namespace game.Server.Controllers
             return Ok(blocks);
         }
 
-        [HttpGet("Generate")]
+        [HttpPost("Generate")]
         public async Task<IActionResult> GetMine()
         {
             Mine mine = new Mine
@@ -66,31 +66,21 @@ namespace game.Server.Controllers
         }
 
         [HttpGet("{mineId}/Layers")]
-        public async Task<ActionResult<List<MineBlock>>> GetLayerBlocksRange(int mineId, [FromQuery] int startLayer, [FromQuery] int endLayer)
+        public async Task<ActionResult<List<MineLayer>>> GetLayerBlocksRange(int mineId, [FromQuery] int startLayer, [FromQuery] int endLayer)
         {
             if (mineId <= 0 || startLayer < 0 || endLayer < 0 || startLayer > endLayer)
             {
-                return BadRequest("Neplatné parametry pro rozsah vrstev. Ujistěte se, že ID dolu > 0, vrstvy >= 0 a startLayer <= endLayer.");
-            }
-
-            const int MaxLayerRange = 20;
-            if (endLayer - startLayer >= MaxLayerRange)
-            {
-                return BadRequest($"Rozsah vrstev nesmí překročit {MaxLayerRange}.");
+                return BadRequest("invalid args");
             }
 
             try
             {
-                List<MineBlock> blocks = await _mineService.GetOrGenerateLayersBlocksAsync(mineId, startLayer, endLayer);
-                return Ok(blocks);
+                var layers = await _mineService.GetOrGenerateLayersBlocksAsync(mineId, startLayer, endLayer);
+                return Ok(layers);
             }
-            catch (ArgumentException ex)
+            catch (Exception ex)
             {
                 return BadRequest(ex.Message);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return NotFound(ex.Message);
             }
         }
     }

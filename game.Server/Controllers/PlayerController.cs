@@ -68,6 +68,7 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        
         [HttpGet("ScreenTypes")]
         public ActionResult<IEnumerable<string>> GetScreenTypes()
         {
@@ -75,6 +76,11 @@ namespace game.Server.Controllers
             return Ok(screenTypes);
         }
 
+        /// <remarks>
+        /// - zmena obrazovky
+        /// - pri vstupu do city resetuje i subposX a subposY na 0
+        /// - pokud je hrac v AbandonedTrap tak nemuze odejit z budovy
+        /// </remarks>
         [HttpPatch("{id}/Action/move-screen")]
         public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest newScreenType)
         {
@@ -85,76 +91,124 @@ namespace game.Server.Controllers
                 return NotFound();
             }
 
-            if (player.ScreenType == ScreenTypes.Floor)
+            if (player.ScreenType == ScreenTypes.Floor && newScreenType.NewScreenType == ScreenTypes.City)
             {
+                var currentFloor = await context.Floors.FindAsync(player.FloorId);
+
+                if (currentFloor == null || currentFloor.Level != 0)
+                {
+                    return BadRequest("You can only leave the building from the ground floor (Level 0).");
+                }
+
+                if (player.SubPositionX != 0 || player.SubPositionY != 0)
+                {
+                    return BadRequest("You must be at the entrance (0, 0) to leave the building.");
+                }
+
+                var building = await context.Buildings.FirstOrDefaultAsync(b =>
+                    b.PositionX == player.PositionX &&
+                    b.PositionY == player.PositionY &&
+                    b.PlayerId == id);
+
+                if (building != null && building.BuildingType == BuildingTypes.AbandonedTrap)
+                {
+                    return BadRequest("This building is a trap!");
+                }
+
                 player.FloorId = null;
             }
 
             player.ScreenType = newScreenType.NewScreenType;
+
+            if (newScreenType.NewScreenType == ScreenTypes.City)
+            {
+                player.SubPositionX = 0;
+                player.SubPositionY = 0;
+            }
 
             await context.SaveChangesAsync();
 
             return Ok(player);
         }
 
-        [HttpPatch("{id}/Action/move")] //predelat, tohle je fakt hnus, ale funguje to
+        /// <remarks>
+        /// - pohyb 
+        /// - pokud je floorId na null, tak se meni PositionX a PositionY 
+        /// - jinak se meni patro a pozice jsou ignorovany 
+        /// </remarks>
+        [HttpPatch("{id}/Action/move")]
         public async Task<ActionResult<Player>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
             Player? player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
+            if (player == null) return NotFound();
 
-            if (player == null)
+            if (player.ScreenType == ScreenTypes.Floor && request.NewFloorId.HasValue && request.NewFloorId != player.FloorId)
             {
-                return NotFound();
+                var currentFloor = await context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+                var targetFloor = await context.Floors.FirstOrDefaultAsync(f => f.FloorId == request.NewFloorId);
+
+                if (player.FloorId != null)
+                {
+                    if (targetFloor == null || currentFloor == null)
+                    {
+                        return BadRequest("Current or target floor doesn't exist.");
+                    }
+
+                    if (targetFloor.BuildingId != currentFloor.BuildingId)
+                    {
+                        return BadRequest("You can't move between buildings like this.");
+                    }
+
+                    int levelDifference = targetFloor.Level - currentFloor.Level;
+
+                    if (levelDifference == 1)
+                    {
+                        if (player.SubPositionX != 5 || player.SubPositionY != 2)
+                        {
+                            return BadRequest("You must be at position (5, 2) to move UP a floor.");
+                        }
+                    }
+                    else if (levelDifference == -1)
+                    {
+                        if (player.SubPositionX != 2 || player.SubPositionY != 2)
+                        {
+                            return BadRequest("You must be at position (2, 2) to move DOWN a floor.");
+                        }
+                    }
+                    else
+                    {
+                        return BadRequest("You can move only one floor at a time.");
+                    }
+                }
+
+                player.FloorId = request.NewFloorId;
+                await context.SaveChangesAsync();
+                return Ok(player); 
+            }
+
+            if (player.ScreenType == ScreenTypes.Floor && (request.NewPositionX < 0 || request.NewPositionX > 7 || request.NewPositionY < 0 || request.NewPositionY > 7))
+            {
+                return BadRequest("Coordinates are out of bounds.");
+            }
+
+            int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
+            int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
+
+            bool isAdjacent = (Math.Abs(request.NewPositionX - currentX) +
+                               Math.Abs(request.NewPositionY - currentY)) == 1;
+
+            if (!isAdjacent)
+            {
+                return BadRequest("Move must be exactly 1 square.");
             }
 
             if (player.ScreenType == ScreenTypes.City)
             {
-                bool isAdjacent = (Math.Abs(request.NewPositionX - player.PositionX) +
-                                Math.Abs(request.NewPositionY - player.PositionY)) == 1;
-
-                if (!isAdjacent)
-                {
-                    return BadRequest("move > 1");
-                }
-
                 player.PositionX = request.NewPositionX;
                 player.PositionY = request.NewPositionY;
             }
-            else if (player.ScreenType == ScreenTypes.Floor)
-            {
-                if (request.NewFloorId.HasValue && request.NewFloorId != player.FloorId)
-                {
-                    var floorExists = await context.Floors.AnyAsync(f => f.FloorId == request.NewFloorId);
-                    if (!floorExists)
-                    {
-                        return BadRequest("Target floor does not exist.");
-                    }
-                    player.FloorId = request.NewFloorId;
-                }
-                else
-                {
-                    bool isAdjacent = (Math.Abs(request.NewPositionX - player.SubPositionX) +
-                                    Math.Abs(request.NewPositionY - player.SubPositionY)) == 1;
-
-                    if (!isAdjacent)
-                    {
-                        return BadRequest("move > 1");
-                    }
-
-                    player.SubPositionX = request.NewPositionX;
-                    player.SubPositionY = request.NewPositionY;
-                }
-            }
             else
             {
-                bool isAdjacent = (Math.Abs((request.NewPositionX - player.SubPositionX)) +
-                                Math.Abs(request.NewPositionY - player.SubPositionY)) == 1;
-
-                if (!isAdjacent)
-                {
-                    return BadRequest("move > 1");
-                }
-
                 player.SubPositionX = request.NewPositionX;
                 player.SubPositionY = request.NewPositionY;
             }
