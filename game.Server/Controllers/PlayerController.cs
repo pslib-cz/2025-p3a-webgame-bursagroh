@@ -68,7 +68,24 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
-        
+        [HttpGet("{id}/GetFreeMoney")]
+        /// <remarks>
+        /// - test purposes
+        /// - v production odstranit
+        /// </remarks>
+        public async Task<ActionResult<Player>> GetFreeMoney(Guid id)
+        {
+            Player? player = await context.Players.Where(p => p.PlayerId == id).FirstOrDefaultAsync(p => p.PlayerId == id);
+            if (player == null)
+            {
+                return NotFound();
+            }
+            player.Money += 10000000;
+            await context.SaveChangesAsync();
+            return Ok(player);
+        }
+
+
         [HttpGet("ScreenTypes")]
         public ActionResult<IEnumerable<string>> GetScreenTypes()
         {
@@ -115,6 +132,11 @@ namespace game.Server.Controllers
                     return BadRequest("This building is a trap!");
                 }
 
+                player.FloorId = null;
+            }
+
+            if (player.ScreenType == ScreenTypes.Mine)
+            {
                 player.FloorId = null;
             }
 
@@ -202,6 +224,21 @@ namespace game.Server.Controllers
                 return BadRequest("Move must be exactly 1 square.");
             }
 
+            if (player.ScreenType == ScreenTypes.Mine)
+            {
+                var mineBlockAtDestination = await context.Mines
+                    .Where(m => m.PlayerId == id)
+                    .SelectMany(m => m.MineLayers)
+                    .Where(l => l.Depth == request.NewPositionY)
+                    .SelectMany(l => l.MineBlocks)
+                    .AnyAsync(mb => mb.Index == request.NewPositionX);
+
+                if (mineBlockAtDestination)
+                {
+                    return BadRequest("You must mine this block before moving onto it.");
+                }
+            }
+
             if (player.ScreenType == ScreenTypes.City)
             {
                 player.PositionX = request.NewPositionX;
@@ -218,18 +255,81 @@ namespace game.Server.Controllers
         }
 
         [HttpGet("{id}/Inventory")]
-        public ActionResult<InventoryItem> GetPlayerInventory(Guid id)
+        public async Task<ActionResult<IEnumerable<InventoryItem>>> GetPlayerInventory(Guid id)
         {
-            IQueryable<InventoryItem> inventoryItems = context.InventoryItems.Where(i => i.PlayerId == id).Where(i => i.IsInBank == false);
+            var items = await context.InventoryItems
+                .Where(i => i.PlayerId == id && !i.IsInBank)
+                .Include(i => i.ItemInstance)        
+                    .ThenInclude(ins => ins.Item)
+                .ToListAsync();
 
-            if (inventoryItems == null)
+            if (items == null || !items.Any())
             {
-                return NoContent();
+                return NoContent(); 
             }
 
-            List<InventoryItem> items = inventoryItems.ToList();
             return Ok(items);
         }
 
+        [HttpPatch("{id}/Action/pick")]
+        public async Task<ActionResult> Pick(Guid id) 
+        {
+
+            var player = await context.Players
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) {
+                return NotFound("Player not found in database.");
+            }
+
+            if (player.FloorId == null) {
+                return BadRequest("Player is not on a floor.");
+            }
+            
+
+            
+            var itemsOnGround = await context.FloorItems
+                .Where(fi => fi.FloorId == player.FloorId &&
+                             fi.PositionX == player.SubPositionX &&
+                             fi.PositionY == player.SubPositionY &&
+                             fi.FloorItemType == FloorItemType.Item)
+                .ToListAsync();
+
+            if (!itemsOnGround.Any()) return BadRequest("Nothing here to pick up.");
+
+            int currentInventoryCount = player.InventoryItems.Count;
+
+            foreach (var floorItem in itemsOnGround)
+            {
+
+                if (currentInventoryCount >= player.Capacity) break;
+
+                var instanceId = floorItem.ItemInstanceId;
+                if (instanceId == null) continue;
+
+
+                context.InventoryItems.Add(new InventoryItem
+                {
+                    PlayerId = id,
+                    ItemInstanceId = instanceId.Value,
+                    IsInBank = false
+                });
+
+                context.FloorItems.Remove(floorItem);
+                currentInventoryCount++;
+            }
+
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                return BadRequest($"Database Error: {ex.InnerException?.Message ?? ex.Message}");
+            }
+
+            return Ok(new { message = "Items picked up.", newCount = currentInventoryCount });
+        }
     }
 }

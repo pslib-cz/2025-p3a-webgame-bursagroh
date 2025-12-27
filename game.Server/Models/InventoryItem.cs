@@ -14,5 +14,11 @@ namespace game.Server.Models
         public int ItemInstanceId { get; set; }
 
         public bool IsInBank { get; set; } = false;
+
+        [ForeignKey("ItemInstanceId")]
+        public virtual ItemInstance ItemInstance { get; set; } = null!;
+
+
+
     }
 }

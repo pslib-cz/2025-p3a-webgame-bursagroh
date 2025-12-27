@@ -11,9 +11,6 @@ namespace game.Server.Models
 
         public int MineId { get; set; }
 
-        [ForeignKey("MineId")]
-        public Mine Mine { get; set; } = null!;
-
         public int Depth { get; set; }
         public ICollection<MineBlock> MineBlocks { get; set; } = new List<MineBlock>();
     }

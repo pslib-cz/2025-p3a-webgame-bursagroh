@@ -1,13 +1,7 @@
 ﻿using game.Server.Data;
 using game.Server.Models;
-using game.Server.Services; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace game.Server.Controllers
 {
@@ -16,6 +10,7 @@ namespace game.Server.Controllers
     public class BuildingController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private static readonly SemaphoreSlim _bulkSemaphore = new SemaphoreSlim(1, 1);
 
         public BuildingController(ApplicationDbContext context)
         {
@@ -25,15 +20,16 @@ namespace game.Server.Controllers
         [HttpGet("{playerId}")]
         public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
         {
-            var playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
+            var playerExists = await _context.Players.AsNoTracking().AnyAsync(p => p.PlayerId == playerId);
             if (!playerExists) return NotFound();
 
             int minX = left;
-            int maxX = left + width;
+            int maxX = left + width - 1;
             int minY = top;
-            int maxY = top + height;
+            int maxY = top + height - 1;
 
             var existingBuildings = await _context.Buildings
+                .AsNoTracking()
                 .Where(b => b.PlayerId == playerId &&
                             b.PositionX >= minX && b.PositionX <= maxX &&
                             b.PositionY >= minY && b.PositionY <= maxY)
@@ -42,14 +38,27 @@ namespace game.Server.Controllers
             var mapGenerator = new MapGeneratorService();
             var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY);
 
+            var existingCoords = new HashSet<(int, int)>(
+                existingBuildings.Select(b => (b.PositionX, b.PositionY))
+            );
+
             var newBuildings = proceduralBuildings
-                .Where(pb => !existingBuildings.Any(eb => eb.PositionX == pb.PositionX && eb.PositionY == pb.PositionY))
+                .Where(pb => !existingCoords.Contains((pb.PositionX, pb.PositionY)))
                 .ToList();
 
             if (newBuildings.Any())
             {
-                _context.Buildings.AddRange(newBuildings);
-                await _context.SaveChangesAsync();
+                await _bulkSemaphore.WaitAsync();
+                try
+                {
+                    await _context.Buildings.AddRangeAsync(newBuildings);
+                    await _context.SaveChangesAsync();
+                }
+                finally
+                {
+                    _bulkSemaphore.Release();
+                }
+
                 existingBuildings.AddRange(newBuildings);
             }
 

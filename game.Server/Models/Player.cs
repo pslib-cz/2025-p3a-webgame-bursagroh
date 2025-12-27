@@ -38,5 +38,8 @@ namespace game.Server.Models
 
         public int Capacity { get; set; } = 10;
         public int Seed { get; set; } = 0;
+
+        [JsonIgnore]
+        public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
     }
 }
