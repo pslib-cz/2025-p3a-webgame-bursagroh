@@ -8,5 +8,9 @@ namespace game.Server.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int MineId { get; set; }
+
+        public Guid PlayerId { get; set; }
+
+        public virtual ICollection<MineLayer> MineLayers { get; set; } = new List<MineLayer>();
     }
 }

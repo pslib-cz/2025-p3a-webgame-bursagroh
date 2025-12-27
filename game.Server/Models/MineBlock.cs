@@ -20,6 +20,8 @@ namespace game.Server.Models
         public int BlockId { get; set; }
 
         [ForeignKey("BlockId")]
-        public Block Block { get; set; } = null!; 
+        public Block Block { get; set; } = null!;
+
+        public int Health { get; set; } = 5;
     }
 }

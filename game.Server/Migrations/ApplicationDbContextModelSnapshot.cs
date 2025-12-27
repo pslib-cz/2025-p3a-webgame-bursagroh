@@ -314,6 +314,9 @@ namespace game.Server.Migrations
                     b.Property<int>("FloorItemType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ItemInstanceId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("PositionX")
                         .HasColumnType("INTEGER");
 
@@ -323,6 +326,8 @@ namespace game.Server.Migrations
                     b.HasKey("FloorItemId");
 
                     b.HasIndex("FloorId");
+
+                    b.HasIndex("ItemInstanceId");
 
                     b.ToTable("FloorItems");
 
@@ -770,6 +775,10 @@ namespace game.Server.Migrations
 
                     b.HasKey("InventoryItemId");
 
+                    b.HasIndex("ItemInstanceId");
+
+                    b.HasIndex("PlayerId");
+
                     b.ToTable("InventoryItems");
                 });
 
@@ -788,9 +797,6 @@ namespace game.Server.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ItemInstanceId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("ItemType")
                         .HasColumnType("INTEGER");
 
@@ -805,8 +811,6 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ItemId");
-
-                    b.HasIndex("ItemInstanceId");
 
                     b.ToTable("Items");
 
@@ -1118,6 +1122,17 @@ namespace game.Server.Migrations
                             MaxDurability = 240,
                             Name = "Unobtainium Pickaxe",
                             Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 39,
+                            ChangeOfGenerating = 0,
+                            Damage = 1,
+                            Description = "Rented Pickaxe",
+                            ItemType = 2,
+                            MaxDurability = 5,
+                            Name = "Rented Pickaxe",
+                            Weight = 1
                         });
                 });
 
@@ -1135,6 +1150,8 @@ namespace game.Server.Migrations
 
                     b.HasKey("ItemInstanceId");
 
+                    b.HasIndex("ItemId");
+
                     b.ToTable("ItemInstances");
                 });
 
@@ -1144,6 +1161,9 @@ namespace game.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("PlayerId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("MineId");
 
                     b.ToTable("Mines");
@@ -1151,7 +1171,8 @@ namespace game.Server.Migrations
                     b.HasData(
                         new
                         {
-                            MineId = 1
+                            MineId = 1,
+                            PlayerId = new Guid("00000000-0000-0000-0000-000000000000")
                         });
                 });
 
@@ -1162,6 +1183,9 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("BlockId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Health")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Index")
@@ -1247,6 +1271,8 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("PlayerId");
+
+                    b.HasIndex("FloorId");
 
                     b.ToTable("Players");
 
@@ -1396,7 +1422,14 @@ namespace game.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("game.Server.Models.ItemInstance", "ItemInstance")
+                        .WithMany()
+                        .HasForeignKey("ItemInstanceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Floor");
+
+                    b.Navigation("ItemInstance");
                 });
 
             modelBuilder.Entity("game.Server.Models.Ingredience", b =>
@@ -1408,11 +1441,32 @@ namespace game.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("game.Server.Models.Item", b =>
+            modelBuilder.Entity("game.Server.Models.InventoryItem", b =>
                 {
-                    b.HasOne("game.Server.Models.ItemInstance", null)
-                        .WithMany("Items")
-                        .HasForeignKey("ItemInstanceId");
+                    b.HasOne("game.Server.Models.ItemInstance", "ItemInstance")
+                        .WithMany()
+                        .HasForeignKey("ItemInstanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("game.Server.Models.Player", null)
+                        .WithMany("InventoryItems")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemInstance");
+                });
+
+            modelBuilder.Entity("game.Server.Models.ItemInstance", b =>
+                {
+                    b.HasOne("game.Server.Models.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("game.Server.Models.MineBlock", b =>
@@ -1436,13 +1490,20 @@ namespace game.Server.Migrations
 
             modelBuilder.Entity("game.Server.Models.MineLayer", b =>
                 {
-                    b.HasOne("game.Server.Models.Mine", "Mine")
-                        .WithMany()
+                    b.HasOne("game.Server.Models.Mine", null)
+                        .WithMany("MineLayers")
                         .HasForeignKey("MineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("Mine");
+            modelBuilder.Entity("game.Server.Models.Player", b =>
+                {
+                    b.HasOne("game.Server.Models.Floor", "Floor")
+                        .WithMany()
+                        .HasForeignKey("FloorId");
+
+                    b.Navigation("Floor");
                 });
 
             modelBuilder.Entity("game.Server.Models.Blueprint", b =>
@@ -1467,14 +1528,19 @@ namespace game.Server.Migrations
                     b.Navigation("Enemy");
                 });
 
-            modelBuilder.Entity("game.Server.Models.ItemInstance", b =>
+            modelBuilder.Entity("game.Server.Models.Mine", b =>
                 {
-                    b.Navigation("Items");
+                    b.Navigation("MineLayers");
                 });
 
             modelBuilder.Entity("game.Server.Models.MineLayer", b =>
                 {
                     b.Navigation("MineBlocks");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Player", b =>
+                {
+                    b.Navigation("InventoryItems");
                 });
 
             modelBuilder.Entity("game.Server.Models.Recipe", b =>

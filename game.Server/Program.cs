@@ -16,6 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 );
 
 builder.Services.AddScoped<MineService>();
+builder.Services.AddSingleton<MapGeneratorService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend",

@@ -12,6 +12,8 @@ namespace game.Server.Models
         public int ItemId { get; set; }
         public int Durability { get; set; }
 
-        public ICollection<Item>? Items { get; set; }
+        [ForeignKey("ItemId")]
+        public virtual Item Item { get; set; } = null!;
+
     }
 }
