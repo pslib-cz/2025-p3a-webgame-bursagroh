@@ -237,6 +237,10 @@ namespace game.Server.Controllers
                 {
                     return BadRequest("You must mine this block before moving onto it.");
                 }
+                if (player.ScreenType == ScreenTypes.Floor && (request.NewPositionX < 0 || request.NewPositionX > 7 || request.NewPositionY < 0 || request.NewPositionY > 7))
+                {
+                    return BadRequest("Coordinates are out of bounds.");
+                }
             }
 
             if (player.ScreenType == ScreenTypes.City)
