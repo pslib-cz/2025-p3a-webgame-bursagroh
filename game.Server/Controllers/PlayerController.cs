@@ -226,6 +226,11 @@ namespace game.Server.Controllers
 
             if (player.ScreenType == ScreenTypes.Mine)
             {
+                if (request.NewPositionX < 0 || request.NewPositionX > 7)
+                {
+                    return BadRequest("Coordinates are out of bounds.");
+                }
+
                 var mineBlockAtDestination = await context.Mines
                     .Where(m => m.PlayerId == id)
                     .SelectMany(m => m.MineLayers)
@@ -236,10 +241,6 @@ namespace game.Server.Controllers
                 if (mineBlockAtDestination)
                 {
                     return BadRequest("You must mine this block before moving onto it.");
-                }
-                if (player.ScreenType == ScreenTypes.Floor && (request.NewPositionX < 0 || request.NewPositionX > 7 || request.NewPositionY < 0 || request.NewPositionY > 7))
-                {
-                    return BadRequest("Coordinates are out of bounds.");
                 }
             }
 
