@@ -212,6 +212,11 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        /// <remarks>
+        /// - mine
+        /// - mine layer je y, index x
+        /// - hrac musi stat vedle blocku ktery chce tezit
+        /// </remarks>
         [HttpPatch("{PlayerID}/Action/mine")]
         public async Task<ActionResult> MineBlock(Guid PlayerID, MineRequest request)
         {
