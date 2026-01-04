@@ -44,7 +44,6 @@ namespace game.Server.Controllers
         [HttpGet("Player/{playerId}")]
         public async Task<ActionResult<IEnumerable<Blueprint>>> GetPlayerBlueprints(Guid playerId)
         {
-            // 1. Check if the player exists
             var playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
             if (!playerExists) return NotFound("Player not found.");
 
@@ -52,7 +51,7 @@ namespace game.Server.Controllers
             var ownedBlueprints = await _context.BlueprintPlayers
                 .Where(bp => bp.PlayerId == playerId)
                 .Include(bp => bp.Blueprint)
-                    .ThenInclude(b => b.Craftings) // Include the recipe details
+                    .ThenInclude(b => b.Craftings)
                 .Select(bp => bp.Blueprint)
                 .ToListAsync();
 
