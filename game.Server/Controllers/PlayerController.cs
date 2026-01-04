@@ -68,24 +68,6 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
-        [HttpGet("{id}/GetFreeMoney")]
-        /// <remarks>
-        /// - test purposes
-        /// - v production odstranit
-        /// </remarks>
-        public async Task<ActionResult<Player>> GetFreeMoney(Guid id)
-        {
-            Player? player = await context.Players.Where(p => p.PlayerId == id).FirstOrDefaultAsync(p => p.PlayerId == id);
-            if (player == null)
-            {
-                return NotFound();
-            }
-            player.Money += 10000000;
-            await context.SaveChangesAsync();
-            return Ok(player);
-        }
-
-
         [HttpGet("ScreenTypes")]
         public ActionResult<IEnumerable<string>> GetScreenTypes()
         {
@@ -336,5 +318,7 @@ namespace game.Server.Controllers
 
             return Ok(new { message = "Items picked up.", newCount = currentInventoryCount });
         }
+
+        
     }
 }

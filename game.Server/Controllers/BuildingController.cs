@@ -152,5 +152,103 @@ namespace game.Server.Controllers
 
             return StatusCode(500, "Error generating floor.");
         }
+
+        [HttpPatch("{id}/Action/interact")]
+        public async Task<ActionResult> Interact(Guid id, [FromBody] InteractionRequest request)
+        {
+            var player = await _context.Players
+                .Include(p => p.InventoryItems)
+                    .ThenInclude(ii => ii.ItemInstance)
+                        .ThenInclude(ins => ins.Item)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found");
+
+            var floorItem = await _context.FloorItems
+                .Include(fi => fi.Enemy)
+                .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
+                                           fi.PositionX == request.TargetX &&
+                                           fi.PositionY == request.TargetY &&
+                                           fi.FloorItemType == FloorItemType.Enemy);
+
+            if (floorItem?.Enemy == null) {
+                return BadRequest("No enemy at target coordinates.");
+            }
+            
+
+            var targetEnemy = floorItem.Enemy;
+
+            if (targetEnemy.EnemyType != EnemyType.Zombie &&
+                targetEnemy.EnemyType != EnemyType.Skeleton &&
+                targetEnemy.EnemyType != EnemyType.Dragon)
+            {
+                return BadRequest("Invalid enemy type.");
+            }
+
+            int diffX = Math.Abs(player.SubPositionX - request.TargetX);
+            int diffY = Math.Abs(player.SubPositionY - request.TargetY);
+
+            bool isWithinReach = (diffX + diffY) <= 1;
+
+            if (!isWithinReach) {
+                return BadRequest("Enemy is too far away.");
+            } 
+
+
+            int damageDealt = 1;
+
+            if (request.InventoryItemId.HasValue && request.InventoryItemId.Value != 0)
+            {
+                var chosenItem = player.InventoryItems
+                    .FirstOrDefault(ii => ii.InventoryItemId == request.InventoryItemId.Value);
+
+                if (chosenItem != null && chosenItem.ItemInstance?.Item != null &&
+                    chosenItem.ItemInstance.Item.Name.Contains("Sword"))
+                {
+                    damageDealt = chosenItem.ItemInstance.Item.Damage;
+                }
+                else
+                {
+                    return BadRequest("Selected item is not a sword. Use null for fists.");
+                }
+            }
+
+            targetEnemy.Health -= damageDealt;
+
+            if (targetEnemy.Health > 0)
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    message = $"You hit the {targetEnemy.EnemyType} for {damageDealt} damage.",
+                    remainingHealth = targetEnemy.Health
+                });
+            }
+
+            var lootInstance = await _context.ItemInstances
+                .Include(i => i.Item)
+                .FirstOrDefaultAsync(i => i.ItemInstanceId == targetEnemy.ItemInstanceId);
+
+            if (lootInstance != null)
+            {
+                floorItem.FloorItemType = FloorItemType.Item;
+                floorItem.Enemy = null;
+                floorItem.ItemInstanceId = lootInstance.ItemInstanceId;
+                _context.Enemies.Remove(targetEnemy);
+            }
+            else
+            {
+                _context.FloorItems.Remove(floorItem);
+                _context.Enemies.Remove(targetEnemy);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = $"Successfully defeated the {targetEnemy.EnemyType}!",
+                lootDropped = lootInstance?.Item?.Name ?? "Nothing"
+            });
+        }
     }
 }

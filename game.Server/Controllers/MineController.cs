@@ -218,7 +218,7 @@ namespace game.Server.Controllers
         /// - hrac musi stat vedle blocku ktery chce tezit
         /// </remarks>
         [HttpPatch("{PlayerID}/Action/mine")]
-        public async Task<ActionResult> MineBlock(Guid PlayerID, MineRequest request)
+        public async Task<ActionResult> MineBlock(Guid PlayerID, InteractionRequest request)
         {
             var player = await context.Players
                 .Include(p => p.InventoryItems)
