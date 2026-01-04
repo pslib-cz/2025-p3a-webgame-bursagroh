@@ -12,6 +12,8 @@ import IronOre from '../../assets/tiles/blocks/IronOre'
 import GoldOre from '../../assets/tiles/blocks/GoldOre'
 import SilverOre from '../../assets/tiles/blocks/SilverOre'
 import UnobtainiumOre from '../../assets/tiles/blocks/UnobtainiumOre'
+import JunctionRoad from '../../assets/tiles/buildings/roads/JunctionRoad'
+import StraightRoad from '../../assets/tiles/buildings/roads/StraightRoad'
 
 type TileSelectorProps = {
     tileType: TileType
@@ -66,6 +68,26 @@ const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileTyp
         case 'restaurant':
             return (
                 <Restaurant {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'road':
+            return (
+                <JunctionRoad {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'road-vertical':
+            return (
+                <StraightRoad {...props} x={x} y={y} width={width} height={height} placement='vertical' />
+            )
+        case 'road-horizontal':
+            return (
+                <StraightRoad {...props} x={x} y={y} width={width} height={height} placement='horizontal' />
+            )
+        case 'abandoned':
+            return (
+                <Rock {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'abandoned-trap':
+            return (
+                <Rock {...props} x={x} y={y} width={width} height={height} />
             )
     }
 }

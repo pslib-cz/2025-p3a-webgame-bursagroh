@@ -7,7 +7,7 @@ export const getBuildingsQuery = (playerId: string, top: number, left: number, w
         queryFn: () => api.get("/api/Building/{playerId}", { playerId }, {top, left, width, height}),
     })
 
-export const getBuildingQuery = (playerId: string, buildingId: number, level: number) =>
+export const getBuildingFloorQuery = (playerId: string, buildingId: number, level: number) =>
     queryOptions({
         queryKey: [playerId, "building", buildingId, level],
         queryFn: () => api.get("/api/Building/{buildingId}/Interior/{level}", {buildingId, level}, {playerId}),

@@ -64,12 +64,12 @@ export interface API extends GenericAPI {
         "/api/Player/{playerId}": APIPlayerGetById
         "/api/Building/{playerId}": APIGetBuildings
         "/api/Building/{buildingId}/Interior/{level}": APIGetBuildingFloor
-        "/api/Mine/Generate": APIGenerateMine
         "/api/Mine/{mineId}/Layer/{layer}": APIGetMineLayer
         "/api/Mine/{mineId}/Layers": APIGetMineLayers
     }
     post: {
         "/api/Player/generate": APIPlayerGenerate
+        "/api/Mine/Generate": APIGenerateMine
     }
     put: {
 

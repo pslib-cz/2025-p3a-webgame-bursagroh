@@ -4,7 +4,7 @@ import { api } from ".";
 export const generateMineQuery = () =>
     queryOptions({
         queryKey: ["mine"],
-        queryFn: () => api.get("/api/Mine/Generate", {}, {}),
+        queryFn: () => api.post("/api/Mine/Generate", {}, {}, {}),
     })
 
 export const getMineLayerQuery = (mineId: number, layer: number) =>

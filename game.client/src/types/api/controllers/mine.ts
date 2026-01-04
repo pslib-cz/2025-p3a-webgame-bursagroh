@@ -1,7 +1,7 @@
-import type { GenericGET } from ".."
+import type { GenericGET, GenericPOST } from ".."
 import type { MineLayer } from "../models/mine"
 
-export interface APIGenerateMine extends GenericGET {
+export interface APIGenerateMine extends GenericPOST {
     res: {
         200: {
             mineId: number

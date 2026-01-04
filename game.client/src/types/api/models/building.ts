@@ -1,4 +1,4 @@
-export type BuildingType = "Fountain" | "Bank" | "Restaurant" | "Mine" | "Blacksmith" | "Abandoned" | "AbandonedTrap"
+export type BuildingType = "Fountain" | "Bank" | "Restaurant" | "Mine" | "Blacksmith" | "Abandoned" | "AbandonedTrap" | "Road"
 export type FloorItemType = "Stair" | "Chest" | "Item" | "Enemy"
 
 export type Building = {
@@ -8,7 +8,7 @@ export type Building = {
     positionY: number
 } & (
     | {
-          buildingType: "Fountain" | "Bank" | "Restaurant" | "Mine" | "Blacksmith"
+          buildingType: "Fountain" | "Bank" | "Restaurant" | "Mine" | "Blacksmith" | "Road"
       }
     | {
           buildingType: "Abandoned" | "AbandonedTrap"

@@ -1,11 +1,11 @@
 import React from "react"
 import type { AssetProps } from "../../../../types"
 
-type StraightRoadProps = AssetProps & Omit<React.SVGProps<SVGSVGElement>, "x" | "y" | "width" | "height" | "viewBox" | "xmlns">
+type StraightRoadProps = {placement: "vertical" | "horizontal"} & AssetProps & Omit<React.SVGProps<SVGSVGElement>, "x" | "y" | "width" | "height" | "viewBox" | "xmlns">
 
-const StraightRoad: React.FC<StraightRoadProps> = ({ x, y, width, height, ...props }) => {
+const StraightRoad: React.FC<StraightRoadProps> = ({ x, y, width, height, placement,  ...props }) => {
     return (
-        <svg {...props} x={x} y={y} width={width} height={height} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <svg {...props} x={x} y={y} width={width} height={height} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style={{rotate: placement === "horizontal" ? "90deg" : "0deg", transformOrigin: `${x + width / 2}px ${y + height / 2}px`}}>
             <rect width="64" height="64" fill="#282828" />
             <rect x="64" width="64" height="64" fill="#282828" />
             <rect x="128" width="64" height="64" fill="#282828" />

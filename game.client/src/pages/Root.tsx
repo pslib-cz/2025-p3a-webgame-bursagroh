@@ -10,7 +10,7 @@ const Root = () => {
     }
 
     return (
-        <NavLink to="/game" onClick={handleClick}>
+        <NavLink to="/game/city" onClick={handleClick}>
             Start
         </NavLink>
     )

@@ -9,6 +9,20 @@ import { MineIdContext } from "../../providers/MineIdProvider"
 import TableLeft from "../../assets/tiles/TableLeft"
 import TableRight from "../../assets/tiles/TableRight"
 
+const chunkSize = 16
+const viewDistanceInChunks = 2
+
+const getLayerList = (playerPositionY: number, viewDistanceInChunks: number, chunkSize: number): Array<number> => {
+    const playerChunkY = playerPositionY - (playerPositionY % chunkSize)
+    const viewDistance = viewDistanceInChunks * chunkSize
+
+    const yFrom = playerChunkY - viewDistance
+
+    const height = viewDistanceInChunks * 2
+
+    return new Array(height).fill(0).map((_, yIndex) => yFrom + yIndex * chunkSize).filter((value) => value >= 0)
+}
+
 const MineScreen = () => {
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const player = useQuery(getPlayerQuery(playerId))
@@ -29,14 +43,14 @@ const MineScreen = () => {
     }
 
     if (player.isSuccess) {
+        const layers = getLayerList(player.data.subPositionY, viewDistanceInChunks, chunkSize)
+
         return (
-            <SVGDisplay width={"99vw"} height={"99vh"}>
+            <SVGDisplay width={"99vw"} height={"99vh"} centerX={player.data.subPositionX} centerY={player.data.subPositionY}>
                 <TableLeft x={0} y={-1} width={1} height={1} onClick={handleClick} />
                 <TableRight x={1} y={-1} width={1} height={1} onClick={handleClick} />
-                <Layer depth={0} />
-                <Layer depth={1} />
-                <Layer depth={2} />
-                <Player x={player.data.floorItem.positionX} y={player.data.floorItem.positionY} width={1} height={1} />
+                {layers.map((depth) => <Layer key={`depth:${depth}`} depth={depth} size={chunkSize} />)}
+                <Player x={player.data.subPositionX} y={player.data.subPositionY} width={1} height={1} />
             </SVGDisplay>
         )
     }
