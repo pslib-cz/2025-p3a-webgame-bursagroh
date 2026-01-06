@@ -147,6 +147,8 @@ namespace game.Server.Migrations
 
                     b.HasKey("BlueprintId");
 
+                    b.HasIndex("ItemId");
+
                     b.ToTable("Blueprints");
 
                     b.HasData(
@@ -156,6 +158,21 @@ namespace game.Server.Migrations
                             ItemId = 10,
                             Price = 5
                         });
+                });
+
+            modelBuilder.Entity("game.Server.Models.BlueprintPlayer", b =>
+                {
+                    b.Property<Guid>("PlayerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("BlueprintId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PlayerId", "BlueprintId");
+
+                    b.HasIndex("BlueprintId");
+
+                    b.ToTable("BlueprintPlayers");
                 });
 
             modelBuilder.Entity("game.Server.Models.Building", b =>
@@ -314,6 +331,9 @@ namespace game.Server.Migrations
                     b.Property<int>("FloorItemType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ItemInstanceId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("PositionX")
                         .HasColumnType("INTEGER");
 
@@ -323,6 +343,8 @@ namespace game.Server.Migrations
                     b.HasKey("FloorItemId");
 
                     b.HasIndex("FloorId");
+
+                    b.HasIndex("ItemInstanceId");
 
                     b.ToTable("FloorItems");
 
@@ -770,6 +792,10 @@ namespace game.Server.Migrations
 
                     b.HasKey("InventoryItemId");
 
+                    b.HasIndex("ItemInstanceId");
+
+                    b.HasIndex("PlayerId");
+
                     b.ToTable("InventoryItems");
                 });
 
@@ -788,9 +814,6 @@ namespace game.Server.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("ItemInstanceId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<int>("ItemType")
                         .HasColumnType("INTEGER");
 
@@ -805,8 +828,6 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ItemId");
-
-                    b.HasIndex("ItemInstanceId");
 
                     b.ToTable("Items");
 
@@ -892,7 +913,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 10,
                             ChangeOfGenerating = 0,
-                            Damage = 1,
+                            Damage = 10,
                             Description = "Wooden Sword",
                             ItemType = 0,
                             MaxDurability = 20,
@@ -903,7 +924,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 11,
                             ChangeOfGenerating = 0,
-                            Damage = 2,
+                            Damage = 20,
                             Description = "Rock Sword",
                             ItemType = 0,
                             MaxDurability = 40,
@@ -914,7 +935,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 12,
                             ChangeOfGenerating = 0,
-                            Damage = 3,
+                            Damage = 30,
                             Description = "Copper Sword",
                             ItemType = 0,
                             MaxDurability = 60,
@@ -925,7 +946,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 13,
                             ChangeOfGenerating = 0,
-                            Damage = 4,
+                            Damage = 40,
                             Description = "Iron Sword",
                             ItemType = 0,
                             MaxDurability = 80,
@@ -936,7 +957,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 14,
                             ChangeOfGenerating = 0,
-                            Damage = 5,
+                            Damage = 50,
                             Description = "Silver Sword",
                             ItemType = 0,
                             MaxDurability = 100,
@@ -947,7 +968,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 15,
                             ChangeOfGenerating = 0,
-                            Damage = 6,
+                            Damage = 60,
                             Description = "Gold Sword",
                             ItemType = 0,
                             MaxDurability = 120,
@@ -958,7 +979,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 16,
                             ChangeOfGenerating = 0,
-                            Damage = 7,
+                            Damage = 70,
                             Description = "Unobtainium Sword",
                             ItemType = 0,
                             MaxDurability = 240,
@@ -1118,6 +1139,17 @@ namespace game.Server.Migrations
                             MaxDurability = 240,
                             Name = "Unobtainium Pickaxe",
                             Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 39,
+                            ChangeOfGenerating = 0,
+                            Damage = 1,
+                            Description = "Rented Pickaxe",
+                            ItemType = 2,
+                            MaxDurability = 5,
+                            Name = "Rented Pickaxe",
+                            Weight = 1
                         });
                 });
 
@@ -1135,6 +1167,8 @@ namespace game.Server.Migrations
 
                     b.HasKey("ItemInstanceId");
 
+                    b.HasIndex("ItemId");
+
                     b.ToTable("ItemInstances");
                 });
 
@@ -1144,6 +1178,9 @@ namespace game.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("PlayerId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("MineId");
 
                     b.ToTable("Mines");
@@ -1151,7 +1188,8 @@ namespace game.Server.Migrations
                     b.HasData(
                         new
                         {
-                            MineId = 1
+                            MineId = 1,
+                            PlayerId = new Guid("00000000-0000-0000-0000-000000000000")
                         });
                 });
 
@@ -1162,6 +1200,9 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("BlockId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Health")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Index")
@@ -1247,6 +1288,8 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("PlayerId");
+
+                    b.HasIndex("FloorId");
 
                     b.ToTable("Players");
 
@@ -1350,6 +1393,36 @@ namespace game.Server.Migrations
                     b.Navigation("Item");
                 });
 
+            modelBuilder.Entity("game.Server.Models.Blueprint", b =>
+                {
+                    b.HasOne("game.Server.Models.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("game.Server.Models.BlueprintPlayer", b =>
+                {
+                    b.HasOne("game.Server.Models.Blueprint", "Blueprint")
+                        .WithMany()
+                        .HasForeignKey("BlueprintId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("game.Server.Models.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Blueprint");
+
+                    b.Navigation("Player");
+                });
+
             modelBuilder.Entity("game.Server.Models.Chest", b =>
                 {
                     b.HasOne("game.Server.Models.FloorItem", null)
@@ -1361,11 +1434,13 @@ namespace game.Server.Migrations
 
             modelBuilder.Entity("game.Server.Models.Crafting", b =>
                 {
-                    b.HasOne("game.Server.Models.Blueprint", null)
+                    b.HasOne("game.Server.Models.Blueprint", "Blueprint")
                         .WithMany("Craftings")
                         .HasForeignKey("BlueprintId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Blueprint");
                 });
 
             modelBuilder.Entity("game.Server.Models.Enemy", b =>
@@ -1396,7 +1471,14 @@ namespace game.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("game.Server.Models.ItemInstance", "ItemInstance")
+                        .WithMany()
+                        .HasForeignKey("ItemInstanceId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Floor");
+
+                    b.Navigation("ItemInstance");
                 });
 
             modelBuilder.Entity("game.Server.Models.Ingredience", b =>
@@ -1408,11 +1490,32 @@ namespace game.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("game.Server.Models.Item", b =>
+            modelBuilder.Entity("game.Server.Models.InventoryItem", b =>
                 {
-                    b.HasOne("game.Server.Models.ItemInstance", null)
-                        .WithMany("Items")
-                        .HasForeignKey("ItemInstanceId");
+                    b.HasOne("game.Server.Models.ItemInstance", "ItemInstance")
+                        .WithMany()
+                        .HasForeignKey("ItemInstanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("game.Server.Models.Player", null)
+                        .WithMany("InventoryItems")
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemInstance");
+                });
+
+            modelBuilder.Entity("game.Server.Models.ItemInstance", b =>
+                {
+                    b.HasOne("game.Server.Models.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("game.Server.Models.MineBlock", b =>
@@ -1436,13 +1539,20 @@ namespace game.Server.Migrations
 
             modelBuilder.Entity("game.Server.Models.MineLayer", b =>
                 {
-                    b.HasOne("game.Server.Models.Mine", "Mine")
-                        .WithMany()
+                    b.HasOne("game.Server.Models.Mine", null)
+                        .WithMany("MineLayers")
                         .HasForeignKey("MineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("Mine");
+            modelBuilder.Entity("game.Server.Models.Player", b =>
+                {
+                    b.HasOne("game.Server.Models.Floor", "Floor")
+                        .WithMany()
+                        .HasForeignKey("FloorId");
+
+                    b.Navigation("Floor");
                 });
 
             modelBuilder.Entity("game.Server.Models.Blueprint", b =>
@@ -1467,14 +1577,19 @@ namespace game.Server.Migrations
                     b.Navigation("Enemy");
                 });
 
-            modelBuilder.Entity("game.Server.Models.ItemInstance", b =>
+            modelBuilder.Entity("game.Server.Models.Mine", b =>
                 {
-                    b.Navigation("Items");
+                    b.Navigation("MineLayers");
                 });
 
             modelBuilder.Entity("game.Server.Models.MineLayer", b =>
                 {
                     b.Navigation("MineBlocks");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Player", b =>
+                {
+                    b.Navigation("InventoryItems");
                 });
 
             modelBuilder.Entity("game.Server.Models.Recipe", b =>

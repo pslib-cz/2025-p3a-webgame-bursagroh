@@ -1,13 +1,7 @@
 ﻿using game.Server.Data;
 using game.Server.Models;
-using game.Server.Services; 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SQLitePCL;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace game.Server.Controllers
 {
@@ -16,6 +10,7 @@ namespace game.Server.Controllers
     public class BuildingController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private static readonly SemaphoreSlim _bulkSemaphore = new SemaphoreSlim(1, 1);
 
         public BuildingController(ApplicationDbContext context)
         {
@@ -25,15 +20,16 @@ namespace game.Server.Controllers
         [HttpGet("{playerId}")]
         public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
         {
-            var playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
+            var playerExists = await _context.Players.AsNoTracking().AnyAsync(p => p.PlayerId == playerId);
             if (!playerExists) return NotFound();
 
             int minX = left;
-            int maxX = left + width;
+            int maxX = left + width - 1;
             int minY = top;
-            int maxY = top + height;
+            int maxY = top + height - 1;
 
             var existingBuildings = await _context.Buildings
+                .AsNoTracking()
                 .Where(b => b.PlayerId == playerId &&
                             b.PositionX >= minX && b.PositionX <= maxX &&
                             b.PositionY >= minY && b.PositionY <= maxY)
@@ -42,14 +38,27 @@ namespace game.Server.Controllers
             var mapGenerator = new MapGeneratorService();
             var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY);
 
+            var existingCoords = new HashSet<(int, int)>(
+                existingBuildings.Select(b => (b.PositionX, b.PositionY))
+            );
+
             var newBuildings = proceduralBuildings
-                .Where(pb => !existingBuildings.Any(eb => eb.PositionX == pb.PositionX && eb.PositionY == pb.PositionY))
+                .Where(pb => !existingCoords.Contains((pb.PositionX, pb.PositionY)))
                 .ToList();
 
             if (newBuildings.Any())
             {
-                _context.Buildings.AddRange(newBuildings);
-                await _context.SaveChangesAsync();
+                await _bulkSemaphore.WaitAsync();
+                try
+                {
+                    await _context.Buildings.AddRangeAsync(newBuildings);
+                    await _context.SaveChangesAsync();
+                }
+                finally
+                {
+                    _bulkSemaphore.Release();
+                }
+
                 existingBuildings.AddRange(newBuildings);
             }
 
@@ -142,6 +151,104 @@ namespace game.Server.Controllers
             }
 
             return StatusCode(500, "Error generating floor.");
+        }
+
+        [HttpPatch("{id}/Action/interact")]
+        public async Task<ActionResult> Interact(Guid id, [FromBody] InteractionRequest request)
+        {
+            var player = await _context.Players
+                .Include(p => p.InventoryItems)
+                    .ThenInclude(ii => ii.ItemInstance)
+                        .ThenInclude(ins => ins.Item)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found");
+
+            var floorItem = await _context.FloorItems
+                .Include(fi => fi.Enemy)
+                .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
+                                           fi.PositionX == request.TargetX &&
+                                           fi.PositionY == request.TargetY &&
+                                           fi.FloorItemType == FloorItemType.Enemy);
+
+            if (floorItem?.Enemy == null) {
+                return BadRequest("No enemy at target coordinates.");
+            }
+            
+
+            var targetEnemy = floorItem.Enemy;
+
+            if (targetEnemy.EnemyType != EnemyType.Zombie &&
+                targetEnemy.EnemyType != EnemyType.Skeleton &&
+                targetEnemy.EnemyType != EnemyType.Dragon)
+            {
+                return BadRequest("Invalid enemy type.");
+            }
+
+            int diffX = Math.Abs(player.SubPositionX - request.TargetX);
+            int diffY = Math.Abs(player.SubPositionY - request.TargetY);
+
+            bool isWithinReach = (diffX + diffY) <= 1;
+
+            if (!isWithinReach) {
+                return BadRequest("Enemy is too far away.");
+            } 
+
+
+            int damageDealt = 1;
+
+            if (request.InventoryItemId.HasValue && request.InventoryItemId.Value != 0)
+            {
+                var chosenItem = player.InventoryItems
+                    .FirstOrDefault(ii => ii.InventoryItemId == request.InventoryItemId.Value);
+
+                if (chosenItem != null && chosenItem.ItemInstance?.Item != null &&
+                    chosenItem.ItemInstance.Item.Name.Contains("Sword"))
+                {
+                    damageDealt = chosenItem.ItemInstance.Item.Damage;
+                }
+                else
+                {
+                    return BadRequest("Selected item is not a sword. Use null for fists.");
+                }
+            }
+
+            targetEnemy.Health -= damageDealt;
+
+            if (targetEnemy.Health > 0)
+            {
+                await _context.SaveChangesAsync();
+                return Ok(new
+                {
+                    message = $"You hit the {targetEnemy.EnemyType} for {damageDealt} damage.",
+                    remainingHealth = targetEnemy.Health
+                });
+            }
+
+            var lootInstance = await _context.ItemInstances
+                .Include(i => i.Item)
+                .FirstOrDefaultAsync(i => i.ItemInstanceId == targetEnemy.ItemInstanceId);
+
+            if (lootInstance != null)
+            {
+                floorItem.FloorItemType = FloorItemType.Item;
+                floorItem.Enemy = null;
+                floorItem.ItemInstanceId = lootInstance.ItemInstanceId;
+                _context.Enemies.Remove(targetEnemy);
+            }
+            else
+            {
+                _context.FloorItems.Remove(floorItem);
+                _context.Enemies.Remove(targetEnemy);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = $"Successfully defeated the {targetEnemy.EnemyType}!",
+                lootDropped = lootInstance?.Item?.Name ?? "Nothing"
+            });
         }
     }
 }

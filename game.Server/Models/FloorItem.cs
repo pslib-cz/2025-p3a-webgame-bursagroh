@@ -29,6 +29,10 @@ namespace game.Server.Models
         public Chest? Chest { get; set; }
         public Enemy? Enemy { get; set; }
 
+        public int? ItemInstanceId { get; set; }
+        [ForeignKey("ItemInstanceId")]
+        public ItemInstance? ItemInstance { get; set; }
+
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public FloorItemType FloorItemType { get; set; }
