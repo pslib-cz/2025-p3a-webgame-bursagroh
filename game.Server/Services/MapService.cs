@@ -101,7 +101,7 @@ public class MapGeneratorService
                     PositionX = pos.x,
                     PositionY = pos.y,
                     FloorItemType = FloorItemType.Enemy,
-                    Enemy = new Enemy { Health = 1000, EnemyType = EnemyType.Dragon }
+                    Enemy = new Enemy { Health = 100, EnemyType = EnemyType.Dragon }
                 });
             }
 
@@ -118,7 +118,7 @@ public class MapGeneratorService
                     PositionX = pos.x,
                     PositionY = pos.y,
                     FloorItemType = FloorItemType.Enemy,
-                    Enemy = new Enemy { Health = 200, EnemyType = selectedType }
+                    Enemy = new Enemy { Health = 20, EnemyType = selectedType }
                 });
             }
 
