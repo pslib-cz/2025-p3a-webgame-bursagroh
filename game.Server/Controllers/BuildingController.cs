@@ -2,6 +2,7 @@
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using EFCore.BulkExtensions;
 
 namespace game.Server.Controllers
 {
@@ -51,8 +52,7 @@ namespace game.Server.Controllers
                 await _bulkSemaphore.WaitAsync();
                 try
                 {
-                    await _context.Buildings.AddRangeAsync(newBuildings);
-                    await _context.SaveChangesAsync();
+                    await _context.BulkInsertAsync(newBuildings);
                 }
                 finally
                 {
