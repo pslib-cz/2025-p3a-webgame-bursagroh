@@ -1,9 +1,8 @@
 import React from "react"
 import QueryProvider from "./QueryProvider"
 import PlayerIdProvider from "./PlayerIdProvider"
-import MineIdProvider from "./MineIdProvider"
 
-const providers = [PlayerIdProvider, MineIdProvider]
+const providers = [PlayerIdProvider]
 
 const Providers: React.FC<React.PropsWithChildren> = ({ children }) => {
     return (
