@@ -18,7 +18,7 @@ public class MapGeneratorService
                 int absY = Math.Abs(y);
 
                 if (absX % 4 == 3 && absY % 4 == 3) continue;
-                if ((x == 0 || y == 0) && type == BuildingTypes.Abandoned) continue;
+                if ((x == 0 || y == 0) && (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap)) continue;
 
                 buildings.Add(new Building
                 {
