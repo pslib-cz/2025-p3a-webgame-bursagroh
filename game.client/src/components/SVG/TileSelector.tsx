@@ -14,6 +14,11 @@ import SilverOre from '../../assets/tiles/blocks/SilverOre'
 import UnobtainiumOre from '../../assets/tiles/blocks/UnobtainiumOre'
 import JunctionRoad from '../../assets/tiles/buildings/roads/JunctionRoad'
 import StraightRoad from '../../assets/tiles/buildings/roads/StraightRoad'
+import BuildingStraight from '../../assets/tiles/buildings/building/BuildingStraight'
+import BuildingStraightTrap from '../../assets/tiles/buildings/building/BuildingStraightTrap'
+import BuildingCorner from '../../assets/tiles/buildings/building/BuildingCorner'
+import BuildingCornerTrap from '../../assets/tiles/buildings/building/BuildingCornerTrap'
+import Grass from '../../assets/tiles/buildings/Grass'
 
 type TileSelectorProps = {
     tileType: TileType
@@ -81,13 +86,73 @@ const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileTyp
             return (
                 <StraightRoad {...props} x={x} y={y} width={width} height={height} placement='horizontal' />
             )
-        case 'abandoned':
+        case 'abandoned-straight-top':
             return (
-                <Rock {...props} x={x} y={y} width={width} height={height} />
+                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
             )
-        case 'abandoned-trap':
+        case 'abandoned-straight-right':
             return (
-                <Rock {...props} x={x} y={y} width={width} height={height} />
+                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'abandoned-straight-bottom':
+            return (
+                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'abandoned-straight-left':
+            return (
+                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+            )
+        case 'abandoned-trap-straight-top':
+            return (
+                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+            )
+        case 'abandoned-trap-straight-right':
+            return (
+                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'abandoned-trap-straight-bottom':
+            return (
+                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'abandoned-trap-straight-left':
+            return (
+                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+            )
+        case 'abandoned-corner-top-left':
+            return (
+                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+            )
+        case 'abandoned-corner-top-right':
+            return (
+                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+            )
+        case 'abandoned-corner-bottom-left':
+            return (
+                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'abandoned-corner-bottom-right':
+            return (
+                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'abandoned-trap-corner-top-left':
+            return (
+                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+            )
+        case 'abandoned-trap-corner-top-right':
+            return (
+                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+            )
+        case 'abandoned-trap-corner-bottom-left':
+            return (
+                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'abandoned-trap-corner-bottom-right':
+            return (
+                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'grass':
+            return (
+                <Grass {...props} x={x} y={y} width={width} height={height} />
             )
     }
 }

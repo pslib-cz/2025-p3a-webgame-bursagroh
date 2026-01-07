@@ -2,9 +2,14 @@ import type { GenericGET, GenericPOST } from ".."
 import type { MineLayer } from "../models/mine"
 
 export interface APIGenerateMine extends GenericPOST {
+    body: {
+        playerId: string
+    }
     res: {
         200: {
-            mineId: number
+            mine: {
+                mineId: number
+            }
         }
     }
 }

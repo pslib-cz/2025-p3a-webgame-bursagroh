@@ -1,10 +1,10 @@
 import React from "react"
-import { MineIdContext } from "../../providers/MineIdProvider"
 import { useQuery } from "@tanstack/react-query"
 import { getMineLayersQuery } from "../../api/mine"
 import Tile from "./Tile"
 import type { BlockType } from "../../types/api/models/mine"
 import type { TileType } from "../../types"
+import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 
 const mapBlockTypeToTileType = (buildingType: BlockType): TileType => {
     switch (buildingType) {
@@ -30,11 +30,12 @@ const mapBlockTypeToTileType = (buildingType: BlockType): TileType => {
 type LayerProps = {
     depth: number
     size: number
+    mineId: number
 }
 
-const Layer: React.FC<LayerProps> = ({ depth, size }) => {
-    const mineId = React.useContext(MineIdContext)!.mineId!
-    const { data, isError, isPending, isSuccess } = useQuery(getMineLayersQuery(mineId, depth, depth + size - 1))
+const Layer: React.FC<LayerProps> = ({ depth, size, mineId }) => {
+    const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const { data, isError, isPending, isSuccess } = useQuery(getMineLayersQuery(playerId, mineId, depth, depth + size - 1))
 
     if (isError) {
         return <div>Error loading.</div>
