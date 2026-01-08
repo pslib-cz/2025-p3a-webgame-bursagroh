@@ -1,3 +1,5 @@
+import type { Floor } from "./building"
+
 export type ScreenType = "City" | "Bank" | "Mine" | "Restaurant" | "Blacksmith" | "Floor" | "Fight"
 
 export type Player = {
@@ -5,15 +7,12 @@ export type Player = {
     name: string,
     money: number,
     screenType: ScreenType,
-    buildingId: null,
-    floorItemId: null,
-    floorItem: {
-        floorItemId: 1,
-        floorId: 1,
-        positionX: 1,
-        positionY: 1,
-        floorItemType: "Stair"
-    },
+    positionX: number,
+    positionY: number,
+    subPositionX: number,
+    subPositionY: number,
+    floorId: number | null,
+    floor: Floor | null,
     capacity: number,
     seed: number
 }

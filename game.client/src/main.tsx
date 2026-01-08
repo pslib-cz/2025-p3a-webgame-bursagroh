@@ -3,9 +3,15 @@ import { createRoot } from "react-dom/client"
 import "normalize.css"
 import { createBrowserRouter } from "react-router"
 import { RouterProvider } from "react-router/dom"
-import Game from "./pages/Game.tsx"
+import Game from "./pages/layouts/Game.tsx"
 import Root from "./pages/Root.tsx"
-import Layout from "./pages/Layout.tsx"
+import Layout from "./pages/layouts/Layout.tsx"
+import CityScreen from "./pages/screens/City.tsx"
+import BankScreen from "./pages/screens/Bank.tsx"
+import BlacksmithScreen from "./pages/screens/Blacksmith.tsx"
+import FightScreen from "./pages/screens/Fight.tsx"
+import MineScreen from "./pages/screens/Mine.tsx"
+import RestaurantScreen from "./pages/screens/Restaurant.tsx"
 
 const router = createBrowserRouter([
     {
@@ -19,6 +25,35 @@ const router = createBrowserRouter([
             {
                 path: "game",
                 Component: Game,
+                children: [
+                    {
+                        index: false
+                    },
+                    {
+                        path: "city",
+                        Component: CityScreen
+                    },
+                    {
+                        path: "bank",
+                        Component: BankScreen
+                    },
+                    {
+                        path: "blacksmith",
+                        Component: BlacksmithScreen
+                    },
+                    {
+                        path: "fight",
+                        Component: FightScreen
+                    },
+                    {
+                        path: "mine",
+                        Component: MineScreen
+                    },
+                    {
+                        path: "restaurant",
+                        Component: RestaurantScreen
+                    }
+                ]
             }
         ]
     }

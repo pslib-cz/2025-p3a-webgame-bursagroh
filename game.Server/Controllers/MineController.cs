@@ -156,12 +156,12 @@ namespace game.Server.Controllers
                 return BadRequest("You can only buy this while at the Mine.");
             }
 
-            bool isThere = (player.SubPositionX == -2 && player.SubPositionY == 1) ||
-                                (player.SubPositionX == -2 && player.SubPositionY == 2);
+            bool isThere = (player.SubPositionX == 1 && player.SubPositionY == -2) ||
+                    (player.SubPositionX == 2 && player.SubPositionY == -2);
 
             if (!isThere)
             {
-                return BadRequest("You are not at the thing (requires position -2,1 or -2,2).");
+                return BadRequest("You are not at the pickaxe thing (requires position 1,-2 or 2,-2).");
             }
 
             bool alreadyHasPickaxe = player.InventoryItems
@@ -212,8 +212,13 @@ namespace game.Server.Controllers
             return Ok(player);
         }
 
+        /// <remarks>
+        /// - mine
+        /// - mine layer je y, index x
+        /// - hrac musi stat vedle blocku ktery chce tezit
+        /// </remarks>
         [HttpPatch("{PlayerID}/Action/mine")]
-        public async Task<ActionResult> MineBlock(Guid PlayerID, MineRequest request)
+        public async Task<ActionResult> MineBlock(Guid PlayerID, InteractionRequest request)
         {
             var player = await context.Players
                 .Include(p => p.InventoryItems)

@@ -1,10 +1,10 @@
 import React from "react"
-import { MineIdContext } from "../../providers/MineIdProvider"
 import { useQuery } from "@tanstack/react-query"
-import { getMineLayerQuery } from "../../api/mine"
+import { getMineLayersQuery } from "../../api/mine"
 import Tile from "./Tile"
 import type { BlockType } from "../../types/api/models/mine"
 import type { TileType } from "../../types"
+import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 
 const mapBlockTypeToTileType = (buildingType: BlockType): TileType => {
     switch (buildingType) {
@@ -29,11 +29,13 @@ const mapBlockTypeToTileType = (buildingType: BlockType): TileType => {
 
 type LayerProps = {
     depth: number
+    size: number
+    mineId: number
 }
 
-const Layer: React.FC<LayerProps> = ({ depth }) => {
-    const mineId = React.useContext(MineIdContext)!.mineId!
-    const { data, isError, isPending, isSuccess } = useQuery(getMineLayerQuery(mineId, depth))
+const Layer: React.FC<LayerProps> = ({ depth, size, mineId }) => {
+    const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const { data, isError, isPending, isSuccess } = useQuery(getMineLayersQuery(playerId, mineId, depth, depth + size - 1))
 
     if (isError) {
         return <div>Error loading.</div>
@@ -46,9 +48,9 @@ const Layer: React.FC<LayerProps> = ({ depth }) => {
     if (isSuccess) {
         return (
             <>
-                {data.map((layer) => (
-                    <Tile key={`${depth}-${layer.index}`} width={1} height={1} x={layer.index} y={depth} tileType={mapBlockTypeToTileType(layer.block.blockType)} />
-                ))}
+                {data.map((layer) => layer.mineBlocks.map((block) => (
+                    <Tile key={`${layer.depth}-${block.index}`} width={1} height={1} x={block.index} y={layer.depth} tileType={mapBlockTypeToTileType(block.block.blockType)} />
+                )))}
             </>
         )
     }

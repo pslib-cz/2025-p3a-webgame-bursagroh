@@ -6,21 +6,29 @@ export const generatePlayerMutation = (playerName?: string) =>
     mutationOptions({
         mutationFn: () => api.post("/api/Player/generate", {}, {}, { name: playerName || "" }),
         onSuccess(data) {
-            queryClient.setQueryData(["player", data.playerId], data)
+            queryClient.setQueryData([data.playerId, "player"], data)
         },
     })
 
 export const getPlayerQuery = (playerId: string) =>
     queryOptions({
-        queryKey: ["player", playerId],
+        queryKey: [playerId, "player"],
         queryFn: () => api.get("/api/Player/{playerId}", { playerId }, {}),
     })
 
 export const updatePlayerPositionMutation = (playerId: string, newPositionX: number, newPositionY: number) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX, newPositionY }),
+        mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX, newPositionY, newFloorId: null }),
         onSuccess(data) {
-            queryClient.setQueryData(["player", playerId], data)
+            queryClient.setQueryData([playerId, "player"], data)
+        },
+    })
+
+export const updatePlayerFloorMutation = (playerId: string, newFloorId: number) =>
+    mutationOptions({
+        mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX: null, newPositionY: null, newFloorId }),
+        onSuccess(data) {
+            queryClient.setQueryData([playerId, "player"], data)
         },
     })
 
@@ -28,6 +36,6 @@ export const updatePlayerScreenMutation = (playerId: string, newScreenType: Scre
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move-screen", { playerId }, {}, { newScreenType }),
         onSuccess(data) {
-            queryClient.setQueryData(["player", playerId], data)
+            queryClient.setQueryData([playerId, "player"], data)
         },
     })

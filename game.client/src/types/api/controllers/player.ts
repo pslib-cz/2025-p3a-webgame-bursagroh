@@ -26,6 +26,11 @@ export interface APIPlayerMove extends GenericPATCH {
     body: {
         newPositionX: number
         newPositionY: number
+        newFloorId: null
+    } | {
+        newPositionX: null
+        newPositionY: null
+        newFloorId: number
     }
     res: {
         200: Player
