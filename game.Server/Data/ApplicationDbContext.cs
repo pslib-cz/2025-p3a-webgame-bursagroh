@@ -56,6 +56,14 @@ namespace game.Server.Data
                 .Navigation(fi => fi.Enemy)
                 .AutoInclude();
 
+            modelBuilder.Entity<InventoryItem>()
+                .Navigation(i => i.ItemInstance)
+                .AutoInclude();
+
+            modelBuilder.Entity<ItemInstance>()
+                .Navigation(ii => ii.Item)
+                .AutoInclude();
+
 
             modelBuilder.Entity<Player>(entity =>
             {

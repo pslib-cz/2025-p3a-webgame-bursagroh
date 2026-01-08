@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260107190718_Init")]
-    partial class Init
+    [Migration("20260108174807_tesdfj")]
+    partial class tesdfj
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
