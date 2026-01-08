@@ -6,13 +6,7 @@ import type { Building, BuildingType } from "../../types/api/models/building"
 import type { TileType } from "../../types"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 
-const mapBuildingTypeToTileType = (
-    buildingType: BuildingType,
-    buildingTypeTop: BuildingType | null,
-    buildingTypeRight: BuildingType | null,
-    buildingTypeBottom: BuildingType | null,
-    buildingTypeLeft: BuildingType | null
-): TileType => {
+const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null): TileType => {
     switch (buildingType) {
         case "Fountain":
             return "fountain"
@@ -40,7 +34,8 @@ const mapBuildingTypeToTileType = (
             if ((buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && (buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap")) return "abandoned-trap-corner-top-right"
             if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap")) return "abandoned-trap-corner-bottom-right"
 
-            if ((buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap") && buildingTypeBottom === "Road") return "abandoned-trap-straight-bottom"
+            if ((buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap") && buildingTypeBottom === "Road")
+                return "abandoned-trap-straight-bottom"
             if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && buildingTypeLeft === "Road") return "abandoned-trap-straight-left"
             if ((buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap") && buildingTypeTop === "Road") return "abandoned-trap-straight-top"
             return "abandoned-trap-straight-right"
@@ -62,7 +57,7 @@ const buildingToChunkPosition = (
 } => {
     return {
         x: ((building.positionX % chunkSize) + chunkSize) % chunkSize,
-        y: ((building.positionY % chunkSize) + chunkSize) % chunkSize
+        y: ((building.positionY % chunkSize) + chunkSize) % chunkSize,
     }
 }
 
@@ -129,7 +124,7 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
         buildingsMap.forEach((row, rowIndex) => {
             row.forEach((_, columnIndex) => {
                 if (rowIndex === 0 && columnIndex !== 0 && columnIndex !== mapSize - 1) {
-                    buildingsMap[rowIndex][columnIndex] = chunkTopMap[ size - 1][columnIndex - 1]
+                    buildingsMap[rowIndex][columnIndex] = chunkTopMap[size - 1][columnIndex - 1]
                 } else if (columnIndex === mapSize - 1 && rowIndex !== 0 && rowIndex !== mapSize - 1) {
                     buildingsMap[rowIndex][columnIndex] = chunkRightMap[rowIndex - 1][0]
                 } else if (rowIndex === mapSize - 1 && columnIndex !== 0 && columnIndex !== mapSize - 1) {
@@ -148,34 +143,18 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
                             const positionX = x + x_index
                             const positionY = y + y_index
 
-                            return (
-                                <Tile
-                                    key={`x:${positionX};y:${positionY}`}
-                                    width={1}
-                                    height={1}
-                                    x={positionX}
-                                    y={positionY}
-                                    tileType={"grass"}
-                                />
-                            )
+                            return <Tile key={`x:${positionX};y:${positionY}`} width={1} height={1} x={positionX} y={positionY} tileType={"grass"} />
                         }
 
-                        return (
-                            <Tile
-                                key={`x:${building.positionX};y:${building.positionY}`}
-                                width={1}
-                                height={1}
-                                x={building.positionX}
-                                y={building.positionY}
-                                tileType={mapBuildingTypeToTileType(
-                                    building.buildingType,
-                                    buildingsMap[y_index][x_index + 1],
-                                    buildingsMap[y_index + 1][x_index + 2],
-                                    buildingsMap[y_index + 2][x_index + 1],
-                                    buildingsMap[y_index + 1][x_index]
-                                )}
-                            />
+                        const tileType = mapBuildingTypeToTileType(
+                            building.buildingType,
+                            buildingsMap[y_index][x_index + 1],
+                            buildingsMap[y_index + 1][x_index + 2],
+                            buildingsMap[y_index + 2][x_index + 1],
+                            buildingsMap[y_index + 1][x_index]
                         )
+
+                        return <Tile key={`x:${building.positionX};y:${building.positionY}`} width={1} height={1} x={building.positionX} y={building.positionY} tileType={tileType} />
                     })
                 })}
             </>

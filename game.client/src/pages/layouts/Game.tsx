@@ -7,7 +7,7 @@ import type { ScreenType } from "../../types/api/models/player"
 import WrongScreen from "../WrongScreen"
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const screenTypeToURL = (screenType: ScreenType) => {
+export const screenTypeToURL = (screenType: ScreenType, level: number | undefined) => {
     switch (screenType) {
         case "City":
             return "/game/city"
@@ -20,7 +20,7 @@ export const screenTypeToURL = (screenType: ScreenType) => {
         case "Blacksmith":
             return "/game/blacksmith"
         case "Floor":
-            return "/game/floor"
+            return `/game/floor/${level}`
         case "Fight":
             return "/game/fight"
     }
@@ -40,7 +40,7 @@ const ProperScreenChecker = () => {
     }
 
     if (isSuccess) {
-        if (screenTypeToURL(data.screenType) != location.pathname) {
+        if (screenTypeToURL(data.screenType, data.floor?.level) != location.pathname) {
             return <WrongScreen />
         }
 

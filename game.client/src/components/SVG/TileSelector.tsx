@@ -19,6 +19,11 @@ import BuildingStraightTrap from '../../assets/tiles/buildings/building/Building
 import BuildingCorner from '../../assets/tiles/buildings/building/BuildingCorner'
 import BuildingCornerTrap from '../../assets/tiles/buildings/building/BuildingCornerTrap'
 import Grass from '../../assets/tiles/buildings/Grass'
+import Floor from '../../assets/tiles/floors/Floor'
+import FloorWall from '../../assets/tiles/floors/FloorWall'
+import FloorCorner from '../../assets/tiles/floors/FloorCorner'
+import FloorDoorLeft from '../../assets/tiles/floors/FloorDoorLeft'
+import FloorDoorRight from '../../assets/tiles/floors/FloorDoorRight'
 
 type TileSelectorProps = {
     tileType: TileType
@@ -153,6 +158,74 @@ const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileTyp
         case 'grass':
             return (
                 <Grass {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'floor':
+            return (
+                <Floor {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'wall-top':
+            return (
+                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+            )
+        case 'wall-right':
+            return (
+                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'wall-bottom':
+            return (
+                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'wall-left':
+            return (
+                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+            )
+        case 'wall-top-left':
+            return (
+                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+            )
+        case 'wall-top-right':
+            return (
+                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'wall-bottom-left':
+            return (
+                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+            )
+        case 'wall-bottom-right':
+            return (
+                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'wall-door-left-top':
+            return (
+                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+            )
+        case 'wall-door-left-right':
+            return (
+                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'wall-door-left-bottom':
+            return (
+                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'wall-door-left-left':
+            return (
+                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+            )
+        case 'wall-door-right-top':
+            return (
+                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+            )
+        case 'wall-door-right-right':
+            return (
+                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+            )
+        case 'wall-door-right-bottom':
+            return (
+                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+            )
+        case 'wall-door-right-left':
+            return (
+                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
             )
     }
 }

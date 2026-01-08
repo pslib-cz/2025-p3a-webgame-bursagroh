@@ -15,6 +15,7 @@ type TileProps = {
 const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected = false }) => {
     const navigate = useNavigate();
     const playerId = React.useContext(PlayerIdContext)!.playerId!
+
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
 
     let screenType: ScreenType
@@ -31,7 +32,57 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
         case "restaurant":
             screenType = "Restaurant"
             break
-        default:
+        case "abandoned-straight-top":
+        case "abandoned-straight-right":
+        case "abandoned-straight-bottom":
+        case "abandoned-straight-left":
+        case "abandoned-trap-straight-top":
+        case "abandoned-trap-straight-right":
+        case "abandoned-trap-straight-bottom":
+        case "abandoned-trap-straight-left":
+        case "abandoned-corner-top-left":
+        case "abandoned-corner-top-right":
+        case "abandoned-corner-bottom-left":
+        case "abandoned-corner-bottom-right":
+        case "abandoned-trap-corner-top-left":
+        case "abandoned-trap-corner-top-right":
+        case "abandoned-trap-corner-bottom-left":
+        case "abandoned-trap-corner-bottom-right":
+            screenType = "Floor"
+            break
+        case "floor":
+        case "wall-top":
+        case "wall-right":
+        case "wall-bottom":
+        case "wall-left":
+        case "wall-top-left":
+        case "wall-top-right":
+        case "wall-bottom-left":
+        case "wall-bottom-right":
+            screenType = "Floor"
+            break
+        case "rock":
+        case "wooden_frame":
+        case "copper_ore":
+        case "iron_ore":
+        case "gold_ore":
+        case "silver_ore":
+        case "unobtanium_ore":
+            screenType = "Mine"
+            break
+        case "grass":
+        case "fountain":
+        case "road":
+        case "road-vertical":
+        case "road-horizontal":
+        case "wall-door-left-top":
+        case "wall-door-left-right":
+        case "wall-door-left-bottom":
+        case "wall-door-left-left":
+        case "wall-door-right-top":
+        case "wall-door-right-right":
+        case "wall-door-right-bottom":
+        case "wall-door-right-left":
             screenType = "City"
             break
     }
@@ -44,6 +95,30 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
             case "blacksmith":
             case "restaurant":
             case "mine":
+            case "wall-door-left-top":
+            case "wall-door-left-right":
+            case "wall-door-left-bottom":
+            case "wall-door-left-left":
+            case "wall-door-right-top":
+            case "wall-door-right-right":
+            case "wall-door-right-bottom":
+            case "wall-door-right-left":
+            case "abandoned-straight-top":
+            case "abandoned-straight-right":
+            case "abandoned-straight-bottom":
+            case "abandoned-straight-left":
+            case "abandoned-trap-straight-top":
+            case "abandoned-trap-straight-right":
+            case "abandoned-trap-straight-bottom":
+            case "abandoned-trap-straight-left":
+            case "abandoned-corner-top-left":
+            case "abandoned-corner-top-right":
+            case "abandoned-corner-bottom-left":
+            case "abandoned-corner-bottom-right":
+            case "abandoned-trap-corner-top-left":
+            case "abandoned-trap-corner-top-right":
+            case "abandoned-trap-corner-bottom-left":
+            case "abandoned-trap-corner-bottom-right":
                 await Promise.all([
                     updatePlayerPositionAsync(),
                     updatePlayerScreenAsync()
@@ -66,6 +141,34 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
                 break
             case "mine":
                 navigate("/game/mine")
+                break
+            case "wall-door-left-top":
+            case "wall-door-left-right":
+            case "wall-door-left-bottom":
+            case "wall-door-left-left":
+            case "wall-door-right-top":
+            case "wall-door-right-right":
+            case "wall-door-right-bottom":
+            case "wall-door-right-left":
+                navigate("/game/city")
+                break
+            case "abandoned-straight-top":
+            case "abandoned-straight-right":
+            case "abandoned-straight-bottom":
+            case "abandoned-straight-left":
+            case "abandoned-trap-straight-top":
+            case "abandoned-trap-straight-right":
+            case "abandoned-trap-straight-bottom":
+            case "abandoned-trap-straight-left":
+            case "abandoned-corner-top-left":
+            case "abandoned-corner-top-right":
+            case "abandoned-corner-bottom-left":
+            case "abandoned-corner-bottom-right":
+            case "abandoned-trap-corner-top-left":
+            case "abandoned-trap-corner-top-right":
+            case "abandoned-trap-corner-bottom-left":
+            case "abandoned-trap-corner-bottom-right":
+                navigate("/game/floor/0")
                 break
         }
     }
