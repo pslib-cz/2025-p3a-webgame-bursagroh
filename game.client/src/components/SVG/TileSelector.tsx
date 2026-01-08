@@ -25,6 +25,7 @@ import FloorCorner from '../../assets/tiles/floors/FloorCorner'
 import FloorDoorLeft from '../../assets/tiles/floors/FloorDoorLeft'
 import FloorDoorRight from '../../assets/tiles/floors/FloorDoorRight'
 import FloorStairs from '../../assets/tiles/floors/FloorStairs'
+import EmptyBlock from '../../assets/tiles/blocks/EmptyBlock'
 
 type TileSelectorProps = {
     tileType: TileType
@@ -231,6 +232,10 @@ const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileTyp
         case 'stair':
             return (
                 <FloorStairs {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'empty':
+            return (
+                <EmptyBlock {...props} x={x} y={y} width={width} height={height} />
             )
     }
 }

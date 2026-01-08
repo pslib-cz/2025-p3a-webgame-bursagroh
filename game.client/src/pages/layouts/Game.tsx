@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { getPlayerInventoryQuery, getPlayerQuery } from "../../api/player"
 import type { ScreenType } from "../../types/api/models/player"
 import WrongScreen from "../WrongScreen"
+import { ActivePickaxeContext } from "../../providers/ActivePickaxeProvider"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const screenTypeToURL = (screenType: ScreenType, level: number | undefined) => {
@@ -49,9 +50,14 @@ const ProperScreenChecker = () => {
 }
 
 const Inventory = () => {
+    const activePickaxe = React.useContext(ActivePickaxeContext)!
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const player = useQuery(getPlayerQuery(playerId))
     const inventory = useQuery(getPlayerInventoryQuery(playerId))
+
+    const handleActivePickaxeChange = (inventoryItemId: number) => {
+        activePickaxe.setActivePickaxeInventoryItemId(prev => prev === inventoryItemId ? null : inventoryItemId)
+    }
 
     if (player.isError || inventory.isError) {
         return <div>Error</div>
@@ -69,6 +75,9 @@ const Inventory = () => {
                 {inventory.data.map((item) => (
                     <div key={item.inventoryItemId}>
                         Item: {item.itemInstance.item.name}
+                        <button onClick={() => handleActivePickaxeChange(item.inventoryItemId)}>
+                            {activePickaxe.activePickaxeInventoryItemId === item.inventoryItemId ? "Deactivate Pickaxe" : "Set as Active Pickaxe"}
+                        </button>
                     </div>
                 ))}
             </>

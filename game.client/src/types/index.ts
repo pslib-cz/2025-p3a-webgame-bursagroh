@@ -17,7 +17,7 @@ export type FloorType =
     | "wall-door-right-bottom"
     | "wall-door-right-left"
     | "stair"
-export type BlockType = "rock" | "wooden_frame" | "copper_ore" | "iron_ore" | "gold_ore" | "silver_ore" | "unobtanium_ore"
+export type BlockType = "empty" | "rock" | "wooden_frame" | "copper_ore" | "iron_ore" | "gold_ore" | "silver_ore" | "unobtanium_ore"
 export type BuildingType =
     | "grass"
     | "bank"

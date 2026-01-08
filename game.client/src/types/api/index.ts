@@ -1,6 +1,6 @@
 import type { APIBankInventory, APIBankItemMove } from "./controllers/bank"
 import type { APIGetBuildingFloor, APIGetBuildings } from "./controllers/building"
-import type { APIGenerateMine, APIGetMineLayer, APIGetMineLayers } from "./controllers/mine"
+import type { APIGenerateMine, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
 import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
 
 export type StringifyAble = string | number
@@ -81,6 +81,8 @@ export interface API extends GenericAPI {
         "/api/Player/{playerId}/Action/move": APIPlayerMove
         "/api/Player/{playerId}/Action/move-screen": APIPlayerMoveScreen
         "/api/Bank/{playerId}/Action/move": APIBankItemMove
+        "/api/Mine/{playerId}/Action/mine": APIMineMine
+        "/api/Mine/{playerId}/Action/buy": APIMineRent
     }
     delete: {
 

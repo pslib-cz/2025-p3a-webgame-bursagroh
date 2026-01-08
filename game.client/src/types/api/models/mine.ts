@@ -26,5 +26,6 @@ export type MineLayer = {
             minAmount: number
             maxAmount: number
         }
+        health: number
     }>
 }
