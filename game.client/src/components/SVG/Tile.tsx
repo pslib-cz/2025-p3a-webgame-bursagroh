@@ -2,21 +2,21 @@ import React from "react"
 import type { AssetProps, TileType } from "../../types"
 import TileSelector from "./TileSelector"
 import { useMutation } from "@tanstack/react-query"
-import { updatePlayerPositionMutation, updatePlayerScreenMutation } from "../../api/player"
+import { updatePlayerFloorMutation, updatePlayerPositionMutation, updatePlayerScreenMutation } from "../../api/player"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import type { ScreenType } from "../../types/api/models/player"
 import { useNavigate } from "react-router"
 
 type TileProps = {
     tileType: TileType
+    targetFloorId?: number
+    targetLevel?: number
     isSelected?: boolean
 } & AssetProps
 
-const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected = false }) => {
+const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorId: targetFloorId, targetLevel, isSelected = false }) => {
     const navigate = useNavigate();
     const playerId = React.useContext(PlayerIdContext)!.playerId!
-
-    const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
 
     let screenType: ScreenType
     switch (tileType) {
@@ -59,6 +59,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
         case "wall-top-right":
         case "wall-bottom-left":
         case "wall-bottom-right":
+        case "stair":
             screenType = "Floor"
             break
         case "rock":
@@ -87,7 +88,9 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
             break
     }
 
+    const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, screenType))
+    const { mutateAsync: updatePlayerFloorAsync } = useMutation(updatePlayerFloorMutation(playerId, x, y, targetFloorId!))
 
     const handleClick = async () => {
         switch (tileType) {
@@ -123,6 +126,10 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
                     updatePlayerPositionAsync(),
                     updatePlayerScreenAsync()
                 ])
+                break
+            case "stair":
+                await updatePlayerPositionAsync()
+                await updatePlayerFloorAsync()
                 break
             default:
                 await updatePlayerPositionAsync()
@@ -169,6 +176,9 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, isSelected =
             case "abandoned-trap-corner-bottom-left":
             case "abandoned-trap-corner-bottom-right":
                 navigate("/game/floor/0")
+                break
+            case "stair":
+                navigate(`/game/floor/${targetLevel}`)
                 break
         }
     }

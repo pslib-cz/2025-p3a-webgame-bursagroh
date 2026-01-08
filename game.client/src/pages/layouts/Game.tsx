@@ -2,7 +2,7 @@ import React from "react"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { Outlet, useLocation } from "react-router"
 import { useQuery } from "@tanstack/react-query"
-import { getPlayerQuery } from "../../api/player"
+import { getPlayerInventoryQuery, getPlayerQuery } from "../../api/player"
 import type { ScreenType } from "../../types/api/models/player"
 import WrongScreen from "../WrongScreen"
 
@@ -48,6 +48,34 @@ const ProperScreenChecker = () => {
     }
 }
 
+const Inventory = () => {
+    const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const player = useQuery(getPlayerQuery(playerId))
+    const inventory = useQuery(getPlayerInventoryQuery(playerId))
+
+    if (player.isError || inventory.isError) {
+        return <div>Error</div>
+    }
+
+    if (player.isPending || inventory.isPending) {
+        return <div>Loading...</div>
+    }
+
+    if (player.isSuccess && inventory.isSuccess) {
+        return (
+            <>
+                <div>Inventory for player {player.data.playerId}</div>
+                <div>Money: {player.data.money}</div>
+                {inventory.data.map((item) => (
+                    <div key={item.inventoryItemId}>
+                        Item: {item.itemInstance.item.name}
+                    </div>
+                ))}
+            </>
+        )
+    }
+}
+
 const Game = () => {
     const { playerId } = React.useContext(PlayerIdContext)!
 
@@ -59,6 +87,7 @@ const Game = () => {
         <>
             <div>Player ID: {playerId}</div>
             <ProperScreenChecker />
+            <Inventory />
         </>
     )
 }
