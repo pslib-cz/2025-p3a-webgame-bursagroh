@@ -156,12 +156,12 @@ namespace game.Server.Controllers
                 return BadRequest("You can only buy this while at the Mine.");
             }
 
-            bool isThere = (player.SubPositionX == -2 && player.SubPositionY == 1) ||
-                                (player.SubPositionX == -2 && player.SubPositionY == 2);
+            bool isThere = (player.SubPositionX == 2 && player.SubPositionY == -1) ||
+                                (player.SubPositionX == 2 && player.SubPositionY == -2);
 
             if (!isThere)
             {
-                return BadRequest("You are not at the thing (requires position -2,1 or -2,2).");
+                return BadRequest("You are not at the pickaxe thing (requires position 2,-1 or 2,-2).");
             }
 
             bool alreadyHasPickaxe = player.InventoryItems
