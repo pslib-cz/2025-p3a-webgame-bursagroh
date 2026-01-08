@@ -81,55 +81,67 @@ namespace game.Server.Controllers
         /// - pokud je hrac v AbandonedTrap tak nemuze odejit z budovy
         /// </remarks>
         [HttpPatch("{id}/Action/move-screen")]
-        public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest newScreenType)
+        public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest request)
         {
-            Player? player = await context.Players.FindAsync(id);
+            var player = await context.Players.FindAsync(id);
+            if (player == null) return NotFound();
 
-            if (player == null)
+            if (request.NewScreenType == ScreenTypes.City)
             {
-                return NotFound();
+                if (player.ScreenType == ScreenTypes.Floor)
+                {
+                    var currentFloor = await context.Floors.FindAsync(player.FloorId);
+                    if (currentFloor == null || currentFloor.Level != 0)
+                        return BadRequest("You can only leave the building from the ground floor (Level 0).");
+
+                    if (player.SubPositionX != 0 || player.SubPositionY != 0)
+                        return BadRequest("You must be at the entrance (0, 0) to leave the building.");
+
+                    var building = await context.Buildings.FirstOrDefaultAsync(b =>
+                        b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.PlayerId == id);
+
+                    if (building != null && building.BuildingType == BuildingTypes.AbandonedTrap)
+                        return BadRequest("This building is a trap!");
+                }
+
+                player.FloorId = null;
+                player.SubPositionX = 0;
+                player.SubPositionY = 0;
             }
 
-            if (player.ScreenType == ScreenTypes.Floor && newScreenType.NewScreenType == ScreenTypes.City)
+            if (request.NewScreenType == ScreenTypes.Floor && player.ScreenType == ScreenTypes.City)
             {
-                var currentFloor = await context.Floors.FindAsync(player.FloorId);
-
-                if (currentFloor == null || currentFloor.Level != 0)
-                {
-                    return BadRequest("You can only leave the building from the ground floor (Level 0).");
-                }
-
-                if (player.SubPositionX != 0 || player.SubPositionY != 0)
-                {
-                    return BadRequest("You must be at the entrance (0, 0) to leave the building.");
-                }
-
                 var building = await context.Buildings.FirstOrDefaultAsync(b =>
                     b.PositionX == player.PositionX &&
                     b.PositionY == player.PositionY &&
                     b.PlayerId == id);
 
-                if (building != null && building.BuildingType == BuildingTypes.AbandonedTrap)
+                if (building == null) return BadRequest("No building here.");
+
+                var floor0 = await context.Floors.FirstOrDefaultAsync(f =>
+                    f.BuildingId == building.BuildingId && f.Level == 0);
+
+                if (floor0 == null)
                 {
-                    return BadRequest("This building is a trap!");
+                    var mapGenerator = new MapGeneratorService();
+                    int totalHeight = building.Height ?? 5;
+
+                    var generatedFloors = mapGenerator.GenerateInterior(building.BuildingId, building.BuildingId, 1, totalHeight);
+                    floor0 = generatedFloors.FirstOrDefault(f => f.Level == 0);
+
+                    if (floor0 == null) return StatusCode(500, "Generation failed.");
+
+                    context.Floors.Add(floor0);
+                    building.ReachedHeight = 0;
+                    await context.SaveChangesAsync();
                 }
 
-                player.FloorId = null;
-            }
-
-            if (player.ScreenType == ScreenTypes.Mine)
-            {
-                player.FloorId = null;
-            }
-
-            player.ScreenType = newScreenType.NewScreenType;
-
-            if (newScreenType.NewScreenType == ScreenTypes.City)
-            {
+                player.FloorId = floor0.FloorId;
                 player.SubPositionX = 0;
                 player.SubPositionY = 0;
             }
 
+            player.ScreenType = request.NewScreenType;
             await context.SaveChangesAsync();
 
             return Ok(player);
