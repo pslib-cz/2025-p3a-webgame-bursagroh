@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace game.Server.Models
 {
@@ -19,6 +20,7 @@ namespace game.Server.Models
         public int ItemId { get; set; }
         public string Name { get; set; } = String.Empty;
         public string? Description { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public ItemTypes ItemType { get; set; }
         public int Weight { get; set; }
         public int Damage { get; set; }

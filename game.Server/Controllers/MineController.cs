@@ -291,13 +291,28 @@ namespace game.Server.Controllers
             }
 
             var blockName = targetBlock.Block.BlockType;
+
+            var toolUsed = await context.ItemInstances
+            .Include(ii => ii.Item)
+            .FirstOrDefaultAsync(ii => ii.ItemInstanceId == chosenItem.ItemInstanceId);
+
+            var itemMineBlock = new
+            {
+                toolUsed.ItemInstanceId,
+                targetBlock.MineBlockId,
+                ItemInstance = toolUsed,
+                MineBlock = targetBlock
+            };
+
             context.MineBlocks.Remove(targetBlock);
             await context.SaveChangesAsync();
 
             return Ok(new
             {
-                message = $"Destroyed {blockName}! Items dropped at ({request.TargetX}, {request.TargetY}).",
-                amountDropped = amountToGive
+                message = $"Destroyed {blockName}!",
+                itemMineBlock,
+                x = request.TargetX,
+                y = request.TargetY
             });
         }
     }

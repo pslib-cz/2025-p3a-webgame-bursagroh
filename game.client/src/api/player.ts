@@ -16,6 +16,12 @@ export const getPlayerQuery = (playerId: string) =>
         queryFn: () => api.get("/api/Player/{playerId}", { playerId }, {}),
     })
 
+export const getPlayerInventoryQuery = (playerId: string) =>
+    queryOptions({
+        queryKey: [playerId, "inventory"],
+        queryFn: () => api.getWith204("/api/Player/{playerId}/Inventory", { playerId }, {}),
+    })
+
 export const updatePlayerPositionMutation = (playerId: string, newPositionX: number, newPositionY: number) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX, newPositionY, newFloorId: null }),
@@ -24,9 +30,9 @@ export const updatePlayerPositionMutation = (playerId: string, newPositionX: num
         },
     })
 
-export const updatePlayerFloorMutation = (playerId: string, newFloorId: number) =>
+export const updatePlayerFloorMutation = (playerId: string, newPositionX: number, newPositionY: number, newFloorId: number) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX: null, newPositionY: null, newFloorId }),
+        mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX, newPositionY, newFloorId }),
         onSuccess(data) {
             queryClient.setQueryData([playerId, "player"], data)
         },

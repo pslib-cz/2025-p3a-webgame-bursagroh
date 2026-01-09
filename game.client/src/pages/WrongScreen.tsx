@@ -21,7 +21,7 @@ const WrongScreen = () => {
         return (
             <>
                 <div>Wrong Screen</div>
-                <NavLink to={screenTypeToURL(data.screenType)}>change</NavLink>
+                <NavLink to={screenTypeToURL(data.screenType, data.floor?.level)}>change</NavLink>
             </>
         )
     }

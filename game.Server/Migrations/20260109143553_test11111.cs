@@ -5,7 +5,7 @@
 namespace game.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class tesdfj : Migration
+    public partial class test11111 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
