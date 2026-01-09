@@ -17,6 +17,8 @@ namespace game.Server.Data
         public DbSet<Mine> Mines { get; set; }
         public DbSet<MineLayer> MineLayers { get; set; }
         public DbSet<MineBlock> MineBlocks { get; set; }
+
+        public DbSet<InventoryItem> ItemMineBlocks { get; set; }
         public DbSet<Block> Blocks { get; set; }
         public DbSet<Floor> Floors { get; set; }
         public DbSet<FloorItem> FloorItems { get; set; }
@@ -318,6 +320,19 @@ namespace game.Server.Data
                 .WithMany()
                 .HasForeignKey(bp => bp.BlueprintId);
 
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasKey(imb => new { imb.ItemInstanceId, imb.MineBlockId });
+
+            
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasOne(imb => imb.ItemInstance)
+                .WithMany()
+                .HasForeignKey(imb => imb.ItemInstanceId);
+
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasOne(imb => imb.MineBlock)
+                .WithMany()
+                .HasForeignKey(imb => imb.MineBlockId);
 
 
         }   
