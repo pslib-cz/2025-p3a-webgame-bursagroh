@@ -86,6 +86,24 @@ namespace game.Server.Controllers
             var player = await context.Players.FindAsync(id);
             if (player == null) return NotFound();
 
+            if (player.ScreenType == ScreenTypes.Mine && request.NewScreenType != ScreenTypes.Mine)
+            {
+                var rentedItems = await context.InventoryItems
+                    .Where(ii => ii.PlayerId == id && ii.ItemInstance.ItemId == 39)
+                    .ToListAsync();
+
+                if (rentedItems.Any())
+                {
+                    var instanceIds = rentedItems.Select(ri => ri.ItemInstanceId).ToList();
+                    var instances = await context.ItemInstances
+                        .Where(ii => instanceIds.Contains(ii.ItemInstanceId))
+                        .ToListAsync();
+
+                    context.InventoryItems.RemoveRange(rentedItems);
+                    context.ItemInstances.RemoveRange(instances);
+                }
+            }
+
             if (request.NewScreenType == ScreenTypes.City)
             {
                 if (player.ScreenType == ScreenTypes.Floor)
