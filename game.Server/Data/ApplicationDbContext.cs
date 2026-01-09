@@ -277,7 +277,7 @@ namespace game.Server.Data
                 new Item { ItemId = 35, Name = "Gold Pickaxe",        Description = "Gold Pickaxe",        ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 6, MaxDurability = 120 },
                 new Item { ItemId = 36, Name = "Unobtainium Pickaxe", Description = "Unobtainium Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 7, MaxDurability = 240 },
 
-                new Item { ItemId = 39, Name = "Rented Pickaxe", Description = "Rented Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 5 }
+                new Item { ItemId = 39, Name = "Rented Pickaxe", Description = "Rented Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 15 }
             );
             modelBuilder.Entity<Block>().HasData(
                 new Block { BlockId = 1, BlockType = BlockType.Wooden_Frame,   ItemId = 1, MinAmount = 1, MaxAmount = 1},

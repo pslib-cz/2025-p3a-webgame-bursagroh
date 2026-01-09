@@ -165,7 +165,7 @@ namespace game.Server.Controllers
             }
 
             bool alreadyHasPickaxe = player.InventoryItems
-                .Any(ii => ii.ItemInstance != null && ii.ItemInstance.ItemId == 30);
+                .Any(ii => ii.ItemInstance != null && ii.ItemInstance.ItemId == 39);
 
             if (alreadyHasPickaxe)
             {
@@ -178,7 +178,7 @@ namespace game.Server.Controllers
                 return BadRequest($"Not enough money. Cost is {cost}.");
             }
 
-            var item = await context.Items.FirstOrDefaultAsync(i => i.ItemId == 30);
+            var item = await context.Items.FirstOrDefaultAsync(i => i.ItemId == 39);
             if (item == null)
             {
                 return BadRequest("Configuration Error: Item 30 does not exist.");
@@ -259,6 +259,13 @@ namespace game.Server.Controllers
 
 
             targetBlock.Health -= chosenItem.ItemInstance.Item.Damage;
+            chosenItem.ItemInstance.Durability -= 1;
+
+            if (chosenItem.ItemInstance.Durability <= 0)
+            {
+                context.InventoryItems.Remove(chosenItem);
+                context.ItemInstances.Remove(chosenItem.ItemInstance);
+            }
 
             if (targetBlock.Health > 0)
             {
@@ -292,17 +299,6 @@ namespace game.Server.Controllers
 
             var blockName = targetBlock.Block.BlockType;
 
-            var toolUsed = await context.ItemInstances
-            .Include(ii => ii.Item)
-            .FirstOrDefaultAsync(ii => ii.ItemInstanceId == chosenItem.ItemInstanceId);
-
-            var itemMineBlock = new
-            {
-                toolUsed.ItemInstanceId,
-                targetBlock.MineBlockId,
-                ItemInstance = toolUsed,
-                MineBlock = targetBlock
-            };
 
             context.MineBlocks.Remove(targetBlock);
             await context.SaveChangesAsync();
@@ -310,9 +306,9 @@ namespace game.Server.Controllers
             return Ok(new
             {
                 message = $"Destroyed {blockName}!",
-                itemMineBlock,
-                x = request.TargetX,
-                y = request.TargetY
+                name = blockName.ToString(),
+                PositionX = request.TargetX,
+                PositionY = request.TargetY
             });
         }
     }
