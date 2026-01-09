@@ -36,6 +36,20 @@ export const api = {
 
         return await response.json() as API["get"][URL]["res"][200]
     },
+    getWith204: async <URL extends keyof Pick<API["get"], "/api/Player/{playerId}/Inventory">, Params extends API["get"][URL]["params"], Query extends API["get"][URL]["query"]>(url: URL, params: Params, query: Query) => {
+        const uri = formatURL(url, params, query)
+        const response = await fetch(uri)
+
+        if (!response.ok) {
+            throw new Error(`Error getting ${uri}: ${response.statusText}`)
+        }
+
+        if (response.status === 204) {
+            return [] as API["get"][URL]["res"][204]
+        }
+
+        return await response.json() as API["get"][URL]["res"][200]
+    },
     post: async <URL extends keyof API["post"], Params extends API["post"][URL]["params"], Query extends API["post"][URL]["query"], Body extends API["post"][URL]["body"]>(url: URL, params: Params, query: Query, body: Body) => {
         const uri = formatURL(url, params, query)
         const response = await fetch(uri, {

@@ -1,5 +1,5 @@
 import type { GenericPOST, GenericGET, GenericPATCH } from ".."
-import type { Player, ScreenType } from "../models/player"
+import type { InventoryItem, Player, ScreenType } from "../models/player"
 
 export interface APIPlayerGenerate extends GenericPOST {
     body: {
@@ -19,6 +19,16 @@ export interface APIPlayerGetById extends GenericGET {
     }
 }
 
+export interface APIPlayerInventory extends GenericGET {
+    params: {
+        playerId: string
+    }
+    res: {
+        200: Array<InventoryItem>
+        204: []
+    }
+}
+
 export interface APIPlayerMove extends GenericPATCH {
     params: {
         playerId: string
@@ -26,11 +36,7 @@ export interface APIPlayerMove extends GenericPATCH {
     body: {
         newPositionX: number
         newPositionY: number
-        newFloorId: null
-    } | {
-        newPositionX: null
-        newPositionY: null
-        newFloorId: number
+        newFloorId: number | null
     }
     res: {
         200: Player
