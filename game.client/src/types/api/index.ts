@@ -2,6 +2,7 @@ import type { APIBankInventory, APIBankItemMove } from "./controllers/bank"
 import type { APIGetBuildingFloor, APIGetBuildings } from "./controllers/building"
 import type { APIGenerateMine, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
 import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
+import type { APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
 
 export type StringifyAble = string | number
 
@@ -69,6 +70,8 @@ export interface API extends GenericAPI {
         "/api/Building/{buildingId}/Interior/{level}": APIGetBuildingFloor
         "/api/Mine/{mineId}/Layer/{layer}": APIGetMineLayer
         "/api/Mine/{mineId}/Layers": APIGetMineLayers
+        "/api/Recipe": APIGetRecipes
+        "/api/Recipe/Random": APIGetRandomRecipe
     }
     post: {
         "/api/Player/generate": APIPlayerGenerate
@@ -83,6 +86,8 @@ export interface API extends GenericAPI {
         "/api/Bank/{playerId}/Action/move": APIBankItemMove
         "/api/Mine/{playerId}/Action/mine": APIMineMine
         "/api/Mine/{playerId}/Action/buy": APIMineRent
+        "/api/Recipe/{recipeId}/Action/start": APIRecipeStart
+        "/api/Recipe/{recipeId}/Action/end": APIRecipeEnd
     }
     delete: {
 
