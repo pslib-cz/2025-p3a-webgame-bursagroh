@@ -4,6 +4,7 @@ import React from "react"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { getBankInventoryQuery, moveBankItemMutation, moveBankMoneyMutation } from "../../api/bank"
 import type { InventoryItem as InventoryItemType } from "../../types/api/models/player"
+import { useNavigate } from "react-router"
 
 const InventoryItem = ({ playerId, item }: {playerId: string, item: InventoryItemType}) => {
     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, item.inventoryItemId))
@@ -36,6 +37,7 @@ const BankItem = ({ playerId, item }: {playerId: string, item: InventoryItemType
 }
 
 const BankScreen = () => {
+    const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
     const player = useQuery(getPlayerQuery(playerId))
@@ -47,8 +49,10 @@ const BankScreen = () => {
 
     const [amount, setAmount] = React.useState(0)
 
-    const handleClick = () => {
-        updatePlayerScreenAsync()
+    const handleClick = async () => {
+        await updatePlayerScreenAsync()
+        
+        navigate("/game/city")
     }
 
     const handleTransferToBank = () => {

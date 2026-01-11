@@ -2,7 +2,7 @@ import React from 'react'
 import { PlayerIdContext } from '../../providers/PlayerIdProvider'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { getPlayerQuery, updatePlayerScreenMutation } from '../../api/player'
-import { useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import type { FloorPathParams, TileType } from '../../types'
 import { getBuildingFloorQuery, getBuildingsQuery } from '../../api/building'
 import type { Player as PlayerType } from '../../types/api/models/player'
@@ -11,6 +11,8 @@ import Player from '../../assets/Player'
 import FloorSVG from '../../components/SVG/Floor'
 import Tile from '../../components/SVG/Tile'
 import type { Building, EnemyType } from '../../types/api/models/building'
+import { BuildingIdContext } from '../../providers/BuildingIdProvider'
+import { LayerContext } from '../../providers/LayerProvider'
 
 const mapEnemyTypeToTileType = (enemyType: EnemyType): TileType => {
     switch (enemyType) {
@@ -23,7 +25,35 @@ const mapEnemyTypeToTileType = (enemyType: EnemyType): TileType => {
     }
 }
 
+const mapItemIdToTileType = (itemId: number): TileType => {
+    switch (itemId) {
+        case 1:
+            return "wood"
+        case 2:
+            return "rock_item"
+        case 3:
+            return "copper"
+        case 4:
+            return "iron"
+        case 5:
+            return "silver"
+        case 6:
+            return "gold"
+        case 7:
+            return "unobtanium"
+        case 10:
+            return "wooden_sword"
+        case 30:
+            return "wooden_pickaxe"
+        case 39:
+            return "wooden_pickaxe"
+        default:
+            return "empty"
+    }
+}
+
 const BuildingFetch = ({player, level}: {player: PlayerType, level: number}) => {
+    const buildingIdContext = React.useContext(BuildingIdContext)!
     const {data, isPending, isError, isSuccess} = useQuery(getBuildingsQuery(player.playerId, player.positionY, player.positionX, 1, 1))
 
     if (isPending) {
@@ -35,11 +65,13 @@ const BuildingFetch = ({player, level}: {player: PlayerType, level: number}) => 
     }
 
     if (isSuccess) {
+        buildingIdContext.setBuildingId(data[0].buildingId)
         return <Floor player={player} building={data[0]} level={level} />
     }
 }
 
 const Floor = ({player, building, level}: {player: PlayerType, building: Building, level: number}) => {
+    const navigate = useNavigate()
     const {data, isPending, isError, isSuccess} = useQuery(getBuildingFloorQuery(player.playerId, building.buildingId, level))
 
     const floorAbove = useQuery(getBuildingFloorQuery(player.playerId, building.buildingId, (building.buildingType === "Abandoned" || building.buildingType === "AbandonedTrap") && building.height === level ? level : level + 1))
@@ -47,8 +79,10 @@ const Floor = ({player, building, level}: {player: PlayerType, building: Buildin
 
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(player.playerId, "City"))
 
-    const handleClick = () => {
-        updatePlayerScreenAsync()
+    const handleClick = async () => {
+        await updatePlayerScreenAsync()
+
+        navigate("/game/city")
     }
 
     if (isPending) {
@@ -79,6 +113,12 @@ const Floor = ({player, building, level}: {player: PlayerType, building: Buildin
                                 <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType={mapEnemyTypeToTileType(item.enemy.enemyType)} targetBuildingId={building.buildingId} targetLevel={level} />
                             )
                         }
+
+                        if (item.floorItemType === "Item" && item.itemInstance) {
+                            return (
+                                <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} tileType={mapItemIdToTileType(item.itemInstance.item.itemId)} targetFloorItemId={item.floorItemId} targetBuildingId={building.buildingId} targetLevel={level} />
+                            )
+                        }
                     })}
                     <Player x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
                 </SVGDisplay>
@@ -91,6 +131,7 @@ const Floor = ({player, building, level}: {player: PlayerType, building: Buildin
 
 const FloorScreen = () => {
     const params = useParams<FloorPathParams>()
+    const layerContext = React.useContext(LayerContext)!
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const {data, isPending, isError, isSuccess} = useQuery(getPlayerQuery(playerId))
 
@@ -103,6 +144,7 @@ const FloorScreen = () => {
     }
 
     if (isSuccess) {
+        layerContext.setLayer(Number(params.level))
         return <BuildingFetch player={data} level={Number(params.level)} />
     }
 }

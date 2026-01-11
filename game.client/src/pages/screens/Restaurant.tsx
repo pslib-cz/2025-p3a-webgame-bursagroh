@@ -4,8 +4,10 @@ import { updatePlayerScreenMutation } from "../../api/player"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { endRecipeMutation, getRandomRecipeMutation, getRecipesQuery, startRecipeMutation } from "../../api/recipe"
 import type { IngredienceType, Recipe } from "../../types/api/models/recipe"
+import { useNavigate } from "react-router"
 
 const RestaurantScreen = () => {
+    const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
 
@@ -19,8 +21,10 @@ const RestaurantScreen = () => {
 
     const recipes = useQuery(getRecipesQuery())
 
-    const handleClose = () => {
-        updatePlayerScreenAsync()
+    const handleClose = async () => {
+        await updatePlayerScreenAsync()
+
+        navigate("/game/city")
     }
 
     const handleStart = async () => {

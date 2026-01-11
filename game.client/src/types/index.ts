@@ -45,8 +45,9 @@ export type BuildingType =
     | "abandoned-trap-corner-bottom-left"
     | "abandoned-trap-corner-bottom-right"
 export type EnemyType = "zombie" | "skeleton" | "dragon"
+export type ItemType = "wooden_sword" | "wooden_pickaxe" | "wood" | "rock_item" | "copper" | "iron" | "silver" | "gold" | "unobtanium"
 
-export type TileType = FloorType | BlockType | BuildingType | EnemyType
+export type TileType = FloorType | BlockType | BuildingType | EnemyType | ItemType
 
 export type AssetProps = {
     width: number

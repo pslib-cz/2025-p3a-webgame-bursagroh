@@ -34,12 +34,28 @@ export type FloorItem = {
     positionY: number
     floorItemType: FloorItemType
     enemy: Enemy | null
+    itemInstanceId: number | null
+    itemInstance: {
+        itemInstanceId: number
+        itemId: number
+        durability: number
+        item: {
+            itemId: number
+            name: string
+            description: string
+            itemType: string
+            weight: number
+            damage: number
+            maxDurability: number
+            changeOfGenerating: number
+        }
+    } | null
 }
 
 export type Enemy = {
-    enemyId: number,
-    health: number,
-    enemyType: EnemyType,
-    floorItemId: number,
+    enemyId: number
+    health: number
+    enemyType: EnemyType
+    floorItemId: number
     itemInstanceId: number
 }

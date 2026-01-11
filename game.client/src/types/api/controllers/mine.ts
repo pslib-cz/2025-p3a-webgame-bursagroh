@@ -1,5 +1,5 @@
 import type { GenericGET, GenericPATCH, GenericPOST } from ".."
-import type { MineLayer } from "../models/mine"
+import type { MineItem, MineLayer } from "../models/mine"
 
 export interface APIGenerateMine extends GenericPOST {
     body: {
@@ -34,6 +34,15 @@ export interface APIGetMineLayers extends GenericGET {
     }
     res: {
         200: Array<MineLayer>
+    }
+}
+
+export interface APIGetMineItems extends GenericGET {
+    params: {
+        mineId: number
+    }
+    res: {
+        200: Array<MineItem>
     }
 }
 

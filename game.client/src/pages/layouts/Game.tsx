@@ -1,11 +1,14 @@
 import React from "react"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { Outlet, useLocation } from "react-router"
-import { useQuery } from "@tanstack/react-query"
-import { getPlayerInventoryQuery, getPlayerQuery } from "../../api/player"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { dropItemMutation, getPlayerInventoryQuery, getPlayerQuery } from "../../api/player"
 import type { ScreenType } from "../../types/api/models/player"
 import WrongScreen from "../WrongScreen"
 import { ActiveItemContext } from "../../providers/ActiveItemProvider"
+import { MineIdContext } from "../../providers/MineIdProvider"
+import { BuildingIdContext } from "../../providers/BuildingIdProvider"
+import { LayerContext } from "../../providers/LayerProvider"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const screenTypeToURL = (screenType: ScreenType, level: number | undefined) => {
@@ -52,11 +55,20 @@ const ProperScreenChecker = () => {
 const Inventory = () => {
     const activeItem = React.useContext(ActiveItemContext)!
     const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const mineId = React.useContext(MineIdContext)!.mineId
+    const buildingId = React.useContext(BuildingIdContext)!.buildingId
+    const layer = React.useContext(LayerContext)!.layer
     const player = useQuery(getPlayerQuery(playerId))
     const inventory = useQuery(getPlayerInventoryQuery(playerId))
 
+    const {mutateAsync: dropItemAsync} = useMutation(dropItemMutation(playerId, mineId ?? -1, buildingId ?? -1, layer ?? -1))
+
     const handleActiveItemChange = (inventoryItemId: number) => {
         activeItem.setActiveItemInventoryItemId(prev => prev === inventoryItemId ? null : inventoryItemId)
+    }
+
+    const handleDropItem = async (inventoryItemId: number) => {
+        await dropItemAsync(inventoryItemId)
     }
 
     if (player.isError || inventory.isError) {
@@ -78,6 +90,7 @@ const Inventory = () => {
                         <button onClick={() => handleActiveItemChange(item.inventoryItemId)}>
                             {activeItem.activeItemInventoryItemId === item.inventoryItemId ? "Deactivate" : "Set as Active"}
                         </button>
+                        <button onClick={() => handleDropItem(item.inventoryItemId)}>drop</button>
                     </div>
                 ))}
             </>

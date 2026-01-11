@@ -4,6 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { updatePlayerScreenMutation } from "../../api/player"
 import { buyBlueprintMutation, craftBlueprintMutation, getBlueprintsQuery, getPlayerBlueprintsQuery } from "../../api/blueprint"
 import type { Blueprint } from "../../types/api/models/blueprint"
+import { useNavigate } from "react-router"
 
 const BlueprintToBuy = ({ blueprint }: {blueprint: Blueprint}) => {
     const playerId = React.useContext(PlayerIdContext)!.playerId!
@@ -45,14 +46,17 @@ const BlueprintToCraft = ({ blueprint }: {blueprint: Blueprint}) => {
 }
 
 const BlacksmithScreen = () => {
+    const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
 
     const blueprints = useQuery(getBlueprintsQuery())
     const playerBlueprints = useQuery(getPlayerBlueprintsQuery(playerId))
 
-    const handleClick = () => {
-        updatePlayerScreenAsync()
+    const handleClick = async () => {
+        await updatePlayerScreenAsync()
+        
+        navigate("/game/city")
     }
 
     if (blueprints.isLoading || playerBlueprints.isLoading) {

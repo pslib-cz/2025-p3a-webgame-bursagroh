@@ -1,8 +1,8 @@
 import type { APIBankInventory, APIBankItemMove, APIBankMoneyTransfer } from "./controllers/bank"
 import type { APIBuyBlueprint, APICraftBlueprint, APIGetBlueprints, APIGetPlayerBlueprints } from "./controllers/blueprint"
 import type { APIGetBuildingFloor, APIGetBuildings, APIInteractInBuilding } from "./controllers/building"
-import type { APIGenerateMine, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
-import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
+import type { APIGenerateMine, APIGetMineItems, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
+import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerItemDrop, APIPlayerItemPick, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
 import type { APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
 
 export type StringifyAble = string | number
@@ -71,6 +71,7 @@ export interface API extends GenericAPI {
         "/api/Building/{buildingId}/Interior/{level}": APIGetBuildingFloor
         "/api/Mine/{mineId}/Layer/{layer}": APIGetMineLayer
         "/api/Mine/{mineId}/Layers": APIGetMineLayers
+        "/api/Mine/{mineId}/Items": APIGetMineItems
         "/api/Recipe": APIGetRecipes
         "/api/Recipe/Random": APIGetRandomRecipe
         "/api/Blueprint": APIGetBlueprints
@@ -86,6 +87,8 @@ export interface API extends GenericAPI {
     patch: {
         "/api/Player/{playerId}/Action/move": APIPlayerMove
         "/api/Player/{playerId}/Action/move-screen": APIPlayerMoveScreen
+        "/api/Player/{playerId}/Action/pick": APIPlayerItemPick
+        "/api/Player/{playerId}/Action/drop": APIPlayerItemDrop
         "/api/Bank/{playerId}/Action/move": APIBankItemMove
         "/api/Bank/{playerId}/Action/transfer": APIBankMoneyTransfer
         "/api/Mine/{playerId}/Action/mine": APIMineMine
