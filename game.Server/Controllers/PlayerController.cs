@@ -86,6 +86,24 @@ namespace game.Server.Controllers
             var player = await context.Players.FindAsync(id);
             if (player == null) return NotFound();
 
+            if (player.ScreenType == ScreenTypes.Mine && request.NewScreenType != ScreenTypes.Mine)
+            {
+                var rentedItems = await context.InventoryItems
+                    .Where(ii => ii.PlayerId == id && ii.ItemInstance.ItemId == 39)
+                    .ToListAsync();
+
+                if (rentedItems.Any())
+                {
+                    var instanceIds = rentedItems.Select(ri => ri.ItemInstanceId).ToList();
+                    var instances = await context.ItemInstances
+                        .Where(ii => instanceIds.Contains(ii.ItemInstanceId))
+                        .ToListAsync();
+
+                    context.InventoryItems.RemoveRange(rentedItems);
+                    context.ItemInstances.RemoveRange(instances);
+                }
+            }
+
             if (request.NewScreenType == ScreenTypes.City)
             {
                 if (player.ScreenType == ScreenTypes.Floor)
@@ -331,6 +349,47 @@ namespace game.Server.Controllers
             return Ok(new { message = "Items picked up.", newCount = currentInventoryCount });
         }
 
-        
+        [HttpPatch("{id}/Action/drop")]
+        public async Task<ActionResult> Drop(Guid id, [FromBody] DropItemRequest request)
+        {
+            var player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
+            if (player == null) {
+                return NotFound("Player not found.");
+            } 
+            if (player.FloorId == null) {
+                return BadRequest("You can only drop items while in floor/mine.");
+            }
+
+            var inventoryItem = await context.InventoryItems
+                .Include(ii => ii.ItemInstance)
+                .FirstOrDefaultAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == id);
+
+            if (inventoryItem == null) {
+                return BadRequest("Item not found in the inventory.");
+            }
+
+            var floorItem = new FloorItem
+            {
+                FloorId = player.FloorId.Value,
+                PositionX = player.SubPositionX,
+                PositionY = player.SubPositionY,
+                FloorItemType = FloorItemType.Item,
+                ItemInstanceId = inventoryItem.ItemInstanceId
+            };
+
+            context.InventoryItems.Remove(inventoryItem);
+            context.FloorItems.Add(floorItem);
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Item dropped.",
+                itemInstanceId = inventoryItem.ItemInstanceId,
+                x = player.SubPositionX,
+                y = player.SubPositionY
+            });
+        }
+
     }
 }

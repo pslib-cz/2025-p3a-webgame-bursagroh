@@ -156,16 +156,16 @@ namespace game.Server.Controllers
                 return BadRequest("You can only buy this while at the Mine.");
             }
 
-            bool isThere = (player.SubPositionX == 2 && player.SubPositionY == -1) ||
-                                (player.SubPositionX == 2 && player.SubPositionY == -2);
+            bool isThere = (player.SubPositionX == 1 && player.SubPositionY == -2) ||
+                    (player.SubPositionX == 2 && player.SubPositionY == -2);
 
             if (!isThere)
             {
-                return BadRequest("You are not at the pickaxe thing (requires position 2,-1 or 2,-2).");
+                return BadRequest("You are not at the pickaxe thing (requires position 1,-2 or 2,-2).");
             }
 
             bool alreadyHasPickaxe = player.InventoryItems
-                .Any(ii => ii.ItemInstance != null && ii.ItemInstance.ItemId == 30);
+                .Any(ii => ii.ItemInstance != null && ii.ItemInstance.ItemId == 39);
 
             if (alreadyHasPickaxe)
             {
@@ -178,7 +178,7 @@ namespace game.Server.Controllers
                 return BadRequest($"Not enough money. Cost is {cost}.");
             }
 
-            var item = await context.Items.FirstOrDefaultAsync(i => i.ItemId == 30);
+            var item = await context.Items.FirstOrDefaultAsync(i => i.ItemId == 39);
             if (item == null)
             {
                 return BadRequest("Configuration Error: Item 30 does not exist.");
@@ -259,6 +259,13 @@ namespace game.Server.Controllers
 
 
             targetBlock.Health -= chosenItem.ItemInstance.Item.Damage;
+            chosenItem.ItemInstance.Durability -= 1;
+
+            if (chosenItem.ItemInstance.Durability <= 0)
+            {
+                context.InventoryItems.Remove(chosenItem);
+                context.ItemInstances.Remove(chosenItem.ItemInstance);
+            }
 
             if (targetBlock.Health > 0)
             {
@@ -291,13 +298,17 @@ namespace game.Server.Controllers
             }
 
             var blockName = targetBlock.Block.BlockType;
+
+
             context.MineBlocks.Remove(targetBlock);
             await context.SaveChangesAsync();
 
             return Ok(new
             {
-                message = $"Destroyed {blockName}! Items dropped at ({request.TargetX}, {request.TargetY}).",
-                amountDropped = amountToGive
+                message = $"Destroyed {blockName}!",
+                name = blockName.ToString(),
+                PositionX = request.TargetX,
+                PositionY = request.TargetY
             });
         }
     }

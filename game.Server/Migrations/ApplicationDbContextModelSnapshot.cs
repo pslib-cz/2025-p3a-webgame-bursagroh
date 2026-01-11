@@ -796,7 +796,7 @@ namespace game.Server.Migrations
 
                     b.HasIndex("PlayerId");
 
-                    b.ToTable("InventoryItems");
+                    b.ToTable("InventoryItem");
                 });
 
             modelBuilder.Entity("game.Server.Models.Item", b =>
@@ -1172,6 +1172,21 @@ namespace game.Server.Migrations
                     b.ToTable("ItemInstances");
                 });
 
+            modelBuilder.Entity("game.Server.Models.ItemMineBlock", b =>
+                {
+                    b.Property<int>("ItemInstanceId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MineBlockId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ItemInstanceId", "MineBlockId");
+
+                    b.HasIndex("MineBlockId");
+
+                    b.ToTable("ItemMineBlock");
+                });
+
             modelBuilder.Entity("game.Server.Models.Mine", b =>
                 {
                     b.Property<int>("MineId")
@@ -1516,6 +1531,25 @@ namespace game.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("Item");
+                });
+
+            modelBuilder.Entity("game.Server.Models.ItemMineBlock", b =>
+                {
+                    b.HasOne("game.Server.Models.ItemInstance", "ItemInstance")
+                        .WithMany()
+                        .HasForeignKey("ItemInstanceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("game.Server.Models.MineBlock", "MineBlock")
+                        .WithMany()
+                        .HasForeignKey("MineBlockId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ItemInstance");
+
+                    b.Navigation("MineBlock");
                 });
 
             modelBuilder.Entity("game.Server.Models.MineBlock", b =>

@@ -17,6 +17,8 @@ namespace game.Server.Data
         public DbSet<Mine> Mines { get; set; }
         public DbSet<MineLayer> MineLayers { get; set; }
         public DbSet<MineBlock> MineBlocks { get; set; }
+
+        public DbSet<InventoryItem> ItemMineBlocks { get; set; }
         public DbSet<Block> Blocks { get; set; }
         public DbSet<Floor> Floors { get; set; }
         public DbSet<FloorItem> FloorItems { get; set; }
@@ -54,6 +56,14 @@ namespace game.Server.Data
 
             modelBuilder.Entity<FloorItem>()
                 .Navigation(fi => fi.Enemy)
+                .AutoInclude();
+
+            modelBuilder.Entity<InventoryItem>()
+                .Navigation(i => i.ItemInstance)
+                .AutoInclude();
+
+            modelBuilder.Entity<ItemInstance>()
+                .Navigation(ii => ii.Item)
                 .AutoInclude();
 
 
@@ -267,7 +277,7 @@ namespace game.Server.Data
                 new Item { ItemId = 35, Name = "Gold Pickaxe",        Description = "Gold Pickaxe",        ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 6, MaxDurability = 120 },
                 new Item { ItemId = 36, Name = "Unobtainium Pickaxe", Description = "Unobtainium Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 7, MaxDurability = 240 },
 
-                new Item { ItemId = 39, Name = "Rented Pickaxe", Description = "Rented Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 5 }
+                new Item { ItemId = 39, Name = "Rented Pickaxe", Description = "Rented Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 15 }
             );
             modelBuilder.Entity<Block>().HasData(
                 new Block { BlockId = 1, BlockType = BlockType.Wooden_Frame,   ItemId = 1, MinAmount = 1, MaxAmount = 1},
@@ -310,6 +320,19 @@ namespace game.Server.Data
                 .WithMany()
                 .HasForeignKey(bp => bp.BlueprintId);
 
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasKey(imb => new { imb.ItemInstanceId, imb.MineBlockId });
+
+            
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasOne(imb => imb.ItemInstance)
+                .WithMany()
+                .HasForeignKey(imb => imb.ItemInstanceId);
+
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasOne(imb => imb.MineBlock)
+                .WithMany()
+                .HasForeignKey(imb => imb.MineBlockId);
 
 
         }   

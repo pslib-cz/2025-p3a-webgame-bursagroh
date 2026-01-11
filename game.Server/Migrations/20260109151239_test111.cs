@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace game.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class idk : Migration
+    public partial class test111 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -346,7 +346,7 @@ namespace game.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "InventoryItems",
+                name: "InventoryItem",
                 columns: table => new
                 {
                     InventoryItemId = table.Column<int>(type: "INTEGER", nullable: false)
@@ -357,15 +357,15 @@ namespace game.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_InventoryItems", x => x.InventoryItemId);
+                    table.PrimaryKey("PK_InventoryItem", x => x.InventoryItemId);
                     table.ForeignKey(
-                        name: "FK_InventoryItems_ItemInstances_ItemInstanceId",
+                        name: "FK_InventoryItem_ItemInstances_ItemInstanceId",
                         column: x => x.ItemInstanceId,
                         principalTable: "ItemInstances",
                         principalColumn: "ItemInstanceId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_InventoryItems_Players_PlayerId",
+                        name: "FK_InventoryItem_Players_PlayerId",
                         column: x => x.PlayerId,
                         principalTable: "Players",
                         principalColumn: "PlayerId",
@@ -410,6 +410,30 @@ namespace game.Server.Migrations
                         column: x => x.FloorItemId,
                         principalTable: "FloorItems",
                         principalColumn: "FloorItemId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ItemMineBlock",
+                columns: table => new
+                {
+                    ItemInstanceId = table.Column<int>(type: "INTEGER", nullable: false),
+                    MineBlockId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ItemMineBlock", x => new { x.ItemInstanceId, x.MineBlockId });
+                    table.ForeignKey(
+                        name: "FK_ItemMineBlock_ItemInstances_ItemInstanceId",
+                        column: x => x.ItemInstanceId,
+                        principalTable: "ItemInstances",
+                        principalColumn: "ItemInstanceId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ItemMineBlock_MineBlocks_MineBlockId",
+                        column: x => x.MineBlockId,
+                        principalTable: "MineBlocks",
+                        principalColumn: "MineBlockId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -642,19 +666,24 @@ namespace game.Server.Migrations
                 column: "RecipeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InventoryItems_ItemInstanceId",
-                table: "InventoryItems",
+                name: "IX_InventoryItem_ItemInstanceId",
+                table: "InventoryItem",
                 column: "ItemInstanceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InventoryItems_PlayerId",
-                table: "InventoryItems",
+                name: "IX_InventoryItem_PlayerId",
+                table: "InventoryItem",
                 column: "PlayerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ItemInstances_ItemId",
                 table: "ItemInstances",
                 column: "ItemId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ItemMineBlock_MineBlockId",
+                table: "ItemMineBlock",
+                column: "MineBlockId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MineBlocks_BlockId",
@@ -696,10 +725,10 @@ namespace game.Server.Migrations
                 name: "Ingrediences");
 
             migrationBuilder.DropTable(
-                name: "InventoryItems");
+                name: "InventoryItem");
 
             migrationBuilder.DropTable(
-                name: "MineBlocks");
+                name: "ItemMineBlock");
 
             migrationBuilder.DropTable(
                 name: "RecipeTimes");
@@ -717,10 +746,7 @@ namespace game.Server.Migrations
                 name: "Players");
 
             migrationBuilder.DropTable(
-                name: "Blocks");
-
-            migrationBuilder.DropTable(
-                name: "MineLayers");
+                name: "MineBlocks");
 
             migrationBuilder.DropTable(
                 name: "ItemInstances");
@@ -729,13 +755,19 @@ namespace game.Server.Migrations
                 name: "Floors");
 
             migrationBuilder.DropTable(
-                name: "Mines");
+                name: "Blocks");
+
+            migrationBuilder.DropTable(
+                name: "MineLayers");
+
+            migrationBuilder.DropTable(
+                name: "Buildings");
 
             migrationBuilder.DropTable(
                 name: "Items");
 
             migrationBuilder.DropTable(
-                name: "Buildings");
+                name: "Mines");
         }
     }
 }

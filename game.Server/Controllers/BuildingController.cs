@@ -109,7 +109,7 @@ namespace game.Server.Controllers
             {
                 var currentPlayerFloor = await _context.Floors.FindAsync(player.FloorId);
 
-                if (currentPlayerFloor == null || currentPlayerFloor.BuildingId != buildingId || currentPlayerFloor.Level != level - 1)
+                if ((currentPlayerFloor == null || currentPlayerFloor.BuildingId != buildingId || currentPlayerFloor.Level != level - 1) && currentPlayerFloor.Level != level)
                 {
                     return BadRequest($"Cannot generate floor {level} unless you are standing on floor {level - 1}. Do not forget that you have to use the player move endpoint to get assigned into the 0th level.");
                 }
