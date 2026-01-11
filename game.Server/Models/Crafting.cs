@@ -10,6 +10,9 @@ namespace game.Server.Models
         public int CraftingId { get; set; }
         public int BlueprintId { get; set; }
         public int ItemId { get; set; }
+
+        [ForeignKey("ItemId")]
+        public virtual Item? Item { get; set; }
         public int Amount { get; set; }
 
         [ForeignKey("BlueprintId")]
