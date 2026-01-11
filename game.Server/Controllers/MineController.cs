@@ -136,6 +136,33 @@ namespace game.Server.Controllers
             }
         }
 
+        [HttpGet("{mineId}/Items")]
+        public async Task<ActionResult<List<FloorItem>>> GetMineItems(int mineId)
+        {
+            var mine = await context.Mines.FirstOrDefaultAsync(m => m.MineId == mineId);
+
+            if (mine == null)
+            {
+                return NotFound("Mine not found.");
+            }
+
+            var player = await context.Players
+                .FirstOrDefaultAsync(p => p.PlayerId == mine.PlayerId);
+
+            if (player == null || player.FloorId == null)
+            {
+                return BadRequest("Player associated with this mine is not on any floor.");
+            }
+
+            var items = await context.FloorItems
+                .Include(fi => fi.ItemInstance)
+                    .ThenInclude(ii => ii.Item)
+                .Where(fi => fi.FloorId == player.FloorId)
+                .ToListAsync();
+
+            return Ok(items);
+        }
+
         [HttpPatch("{PlayerID}/Action/buy")]
         public async Task<ActionResult> BuyCapacity(Guid PlayerID, [FromQuery] int amount)
         {
