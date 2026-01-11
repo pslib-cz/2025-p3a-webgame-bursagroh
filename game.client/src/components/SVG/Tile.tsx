@@ -13,11 +13,10 @@ type TileProps = {
     tileType: TileType
     targetFloorId?: number
     targetLevel?: number
-    isSelected?: boolean
     mineId?: number
 } & AssetProps
 
-const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorId: targetFloorId, targetLevel, mineId, isSelected = false }) => {
+const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorId: targetFloorId, targetLevel, mineId }) => {
     const navigate = useNavigate();
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const activePickaxe = React.useContext(ActivePickaxeContext)!
@@ -64,6 +63,9 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
         case "wall-bottom-left":
         case "wall-bottom-right":
         case "stair":
+        case "zombie":
+        case "skeleton":
+        case "dragon":
             screenType = "Floor"
             break
         case "empty":
@@ -200,7 +202,6 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
 
     return (
         <>
-            <rect x={x} y={y} width={width} height={height} stroke={isSelected ? "red" : "none"} strokeWidth={0.05} />
             <TileSelector width={width} height={height} x={x} y={y} tileType={tileType} onClick={handleClick} />
         </>
     )

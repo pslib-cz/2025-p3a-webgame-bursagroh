@@ -1,5 +1,6 @@
 export type BuildingType = "Fountain" | "Bank" | "Restaurant" | "Mine" | "Blacksmith" | "Abandoned" | "AbandonedTrap" | "Road"
 export type FloorItemType = "Stair" | "Chest" | "Item" | "Enemy"
+export type EnemyType = "Zombie" | "Skeleton" | "Dragon"
 
 export type Building = {
     buildingId: number
@@ -32,4 +33,13 @@ export type FloorItem = {
     positionX: number
     positionY: number
     floorItemType: FloorItemType
+    enemy: Enemy | null
+}
+
+export type Enemy = {
+    enemyId: number,
+    health: number,
+    enemyType: EnemyType,
+    floorItemId: number,
+    itemInstanceId: number
 }
