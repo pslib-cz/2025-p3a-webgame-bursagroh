@@ -2,25 +2,27 @@ import React from "react"
 import type { AssetProps, TileType } from "../../types"
 import TileSelector from "./TileSelector"
 import { useMutation } from "@tanstack/react-query"
-import { updatePlayerFloorMutation, updatePlayerPositionMutation, updatePlayerScreenMutation } from "../../api/player"
+import { pickItemMutation, updatePlayerFloorMutation, updatePlayerPositionMutation, updatePlayerScreenMutation } from "../../api/player"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import type { ScreenType } from "../../types/api/models/player"
 import { useNavigate } from "react-router"
-import { ActivePickaxeContext } from "../../providers/ActivePickaxeProvider"
+import { ActiveItemContext } from "../../providers/ActiveItemProvider"
 import { mineMineBlockMutation } from "../../api/mine"
+import { interactInBuildingMutation } from "../../api/building"
 
 type TileProps = {
     tileType: TileType
     targetFloorId?: number
+    targetFloorItemId?: number
     targetLevel?: number
-    isSelected?: boolean
+    targetBuildingId?: number
     mineId?: number
 } & AssetProps
 
-const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorId: targetFloorId, targetLevel, mineId, isSelected = false }) => {
-    const navigate = useNavigate();
+const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorId, targetLevel, targetBuildingId, mineId, targetFloorItemId }) => {
+    const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const activePickaxe = React.useContext(ActivePickaxeContext)!
+    const activeItem = React.useContext(ActiveItemContext)!
 
     let screenType: ScreenType
     switch (tileType) {
@@ -63,6 +65,9 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
         case "wall-top-right":
         case "wall-bottom-left":
         case "wall-bottom-right":
+        case "zombie":
+        case "skeleton":
+        case "dragon":
         case "stair":
             screenType = "Floor"
             break
@@ -74,6 +79,15 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
         case "gold_ore":
         case "silver_ore":
         case "unobtanium_ore":
+        case "wooden_sword":
+        case "wooden_pickaxe":
+        case "wood":
+        case "rock_item":
+        case "copper":
+        case "iron":
+        case "silver":
+        case "gold":
+        case "unobtanium":
             screenType = "Mine"
             break
         case "grass":
@@ -96,7 +110,9 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, screenType))
     const { mutateAsync: updatePlayerFloorAsync } = useMutation(updatePlayerFloorMutation(playerId, x, y, targetFloorId!))
-    const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(playerId, mineId ?? -1, activePickaxe.activePickaxeInventoryItemId ?? -1, x, y))
+    const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(playerId, mineId ?? -1, activeItem.activeItemInventoryItemId ?? -1, x, y))
+    const {mutateAsync: interactInBuildingAsync} = useMutation(interactInBuildingMutation(playerId, targetBuildingId ?? -1, targetLevel ?? -1, activeItem.activeItemInventoryItemId ?? -1, x, y))
+    const {mutateAsync: pickItemAsync} = useMutation(pickItemMutation(playerId, mineId ?? -1, targetBuildingId ?? -1, targetLevel ?? -1))
 
     const handleClick = async () => {
         switch (tileType) {
@@ -128,10 +144,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "abandoned-trap-corner-top-right":
             case "abandoned-trap-corner-bottom-left":
             case "abandoned-trap-corner-bottom-right":
-                await Promise.all([
-                    updatePlayerPositionAsync(),
-                    updatePlayerScreenAsync()
-                ])
+                await Promise.all([updatePlayerPositionAsync(), updatePlayerScreenAsync()])
                 break
             case "stair":
                 await updatePlayerPositionAsync()
@@ -145,6 +158,22 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "silver_ore":
             case "unobtanium_ore":
                 await mineMineBlockAsync()
+                break
+            case "zombie":
+            case "skeleton":
+            case "dragon":
+                await interactInBuildingAsync()
+                break
+            case "wooden_sword":
+            case "wooden_pickaxe":
+            case "wood":
+            case "rock_item":
+            case "copper":
+            case "iron":
+            case "silver":
+            case "gold":
+            case "unobtanium":
+                await pickItemAsync(targetFloorItemId ?? -1)
                 break
             default:
                 await updatePlayerPositionAsync()
@@ -200,7 +229,6 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
 
     return (
         <>
-            <rect x={x} y={y} width={width} height={height} stroke={isSelected ? "red" : "none"} strokeWidth={0.05} />
             <TileSelector width={width} height={height} x={x} y={y} tileType={tileType} onClick={handleClick} />
         </>
     )

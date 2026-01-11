@@ -19,6 +19,12 @@ export const getMineLayersQuery = (playerId: string, mineId: number, startLayer:
         queryFn: () => api.get("/api/Mine/{mineId}/Layers", {mineId}, {startLayer, endLayer}),
     })
 
+export const getMineItemsQuery = (playerId: string, mineId: number) =>
+    queryOptions({
+        queryKey: [playerId, "mine", mineId, "items"],
+        queryFn: () => api.get("/api/Mine/{mineId}/Items", {mineId}, {}),
+    })
+
 export const mineMineBlockMutation = (playerId: string, mineId: number, inventoryItemId: number, targetX: number, targetY: number) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Mine/{playerId}/Action/mine", { playerId }, {}, { inventoryItemId, targetX, targetY }),
@@ -32,5 +38,6 @@ export const rentPickMutation = (playerId: string, amount: number) =>
         mutationFn: () => api.patch("/api/Mine/{playerId}/Action/buy", { playerId }, {}, { amount }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },
     })
