@@ -1,4 +1,4 @@
-import type { APIBankInventory, APIBankItemMove } from "./controllers/bank"
+import type { APIBankInventory, APIBankItemMove, APIBankMoneyTransfer } from "./controllers/bank"
 import type { APIBuyBlueprint, APICraftBlueprint, APIGetBlueprints, APIGetPlayerBlueprints } from "./controllers/blueprint"
 import type { APIGetBuildingFloor, APIGetBuildings, APIInteractInBuilding } from "./controllers/building"
 import type { APIGenerateMine, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
@@ -87,6 +87,7 @@ export interface API extends GenericAPI {
         "/api/Player/{playerId}/Action/move": APIPlayerMove
         "/api/Player/{playerId}/Action/move-screen": APIPlayerMoveScreen
         "/api/Bank/{playerId}/Action/move": APIBankItemMove
+        "/api/Bank/{playerId}/Action/transfer": APIBankMoneyTransfer
         "/api/Mine/{playerId}/Action/mine": APIMineMine
         "/api/Mine/{playerId}/Action/buy": APIMineRent
         "/api/Recipe/{recipeId}/Action/start": APIRecipeStart

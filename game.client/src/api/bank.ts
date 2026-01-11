@@ -1,5 +1,5 @@
-import { mutationOptions, queryOptions } from "@tanstack/react-query";
-import { api, queryClient } from ".";
+import { mutationOptions, queryOptions } from "@tanstack/react-query"
+import { api, queryClient } from "."
 
 export const getBankInventoryQuery = (playerId: string) =>
     queryOptions({
@@ -9,9 +9,17 @@ export const getBankInventoryQuery = (playerId: string) =>
 
 export const moveBankItemMutation = (playerId: string, inventoryItemId: number) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Bank/{playerId}/Action/move", { playerId }, {}, {inventoryItemId}),
+        mutationFn: () => api.patch("/api/Bank/{playerId}/Action/move", { playerId }, {}, { inventoryItemId }),
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: [playerId, "bank"]})
-            queryClient.invalidateQueries({queryKey: [playerId, "inventory"]})
+            queryClient.invalidateQueries({ queryKey: [playerId, "bank"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+        },
+    })
+
+export const moveBankMoneyMutation = (playerId: string) =>
+    mutationOptions({
+        mutationFn: ({ amount, direction }: { amount: number; direction: "ToPlayer" | "ToBank" }) => api.patch("/api/Bank/{playerId}/Action/transfer", { playerId }, {}, { amount, direction }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },
     })

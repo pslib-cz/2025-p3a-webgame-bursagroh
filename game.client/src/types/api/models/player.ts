@@ -6,6 +6,7 @@ export type Player = {
     playerId: string,
     name: string,
     money: number,
+    bankBalance: number,
     screenType: ScreenType,
     positionX: number,
     positionY: number,
