@@ -288,8 +288,14 @@ namespace game.Server.Controllers
             return Ok(items);
         }
 
+        public class PickRequest
+        {
+            public int FloorItemId { get; set; }
+
+        }
+
         [HttpPatch("{id}/Action/pick")]
-        public async Task<ActionResult> Pick(Guid id) 
+        public async Task<ActionResult> Pick(Guid id, [FromBody] PickRequest request) 
         {
 
             var player = await context.Players
@@ -310,6 +316,7 @@ namespace game.Server.Controllers
                 .Where(fi => fi.FloorId == player.FloorId &&
                              fi.PositionX == player.SubPositionX &&
                              fi.PositionY == player.SubPositionY &&
+                             fi.FloorItemId == request.FloorItemId &&
                              fi.FloorItemType == FloorItemType.Item)
                 .ToListAsync();
 

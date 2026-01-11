@@ -296,17 +296,19 @@ namespace game.Server.Data
             modelBuilder.Entity<Blueprint>(entity =>
             {
                 entity.HasData(
-                    new Blueprint { BlueprintId = 1, ItemId = 10, Price = 5 }
+                    new Blueprint { BlueprintId = 1, ItemId = 10, Price = 5 },
+                    new Blueprint { BlueprintId = 2, ItemId = 30, Price = 5 }
                 );
             });
 
             modelBuilder.Entity<Crafting>(entity =>
             {
                 entity.HasData(
-                    new Crafting { CraftingId = 1, BlueprintId = 1, ItemId = 1, Amount = 3 }
+                    new Crafting { CraftingId = 1, BlueprintId = 1, ItemId = 1, Amount = 2 },
+                    new Crafting { CraftingId = 2, BlueprintId = 2, ItemId = 1, Amount = 3 }
                 );
             });
-
+            
             modelBuilder.Entity<BlueprintPlayer>()
                 .HasKey(bp => new { bp.PlayerId, bp.BlueprintId });
 
@@ -334,6 +336,13 @@ namespace game.Server.Data
                 .WithMany()
                 .HasForeignKey(imb => imb.MineBlockId);
 
+            modelBuilder.Entity<Blueprint>()
+                .Navigation(b => b.Item)
+                .AutoInclude();
+
+            modelBuilder.Entity<Crafting>()
+                .Navigation(c => c.Item)
+                .AutoInclude();
 
         }   
     }

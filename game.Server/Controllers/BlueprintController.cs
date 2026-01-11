@@ -64,6 +64,8 @@ namespace game.Server.Controllers
             var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == playerId);
             var blueprint = await _context.Blueprints.FirstOrDefaultAsync(b => b.BlueprintId == blueprintId);
 
+            if (player == null) return NotFound();
+
             if (player.ScreenType != ScreenTypes.Blacksmith)
             {
                 return BadRequest("You must be at the Blacksmith to buy blueprints.");
