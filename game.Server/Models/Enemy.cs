@@ -21,6 +21,8 @@ namespace game.Server.Models
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public EnemyType EnemyType { get; set; }
         public int FloorItemId { get; set; }
-        public int ItemInstanceId { get; set; }
+        public int? ItemInstanceId { get; set; }
+
+        public virtual ItemInstance? ItemInstance { get; set; }
     }
 }
