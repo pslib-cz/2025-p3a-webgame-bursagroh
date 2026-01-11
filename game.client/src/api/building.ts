@@ -1,5 +1,5 @@
-import { queryOptions } from "@tanstack/react-query";
-import { api } from ".";
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
+import { api, queryClient } from ".";
 
 export const getBuildingsQuery = (playerId: string, top: number, left: number, width: number, height: number) =>
     queryOptions({
@@ -11,4 +11,14 @@ export const getBuildingFloorQuery = (playerId: string, buildingId: number, leve
     queryOptions({
         queryKey: [playerId, "building", buildingId, level],
         queryFn: () => api.get("/api/Building/{buildingId}/Interior/{level}", {buildingId, level}, {playerId}),
+    })
+
+export const interactInBuildingMutation = (playerId: string, buildingId: number, level: number, inventoryItemId: number, targetX: number, targetY: number) =>
+    mutationOptions({
+        mutationFn: () => api.patch("/api/Building/{playerId}/Action/interact", { playerId }, {}, { inventoryItemId, targetX, targetY }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: [playerId, "player"]})
+            queryClient.invalidateQueries({queryKey: [playerId, "inventory"]})
+            queryClient.invalidateQueries({queryKey: [playerId, "building", buildingId, level]})
+        },
     })

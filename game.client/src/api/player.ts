@@ -45,3 +45,23 @@ export const updatePlayerScreenMutation = (playerId: string, newScreenType: Scre
             queryClient.setQueryData([playerId, "player"], data)
         },
     })
+
+export const pickItemMutation = (playerId: string, mineId: number, buildingId: number, level: number) =>
+    mutationOptions({
+        mutationFn: (floorItemId: number) => api.patch("/api/Player/{playerId}/Action/pick", { playerId }, {}, { floorItemId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
+            queryClient.invalidateQueries({queryKey: [playerId, "building", buildingId, level]})
+        },
+    })
+
+export const dropItemMutation = (playerId: string, mineId: number, buildingId: number, level: number) =>
+    mutationOptions({
+        mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/drop", { playerId }, {}, { inventoryItemId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
+            queryClient.invalidateQueries({queryKey: [playerId, "building", buildingId, level]})
+        },
+    })

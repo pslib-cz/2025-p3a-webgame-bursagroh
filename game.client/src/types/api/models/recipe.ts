@@ -1,0 +1,19 @@
+export type IngredienceType = "Meat" | "Salad" | "BunUp" | "BunDown" | "Tomato" | "Sauce" | "Bacon" | "Cheese"
+
+export type Recipe = {
+    recipeId: number
+    name: string
+    ingrediences: Array<Ingredience>
+}
+
+export type Ingredience = {
+    ingredienceId: number
+    recipeId: number
+    order: number
+    ingredienceType: IngredienceType
+}
+
+export type RecipeResult = {
+    duration: string
+    money: number
+}

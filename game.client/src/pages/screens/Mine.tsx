@@ -7,9 +7,11 @@ import { getPlayerQuery, updatePlayerScreenMutation } from "../../api/player"
 import Layer from "../../components/SVG/Layer"
 import TableLeft from "../../assets/tiles/TableLeft"
 import TableRight from "../../assets/tiles/TableRight"
-import { generateMineQuery, rentPickMutation } from "../../api/mine"
+import { generateMineQuery, getMineItemsQuery, rentPickMutation } from "../../api/mine"
 import { useNavigate } from "react-router"
 import Tile from "../../components/SVG/Tile"
+import type { TileType } from "../../types"
+import { MineIdContext } from "../../providers/MineIdProvider"
 
 const chunkSize = 16
 const viewDistanceInChunks = 2
@@ -28,9 +30,60 @@ const getLayerList = (playerPositionY: number, viewDistanceInChunks: number, chu
         .filter((value) => value >= 0)
 }
 
+const mapItemIdToTileType = (itemId: number): TileType => {
+    switch (itemId) {
+        case 1:
+            return "wood"
+        case 2:
+            return "rock_item"
+        case 3:
+            return "copper"
+        case 4:
+            return "iron"
+        case 5:
+            return "silver"
+        case 6:
+            return "gold"
+        case 7:
+            return "unobtanium"
+        case 10:
+            return "wooden_sword"
+        case 30:
+            return "wooden_pickaxe"
+        case 39:
+            return "wooden_pickaxe"
+        default:
+            return "empty"
+    }
+}
+
+const DisplayMineItems = ({ mineId }: { mineId: number }) => {
+    const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const mineItems = useQuery(getMineItemsQuery(playerId, mineId))
+
+    if (mineItems.isError) {
+        return <div>Error loading mine items.</div>
+    }
+
+    if (mineItems.isPending) {
+        return <div>Loading mine items...</div>
+    }
+
+    if (mineItems.isSuccess) {
+        return (
+            <>
+                {mineItems.data.map((item) => (
+                    <Tile key={`mineItem:${item.floorItemId}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} tileType={mapItemIdToTileType(item.itemInstance.item.itemId)} targetFloorItemId={item.floorItemId} mineId={mineId} />
+                ))}
+            </>
+        )
+    }
+}
+
 const MineScreen = () => {
     const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const mineIdContext = React.useContext(MineIdContext)!
     const player = useQuery(getPlayerQuery(playerId))
     const mine = useQuery(generateMineQuery(playerId))
 
@@ -56,6 +109,7 @@ const MineScreen = () => {
     }
 
     if (player.isSuccess && mine.isSuccess) {
+        mineIdContext.setMineId(mine.data.mine.mineId)
         const layers = getLayerList(player.data.subPositionY, viewDistanceInChunks, chunkSize)
 
         return (
@@ -83,6 +137,8 @@ const MineScreen = () => {
                 {layers.map((depth) => (
                     <Layer key={`depth:${depth}`} mineId={mine.data.mine.mineId} depth={depth} size={chunkSize} />
                 ))}
+
+                <DisplayMineItems mineId={mine.data.mine.mineId} />
                 
                 <Player x={player.data.subPositionX} y={player.data.subPositionY} width={1} height={1} />
             </SVGDisplay>

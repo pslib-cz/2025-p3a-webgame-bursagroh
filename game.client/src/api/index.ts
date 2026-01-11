@@ -98,6 +98,26 @@ export const api = {
 
         return await response.json() as API["patch"][URL]["res"][200]
     },
+    patchWith204: async <URL extends keyof Pick<API["patch"], "/api/Recipe/{recipeId}/Action/start">, Params extends API["patch"][URL]["params"], Query extends API["patch"][URL]["query"], Body extends API["patch"][URL]["body"]>(url: URL, params: Params, query: Query, body: Body) => {
+        const uri = formatURL(url, params, query)
+        const response = await fetch(uri, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        })
+
+        if (!response.ok) {
+            throw new Error(`Error patching to ${uri}: ${response.statusText}`)
+        }
+
+        if (response.status === 204) {
+            return [] as API["patch"][URL]["res"][204]
+        }
+
+        return await response.json() as API["patch"][URL]["res"][200]
+    },
     delete: async <URL extends keyof API["delete"], Params extends API["delete"][URL]["params"], Query extends API["delete"][URL]["query"]>(url: URL, params: Params, query: Query) => {
         const uri = formatURL(url, params, query)
         const response = await fetch(uri, {

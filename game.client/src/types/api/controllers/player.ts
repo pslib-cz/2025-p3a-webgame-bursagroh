@@ -54,3 +54,27 @@ export interface APIPlayerMoveScreen extends GenericPATCH {
         200: Player
     }
 }
+
+export interface APIPlayerItemPick extends GenericPATCH {
+    params: {
+        playerId: string
+    }
+    body: {
+        floorItemId: number
+    }
+    res: {
+        200: object
+    }
+}
+
+export interface APIPlayerItemDrop extends GenericPATCH {
+    params: {
+        playerId: string
+    }
+    body: {
+        inventoryItemId: number
+    }
+    res: {
+        200: object
+    }
+}
