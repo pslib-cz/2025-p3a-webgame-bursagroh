@@ -11,6 +11,7 @@ export const moveBankItemMutation = (playerId: string, inventoryItemId: number) 
     mutationOptions({
         mutationFn: () => api.patch("/api/Bank/{playerId}/Action/move", { playerId }, {}, {inventoryItemId}),
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: [[playerId, "bank"], [playerId, "inventory"]]})
+            queryClient.invalidateQueries({queryKey: [playerId, "bank"]})
+            queryClient.invalidateQueries({queryKey: [playerId, "inventory"]})
         },
     })

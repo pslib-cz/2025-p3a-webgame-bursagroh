@@ -76,7 +76,7 @@ const Floor = ({player, building, level}: {player: PlayerType, building: Buildin
 
                         if (item.floorItemType === "Enemy" && item.enemy) {
                             return (
-                                <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType={mapEnemyTypeToTileType(item.enemy.enemyType)} />
+                                <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType={mapEnemyTypeToTileType(item.enemy.enemyType)} targetBuildingId={building.buildingId} targetLevel={level} />
                             )
                         }
                     })}

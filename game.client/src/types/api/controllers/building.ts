@@ -1,4 +1,4 @@
-import type { GenericGET } from ".."
+import type { GenericGET, GenericPATCH } from ".."
 import type { Building, Floor } from "../models/building"
 
 export interface APIGetBuildings extends GenericGET {
@@ -26,5 +26,19 @@ export interface APIGetBuildingFloor extends GenericGET {
     }
     res: {
         200: Floor
+    }
+}
+
+export interface APIInteractInBuilding extends GenericPATCH {
+    params: {
+        playerId: string
+    }
+    body: {
+        inventoryItemId: number
+        targetX: number
+        targetY: number
+    }
+    res: {
+        200: object
     }
 }

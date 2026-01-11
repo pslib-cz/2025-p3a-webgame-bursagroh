@@ -1,5 +1,6 @@
 import type { APIBankInventory, APIBankItemMove } from "./controllers/bank"
-import type { APIGetBuildingFloor, APIGetBuildings } from "./controllers/building"
+import type { APIBuyBlueprint, APICraftBlueprint, APIGetBlueprints, APIGetPlayerBlueprints } from "./controllers/blueprint"
+import type { APIGetBuildingFloor, APIGetBuildings, APIInteractInBuilding } from "./controllers/building"
 import type { APIGenerateMine, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
 import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
 import type { APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
@@ -72,6 +73,8 @@ export interface API extends GenericAPI {
         "/api/Mine/{mineId}/Layers": APIGetMineLayers
         "/api/Recipe": APIGetRecipes
         "/api/Recipe/Random": APIGetRandomRecipe
+        "/api/Blueprint": APIGetBlueprints
+        "/api/Blueprint/Player/{playerId}": APIGetPlayerBlueprints
     }
     post: {
         "/api/Player/generate": APIPlayerGenerate
@@ -88,6 +91,9 @@ export interface API extends GenericAPI {
         "/api/Mine/{playerId}/Action/buy": APIMineRent
         "/api/Recipe/{recipeId}/Action/start": APIRecipeStart
         "/api/Recipe/{recipeId}/Action/end": APIRecipeEnd
+        "/api/Blueprint/{blueprintId}/Action/buy": APIBuyBlueprint
+        "/api/Blueprint/{blueprintId}/Action/craft": APICraftBlueprint
+        "/api/Building/{playerId}/Action/interact": APIInteractInBuilding
     }
     delete: {
 
