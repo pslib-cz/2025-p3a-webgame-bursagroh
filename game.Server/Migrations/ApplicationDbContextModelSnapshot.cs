@@ -296,13 +296,15 @@ namespace game.Server.Migrations
                     b.Property<int>("Health")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ItemInstanceId")
+                    b.Property<int?>("ItemInstanceId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("EnemyId");
 
                     b.HasIndex("FloorItemId")
                         .IsUnique();
+
+                    b.HasIndex("ItemInstanceId");
 
                     b.ToTable("Enemies");
                 });
@@ -1488,6 +1490,12 @@ namespace game.Server.Migrations
                         .HasForeignKey("game.Server.Models.Enemy", "FloorItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("game.Server.Models.ItemInstance", "ItemInstance")
+                        .WithMany()
+                        .HasForeignKey("ItemInstanceId");
+
+                    b.Navigation("ItemInstance");
                 });
 
             modelBuilder.Entity("game.Server.Models.Floor", b =>

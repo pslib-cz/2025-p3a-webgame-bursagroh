@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260109151239_test111")]
-    partial class test111
+    [Migration("20260111213953_testlmao11")]
+    partial class testlmao11
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -160,6 +160,12 @@ namespace game.Server.Migrations
                             BlueprintId = 1,
                             ItemId = 10,
                             Price = 5
+                        },
+                        new
+                        {
+                            BlueprintId = 2,
+                            ItemId = 30,
+                            Price = 5
                         });
                 });
 
@@ -257,14 +263,23 @@ namespace game.Server.Migrations
 
                     b.HasIndex("BlueprintId");
 
+                    b.HasIndex("ItemId");
+
                     b.ToTable("Craftings");
 
                     b.HasData(
                         new
                         {
                             CraftingId = 1,
-                            Amount = 3,
+                            Amount = 2,
                             BlueprintId = 1,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 2,
+                            Amount = 3,
+                            BlueprintId = 2,
                             ItemId = 1
                         });
                 });
@@ -284,13 +299,15 @@ namespace game.Server.Migrations
                     b.Property<int>("Health")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ItemInstanceId")
+                    b.Property<int?>("ItemInstanceId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("EnemyId");
 
                     b.HasIndex("FloorItemId")
                         .IsUnique();
+
+                    b.HasIndex("ItemInstanceId");
 
                     b.ToTable("Enemies");
                 });
@@ -1150,7 +1167,7 @@ namespace game.Server.Migrations
                             Damage = 1,
                             Description = "Rented Pickaxe",
                             ItemType = 2,
-                            MaxDurability = 5,
+                            MaxDurability = 15,
                             Name = "Rented Pickaxe",
                             Weight = 1
                         });
@@ -1458,7 +1475,15 @@ namespace game.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("game.Server.Models.Item", "Item")
+                        .WithMany()
+                        .HasForeignKey("ItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Blueprint");
+
+                    b.Navigation("Item");
                 });
 
             modelBuilder.Entity("game.Server.Models.Enemy", b =>
@@ -1468,6 +1493,12 @@ namespace game.Server.Migrations
                         .HasForeignKey("game.Server.Models.Enemy", "FloorItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("game.Server.Models.ItemInstance", "ItemInstance")
+                        .WithMany()
+                        .HasForeignKey("ItemInstanceId");
+
+                    b.Navigation("ItemInstance");
                 });
 
             modelBuilder.Entity("game.Server.Models.Floor", b =>

@@ -129,6 +129,11 @@ namespace game.Server.Controllers
                     .ThenInclude(fi => fi.Chest)
                 .Include(f => f.FloorItems!)
                     .ThenInclude(fi => fi.Enemy)
+                        .ThenInclude(e => e!.ItemInstance) 
+                            .ThenInclude(ii => ii!.Item) 
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.ItemInstance)    
+                        .ThenInclude(ii => ii!.Item)
                 .FirstOrDefaultAsync(f => f.BuildingId == buildingId && f.Level == level);
 
             if (targetFloor != null)
