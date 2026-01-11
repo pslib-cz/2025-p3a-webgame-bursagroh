@@ -3,14 +3,25 @@ import { PlayerIdContext } from '../../providers/PlayerIdProvider'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { getPlayerQuery, updatePlayerScreenMutation } from '../../api/player'
 import { useParams } from 'react-router'
-import type { FloorPathParams } from '../../types'
+import type { FloorPathParams, TileType } from '../../types'
 import { getBuildingFloorQuery, getBuildingsQuery } from '../../api/building'
 import type { Player as PlayerType } from '../../types/api/models/player'
 import SVGDisplay from '../../components/SVGDisplay'
 import Player from '../../assets/Player'
 import FloorSVG from '../../components/SVG/Floor'
 import Tile from '../../components/SVG/Tile'
-import type { Building } from '../../types/api/models/building'
+import type { Building, EnemyType } from '../../types/api/models/building'
+
+const mapEnemyTypeToTileType = (enemyType: EnemyType): TileType => {
+    switch (enemyType) {
+        case 'Zombie':
+            return 'zombie'
+        case 'Skeleton':
+            return 'skeleton'
+        case 'Dragon':
+            return 'dragon'
+    }
+}
 
 const BuildingFetch = ({player, level}: {player: PlayerType, level: number}) => {
     const {data, isPending, isError, isSuccess} = useQuery(getBuildingsQuery(player.playerId, player.positionY, player.positionX, 1, 1))
@@ -60,6 +71,12 @@ const Floor = ({player, building, level}: {player: PlayerType, building: Buildin
 
                             return (
                                 <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType='stair' targetLevel={targetLevel} targetFloorId={targetFloorId} />
+                            )
+                        }
+
+                        if (item.floorItemType === "Enemy" && item.enemy) {
+                            return (
+                                <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType={mapEnemyTypeToTileType(item.enemy.enemyType)} targetBuildingId={building.buildingId} targetLevel={level} />
                             )
                         }
                     })}

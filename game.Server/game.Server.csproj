@@ -54,6 +54,9 @@
 
   <ItemGroup>
     <None Include="Models\PickRequest.cs" />
+    <None Update="game.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

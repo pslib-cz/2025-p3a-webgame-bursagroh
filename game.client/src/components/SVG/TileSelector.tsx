@@ -26,6 +26,9 @@ import FloorDoorLeft from '../../assets/tiles/floors/FloorDoorLeft'
 import FloorDoorRight from '../../assets/tiles/floors/FloorDoorRight'
 import FloorStairs from '../../assets/tiles/floors/FloorStairs'
 import EmptyBlock from '../../assets/tiles/blocks/EmptyBlock'
+import Zombie from '../../assets/tiles/enemies/Zombie'
+import Dragon from '../../assets/tiles/enemies/Dragon'
+import Skeleton from '../../assets/tiles/enemies/Skeleton'
 
 type TileSelectorProps = {
     tileType: TileType
@@ -236,6 +239,18 @@ const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileTyp
         case 'empty':
             return (
                 <EmptyBlock {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'zombie':
+            return (
+                <Zombie {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'skeleton':
+            return (
+                <Skeleton {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'dragon':
+            return (
+                <Dragon {...props} x={x} y={y} width={width} height={height} />
             )
     }
 }
