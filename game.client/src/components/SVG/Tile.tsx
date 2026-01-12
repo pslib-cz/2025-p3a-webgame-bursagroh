@@ -144,7 +144,8 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "abandoned-trap-corner-top-right":
             case "abandoned-trap-corner-bottom-left":
             case "abandoned-trap-corner-bottom-right":
-                await Promise.all([updatePlayerPositionAsync(), updatePlayerScreenAsync()])
+                await updatePlayerPositionAsync(), 
+                await updatePlayerScreenAsync()
                 break
             case "stair":
                 await updatePlayerPositionAsync()
