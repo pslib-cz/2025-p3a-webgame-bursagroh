@@ -21,3 +21,16 @@ export interface APIBankItemMove extends GenericPATCH {
         200: object
     }
 }
+
+export interface APIBankMoneyTransfer extends GenericPATCH {
+    params: {
+        playerId: string
+    }
+    body: {
+        amount: number
+        direction: "ToPlayer" | "ToBank"
+    }
+    res: {
+        200: object
+    }
+}

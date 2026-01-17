@@ -1,11 +1,14 @@
 import React from "react"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { Outlet, useLocation } from "react-router"
-import { useQuery } from "@tanstack/react-query"
-import { getPlayerInventoryQuery, getPlayerQuery } from "../../api/player"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { dropItemMutation, getPlayerInventoryQuery, getPlayerQuery } from "../../api/player"
 import type { ScreenType } from "../../types/api/models/player"
 import WrongScreen from "../WrongScreen"
-import { ActivePickaxeContext } from "../../providers/ActivePickaxeProvider"
+import { ActiveItemContext } from "../../providers/ActiveItemProvider"
+import { MineIdContext } from "../../providers/MineIdProvider"
+import { BuildingIdContext } from "../../providers/BuildingIdProvider"
+import { LayerContext } from "../../providers/LayerProvider"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const screenTypeToURL = (screenType: ScreenType, level: number | undefined) => {
@@ -50,13 +53,22 @@ const ProperScreenChecker = () => {
 }
 
 const Inventory = () => {
-    const activePickaxe = React.useContext(ActivePickaxeContext)!
+    const activeItem = React.useContext(ActiveItemContext)!
     const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const mineId = React.useContext(MineIdContext)!.mineId
+    const buildingId = React.useContext(BuildingIdContext)!.buildingId
+    const layer = React.useContext(LayerContext)!.layer
     const player = useQuery(getPlayerQuery(playerId))
     const inventory = useQuery(getPlayerInventoryQuery(playerId))
 
-    const handleActivePickaxeChange = (inventoryItemId: number) => {
-        activePickaxe.setActivePickaxeInventoryItemId(prev => prev === inventoryItemId ? null : inventoryItemId)
+    const {mutateAsync: dropItemAsync} = useMutation(dropItemMutation(playerId, mineId ?? -1, buildingId ?? -1, layer ?? -1))
+
+    const handleActiveItemChange = (inventoryItemId: number) => {
+        activeItem.setActiveItemInventoryItemId(prev => prev === inventoryItemId ? null : inventoryItemId)
+    }
+
+    const handleDropItem = async (inventoryItemId: number) => {
+        await dropItemAsync(inventoryItemId)
     }
 
     if (player.isError || inventory.isError) {
@@ -75,9 +87,10 @@ const Inventory = () => {
                 {inventory.data.map((item) => (
                     <div key={item.inventoryItemId}>
                         Item: {item.itemInstance.item.name}
-                        <button onClick={() => handleActivePickaxeChange(item.inventoryItemId)}>
-                            {activePickaxe.activePickaxeInventoryItemId === item.inventoryItemId ? "Deactivate Pickaxe" : "Set as Active Pickaxe"}
+                        <button onClick={() => handleActiveItemChange(item.inventoryItemId)}>
+                            {activeItem.activeItemInventoryItemId === item.inventoryItemId ? "Deactivate" : "Set as Active"}
                         </button>
+                        <button onClick={() => handleDropItem(item.inventoryItemId)}>drop</button>
                     </div>
                 ))}
             </>

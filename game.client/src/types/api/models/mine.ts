@@ -29,3 +29,26 @@ export type MineLayer = {
         health: number
     }>
 }
+
+export type MineItem = {
+    floorItemId: number,
+    floorId: number,
+    positionX: number,
+    positionY: number,
+    itemInstanceId: number,
+    itemInstance: {
+      itemInstanceId: number,
+      itemId: number,
+      durability: number,
+      item: {
+        itemId: number,
+        name: string,
+        description: string,
+        itemType: string,
+        weight: number,
+        damage: number,
+        maxDurability: number,
+        changeOfGenerating: number
+      }
+    },
+}
