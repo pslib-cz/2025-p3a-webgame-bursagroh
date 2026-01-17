@@ -167,6 +167,30 @@ namespace game.Server.Controllers
             return StatusCode(500, "Error generating floor.");
         }
 
+        [HttpGet("Floor/{floorId}")]
+        public async Task<ActionResult<FloorDto>> GetFloorById(int floorId)
+        {
+            var floor = await _context.Floors
+                .AsNoTracking() 
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.Chest)
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.Enemy)
+                        .ThenInclude(e => e!.ItemInstance)
+                            .ThenInclude(ii => ii!.Item)
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.ItemInstance)
+                        .ThenInclude(ii => ii!.Item)
+                .FirstOrDefaultAsync(f => f.FloorId == floorId);
+
+            if (floor == null)
+            {
+                return NotFound($"Floor with ID {floorId} not found.");
+            }
+
+            return Ok(_mapper.Map<FloorDto>(floor));
+        }
+
         [HttpPatch("{id}/Action/interact")]
         public async Task<ActionResult> Interact(Guid id, [FromBody] InteractionRequest request)
         {
