@@ -83,24 +83,28 @@ namespace game.Server.Controllers
         [HttpPatch("{id}/Action/move-screen")]
         public async Task<ActionResult> MoveScreen(Guid id, [FromBody] MoveScreenRequest request)
         {
-            var player = await context.Players.FindAsync(id);
+
+            var player = await context.Players
+                .Include(p => p.Floor)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
             if (player == null) return NotFound();
 
             if (player.ScreenType == ScreenTypes.Mine && request.NewScreenType != ScreenTypes.Mine)
             {
                 var rentedItems = await context.InventoryItems
+                    .Include(ii => ii.ItemInstance)
                     .Where(ii => ii.PlayerId == id && ii.ItemInstance.ItemId == 39)
                     .ToListAsync();
 
                 if (rentedItems.Any())
                 {
-                    var instanceIds = rentedItems.Select(ri => ri.ItemInstanceId).ToList();
-                    var instances = await context.ItemInstances
-                        .Where(ii => instanceIds.Contains(ii.ItemInstanceId))
-                        .ToListAsync();
+                    var instances = rentedItems.Select(ri => ri.ItemInstance).ToList();
 
                     context.InventoryItems.RemoveRange(rentedItems);
                     context.ItemInstances.RemoveRange(instances);
+
+                    await context.SaveChangesAsync();
                 }
             }
 
@@ -136,8 +140,8 @@ namespace game.Server.Controllers
 
                 if (building == null) return BadRequest("No building here.");
 
-                var floor0 = await context.Floors.FirstOrDefaultAsync(f =>
-                    f.BuildingId == building.BuildingId && f.Level == 0);
+                var floor0 = await context.Floors
+                    .FirstOrDefaultAsync(f => f.BuildingId == building.BuildingId && f.Level == 0);
 
                 if (floor0 == null)
                 {
@@ -151,6 +155,7 @@ namespace game.Server.Controllers
 
                     context.Floors.Add(floor0);
                     building.ReachedHeight = 0;
+
                     await context.SaveChangesAsync();
                 }
 

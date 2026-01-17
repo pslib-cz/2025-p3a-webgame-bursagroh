@@ -26,6 +26,18 @@ import FloorDoorLeft from '../../assets/tiles/floors/FloorDoorLeft'
 import FloorDoorRight from '../../assets/tiles/floors/FloorDoorRight'
 import FloorStairs from '../../assets/tiles/floors/FloorStairs'
 import EmptyBlock from '../../assets/tiles/blocks/EmptyBlock'
+import Zombie from '../../assets/tiles/enemies/Zombie'
+import Dragon from '../../assets/tiles/enemies/Dragon'
+import Skeleton from '../../assets/tiles/enemies/Skeleton'
+import WoodenPickaxe from '../../assets/items/pickaxe/WoodenPickaxe'
+import WoodenSword from '../../assets/items/sword/WoodenSword'
+import Wood from '../../assets/items/Wood'
+import RockItem from '../../assets/items/RockItem'
+import Copper from '../../assets/items/Copper'
+import Iron from '../../assets/items/Iron'
+import Silver from '../../assets/items/Silver'
+import Gold from '../../assets/items/Gold'
+import Unobtanium from '../../assets/items/Unobtanium'
 
 type TileSelectorProps = {
     tileType: TileType
@@ -236,6 +248,54 @@ const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileTyp
         case 'empty':
             return (
                 <EmptyBlock {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'zombie':
+            return (
+                <Zombie {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'skeleton':
+            return (
+                <Skeleton {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'dragon':
+            return (
+                <Dragon {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'wooden_sword':
+            return (
+                <WoodenSword {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'wooden_pickaxe':
+            return (
+                <WoodenPickaxe {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'wood':
+            return (
+                <Wood {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'rock_item':
+            return (
+                <RockItem {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'copper':
+            return (
+                <Copper {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'iron':
+            return (
+                <Iron {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'silver':
+            return (
+                <Silver {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'gold':
+            return (
+                <Gold {...props} x={x} y={y} width={width} height={height} />
+            )
+        case 'unobtanium':
+            return (
+                <Unobtanium {...props} x={x} y={y} width={width} height={height} />
             )
     }
 }

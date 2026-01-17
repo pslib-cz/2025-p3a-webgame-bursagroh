@@ -344,6 +344,22 @@ namespace game.Server.Data
                 .Navigation(c => c.Item)
                 .AutoInclude();
 
+            modelBuilder.Entity<Floor>()
+                .Navigation(f => f.FloorItems)
+                .AutoInclude();
+
+            modelBuilder.Entity<FloorItem>()
+                .Navigation(fi => fi.Enemy)
+                .AutoInclude();
+
+            modelBuilder.Entity<Enemy>()
+                .Navigation(e => e.ItemInstance)
+                .AutoInclude();
+
+            modelBuilder.Entity<ItemInstance>()
+                .Navigation(ii => ii.Item)
+                .AutoInclude();
+
         }   
     }
 }
