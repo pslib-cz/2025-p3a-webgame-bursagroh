@@ -1,4 +1,7 @@
-﻿using game.Server.Data;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using game.Server.Data;
+using game.Server.DTOs;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,47 +15,32 @@ namespace game.Server.Controllers
     public class BlueprintController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BlueprintController(ApplicationDbContext context)
+        public BlueprintController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
 
         [HttpGet]
-        public async Task<ActionResult<List<Blueprint>>> GetBlueprintsWithCraftings()
+        public async Task<ActionResult<IEnumerable<BlueprintDto>>> GetBlueprintsWithCraftings()
         {
-
-            List<Blueprint> blueprints = await _context.Blueprints.Include(b => b.Craftings).ToListAsync();
-
+            var blueprints = await _context.Blueprints.ProjectTo<BlueprintDto>(_mapper.ConfigurationProvider).ToListAsync();
             return Ok(blueprints);
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Blueprint>> GetBlueprint(int id)
-        {
-            Blueprint? blueprint = await _context.Blueprints .Include(b => b.Craftings).FirstOrDefaultAsync(b => b.BlueprintId == id);
-
-            if (blueprint == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(blueprint);
-        }
-
         [HttpGet("Player/{playerId}")]
-        public async Task<ActionResult<IEnumerable<Blueprint>>> GetPlayerBlueprints(Guid playerId)
+        public async Task<ActionResult<IEnumerable<BlueprintDto>>> GetPlayerBlueprints(Guid playerId)
         {
             var playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
             if (!playerExists) return NotFound("Player not found.");
 
-            
             var ownedBlueprints = await _context.BlueprintPlayers
                 .Where(bp => bp.PlayerId == playerId)
-                .Include(bp => bp.Blueprint)
-                    .ThenInclude(b => b.Craftings)
                 .Select(bp => bp.Blueprint)
+                .ProjectTo<BlueprintDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return Ok(ownedBlueprints);

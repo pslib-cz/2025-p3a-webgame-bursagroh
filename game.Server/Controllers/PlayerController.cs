@@ -1,4 +1,6 @@
+using AutoMapper;
 using game.Server.Data;
+using game.Server.DTOs;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,15 +12,17 @@ namespace game.Server.Controllers
     [Route("api/[controller]")]
     public class PlayerController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public PlayerController(ApplicationDbContext context)
+        public PlayerController(ApplicationDbContext context, IMapper mapper)
         {
-            this.context = context;
+            _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost("Generate")]
-        public async Task<Player> Generate([FromBody] GeneratePlayerRequest request)
+        public async Task<ActionResult<PlayerDto>> Generate([FromBody] GeneratePlayerRequest request)
         {
             Player player = new Player
             {
@@ -45,34 +49,21 @@ namespace game.Server.Controllers
                 new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Blacksmith, PositionX = 0, PositionY = 2, IsBossDefeated = false }
             };
 
-            context.Players.Add(player);
-            context.Buildings.AddRange(fixedBuildings);
-            await context.SaveChangesAsync();
+            _context.Players.Add(player);
+            _context.Buildings.AddRange(fixedBuildings);
+            await _context.SaveChangesAsync();
 
-
-
-            context.Players.Update(player);
-            await context.SaveChangesAsync();
-
-            return player;
+            return Ok(_mapper.Map<PlayerDto>(player));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Player>> GetPlayer(Guid id) {
-            Player? player = await context.Players.Where(p => p.PlayerId == id).FirstOrDefaultAsync(p => p.PlayerId == id);
-
-            if (player == null) {
-                return NotFound();
-            }
-
-            return Ok(player);
-        }
-
-        [HttpGet("ScreenTypes")]
-        public ActionResult<IEnumerable<string>> GetScreenTypes()
+        public async Task<ActionResult<PlayerDto>> GetPlayer(Guid id)
         {
-            string[] screenTypes = Enum.GetNames<ScreenTypes>();
-            return Ok(screenTypes);
+            var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound();
+
+            return Ok(_mapper.Map<PlayerDto>(player));
         }
 
         /// <remarks>
@@ -89,6 +80,7 @@ namespace game.Server.Controllers
             if (player.ScreenType == ScreenTypes.Mine && request.NewScreenType != ScreenTypes.Mine)
             {
                 var rentedItems = await context.InventoryItems
+                    .Include(ii => ii.ItemInstance)
                     .Where(ii => ii.PlayerId == id && ii.ItemInstance.ItemId == 39)
                     .ToListAsync();
 
@@ -108,14 +100,14 @@ namespace game.Server.Controllers
             {
                 if (player.ScreenType == ScreenTypes.Floor)
                 {
-                    var currentFloor = await context.Floors.FindAsync(player.FloorId);
+                    var currentFloor = await _context.Floors.FindAsync(player.FloorId);
                     if (currentFloor == null || currentFloor.Level != 0)
                         return BadRequest("You can only leave the building from the ground floor (Level 0).");
 
                     if (player.SubPositionX != 0 || player.SubPositionY != 0)
                         return BadRequest("You must be at the entrance (0, 0) to leave the building.");
 
-                    var building = await context.Buildings.FirstOrDefaultAsync(b =>
+                    var building = await _context.Buildings.FirstOrDefaultAsync(b =>
                         b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.PlayerId == id);
 
                     if (building != null && building.BuildingType == BuildingTypes.AbandonedTrap)
@@ -129,7 +121,7 @@ namespace game.Server.Controllers
 
             if (request.NewScreenType == ScreenTypes.Floor && player.ScreenType == ScreenTypes.City)
             {
-                var building = await context.Buildings.FirstOrDefaultAsync(b =>
+                var building = await _context.Buildings.FirstOrDefaultAsync(b =>
                     b.PositionX == player.PositionX &&
                     b.PositionY == player.PositionY &&
                     b.PlayerId == id);
@@ -149,7 +141,7 @@ namespace game.Server.Controllers
 
                     if (floor0 == null) return StatusCode(500, "Generation failed.");
 
-                    context.Floors.Add(floor0);
+                    _context.Floors.Add(floor0);
                     building.ReachedHeight = 0;
                     await context.SaveChangesAsync();
                 }
@@ -160,9 +152,9 @@ namespace game.Server.Controllers
             }
 
             player.ScreenType = request.NewScreenType;
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return Ok(player);
+            return Ok(_mapper.Map<PlayerDto>(player));
         }
 
         /// <remarks>
@@ -171,15 +163,15 @@ namespace game.Server.Controllers
         /// - jinak se meni patro a pozice jsou ignorovany 
         /// </remarks>
         [HttpPatch("{id}/Action/move")]
-        public async Task<ActionResult<Player>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
+        public async Task<ActionResult<PlayerDto>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
-            Player? player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
+            Player? player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
             if (player == null) return NotFound();
 
             if (player.ScreenType == ScreenTypes.Floor && request.NewFloorId.HasValue && request.NewFloorId != player.FloorId)
             {
-                var currentFloor = await context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
-                var targetFloor = await context.Floors.FirstOrDefaultAsync(f => f.FloorId == request.NewFloorId);
+                var currentFloor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+                var targetFloor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == request.NewFloorId);
 
                 if (player.FloorId != null)
                 {
@@ -216,8 +208,8 @@ namespace game.Server.Controllers
                 }
 
                 player.FloorId = request.NewFloorId;
-                await context.SaveChangesAsync();
-                return Ok(player); 
+                await _context.SaveChangesAsync();
+                return Ok(_mapper.Map<PlayerDto>(player));
             }
 
             if (player.ScreenType == ScreenTypes.Floor && (request.NewPositionX < 0 || request.NewPositionX > 7 || request.NewPositionY < 0 || request.NewPositionY > 7))
@@ -243,7 +235,7 @@ namespace game.Server.Controllers
                     return BadRequest("Coordinates are out of bounds.");
                 }
 
-                var mineBlockAtDestination = await context.Mines
+                var mineBlockAtDestination = await _context.Mines
                     .Where(m => m.PlayerId == id)
                     .SelectMany(m => m.MineLayers)
                     .Where(l => l.Depth == request.NewPositionY)
@@ -267,25 +259,27 @@ namespace game.Server.Controllers
                 player.SubPositionY = request.NewPositionY;
             }
 
-            await context.SaveChangesAsync();
-            return Ok(player);
+            await _context.SaveChangesAsync();
+            return Ok(_mapper.Map<PlayerDto>(player));
         }
 
         [HttpGet("{id}/Inventory")]
-        public async Task<ActionResult<IEnumerable<InventoryItem>>> GetPlayerInventory(Guid id)
+        public async Task<ActionResult<IEnumerable<InventoryItemDto>>> GetPlayerInventory(Guid id)
         {
-            var items = await context.InventoryItems
+            var items = await _context.InventoryItems
                 .Where(i => i.PlayerId == id && !i.IsInBank)
-                .Include(i => i.ItemInstance)        
-                    .ThenInclude(ins => ins.Item)
+                .Include(i => i.ItemInstance)
+                    .ThenInclude(ins => ins!.Item)
                 .ToListAsync();
 
             if (items == null || !items.Any())
             {
-                return NoContent(); 
+                return NoContent();
             }
 
-            return Ok(items);
+            var inventoryDtos = _mapper.Map<List<InventoryItemDto>>(items);
+
+            return Ok(inventoryDtos);
         }
 
         public class PickRequest
@@ -298,7 +292,7 @@ namespace game.Server.Controllers
         public async Task<ActionResult> Pick(Guid id, [FromBody] PickRequest request) 
         {
 
-            var player = await context.Players
+            var player = await _context.Players
                 .Include(p => p.InventoryItems)
                 .FirstOrDefaultAsync(p => p.PlayerId == id);
 
@@ -312,7 +306,7 @@ namespace game.Server.Controllers
             
 
             
-            var itemsOnGround = await context.FloorItems
+            var itemsOnGround = await _context.FloorItems
                 .Where(fi => fi.FloorId == player.FloorId &&
                              fi.PositionX == player.SubPositionX &&
                              fi.PositionY == player.SubPositionY &&
@@ -333,20 +327,20 @@ namespace game.Server.Controllers
                 if (instanceId == null) continue;
 
 
-                context.InventoryItems.Add(new InventoryItem
+                _context.InventoryItems.Add(new InventoryItem
                 {
                     PlayerId = id,
                     ItemInstanceId = instanceId.Value,
                     IsInBank = false
                 });
 
-                context.FloorItems.Remove(floorItem);
+                _context.FloorItems.Remove(floorItem);
                 currentInventoryCount++;
             }
 
             try
             {
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
             catch (DbUpdateException ex)
             {
@@ -359,7 +353,7 @@ namespace game.Server.Controllers
         [HttpPatch("{id}/Action/drop")]
         public async Task<ActionResult> Drop(Guid id, [FromBody] DropItemRequest request)
         {
-            var player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
+            var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
             if (player == null) {
                 return NotFound("Player not found.");
             } 
@@ -367,7 +361,7 @@ namespace game.Server.Controllers
                 return BadRequest("You can only drop items while in floor/mine.");
             }
 
-            var inventoryItem = await context.InventoryItems
+            var inventoryItem = await _context.InventoryItems
                 .Include(ii => ii.ItemInstance)
                 .FirstOrDefaultAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == id);
 
@@ -384,10 +378,10 @@ namespace game.Server.Controllers
                 ItemInstanceId = inventoryItem.ItemInstanceId
             };
 
-            context.InventoryItems.Remove(inventoryItem);
-            context.FloorItems.Add(floorItem);
+            _context.InventoryItems.Remove(inventoryItem);
+            _context.FloorItems.Add(floorItem);
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {

@@ -1,4 +1,7 @@
-﻿using game.Server.Data;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using game.Server.Data;
+using game.Server.DTOs;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,25 +12,24 @@ namespace game.Server.Controllers
     [Route("api/[controller]")]
     public class BankController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public BankController(ApplicationDbContext context)
+        public BankController(ApplicationDbContext context, IMapper mapper)
         {
-            this.context = context;
+            _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet("{id}")]
-        public ActionResult<InventoryItem> GetPlayerBankInventory(Guid id)
+        public ActionResult<IEnumerable<BankInventoryDto>> GetPlayerBankInventory(Guid id)
         {
-            IQueryable<InventoryItem> bankItems = context.InventoryItems.Where(i => i.PlayerId == id).Where(i => i.IsInBank == true);
+            var items = _context.InventoryItems
+                .Where(i => i.PlayerId == id && i.IsInBank)
+                .ProjectTo<BankInventoryDto>(_mapper.ConfigurationProvider)
+                .ToList();
 
-            if (bankItems == null)
-            {
-                return NoContent();
-            }
-
-            List<InventoryItem> items = bankItems.ToList();
-            return Ok(items);
+            return items.Any() ? Ok(items) : NoContent();
         }
 
         [HttpPatch("{id}/Action/transfer")]
@@ -38,7 +40,7 @@ namespace game.Server.Controllers
                 return BadRequest("amount < 0");
             }
 
-            Player? player = context.Players.Where(i => i.PlayerId == id).FirstOrDefault();
+            Player? player = _context.Players.Where(i => i.PlayerId == id).FirstOrDefault();
 
             if (player == null)
             {
@@ -56,7 +58,7 @@ namespace game.Server.Controllers
                 return BadRequest("insufficient funds");
             }
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return Ok(player.BankBalance);
         }
@@ -69,7 +71,7 @@ namespace game.Server.Controllers
                 return BadRequest();
             }
 
-            InventoryItem? item = await context.InventoryItems
+            InventoryItem? item = await _context.InventoryItems
                 .Where(i => i.InventoryItemId == request.InventoryItemId)
                 .SingleOrDefaultAsync();
 
@@ -85,7 +87,7 @@ namespace game.Server.Controllers
 
             item.IsInBank = !item.IsInBank;
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return Ok(item);
         }
     }

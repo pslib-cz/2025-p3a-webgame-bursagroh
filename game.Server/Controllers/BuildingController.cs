@@ -1,8 +1,10 @@
-﻿using game.Server.Data;
+﻿using AutoMapper;
+using EFCore.BulkExtensions;
+using game.Server.Data;
+using game.Server.DTOs;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EFCore.BulkExtensions;
 
 namespace game.Server.Controllers
 {
@@ -12,14 +14,16 @@ namespace game.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
         private static readonly SemaphoreSlim _bulkSemaphore = new SemaphoreSlim(1, 1);
+        private readonly IMapper _mapper;
 
-        public BuildingController(ApplicationDbContext context)
+        public BuildingController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet("{playerId}")]
-        public async Task<ActionResult<IEnumerable<Building>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
+        public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
         {
             var playerExists = await _context.Players.AsNoTracking().AnyAsync(p => p.PlayerId == playerId);
             if (!playerExists) return NotFound();
@@ -65,11 +69,12 @@ namespace game.Server.Controllers
                 existingBuildings.AddRange(newBuildings);
             }
 
-            return Ok(existingBuildings);
+            var buildingDtos = _mapper.Map<IEnumerable<BuildingDto>>(existingBuildings);
+            return Ok(buildingDtos);
         }
 
         [HttpGet("{buildingId}/Interior/{level}")]
-        public async Task<ActionResult<Floor>> GetSpecificFloor(Guid playerId, int buildingId, int level)
+        public async Task<ActionResult<FloorDto>> GetSpecificFloor(Guid playerId, int buildingId, int level)
         {
             var player = await _context.Players.FindAsync(playerId);
 
@@ -133,7 +138,7 @@ namespace game.Server.Controllers
 
             if (targetFloor != null)
             {
-                return Ok(targetFloor);
+                return Ok(_mapper.Map<FloorDto>(targetFloor));
             }
 
             int totalHeight = building.Height ?? 5;
@@ -148,9 +153,10 @@ namespace game.Server.Controllers
             {
                 _context.Floors.Add(newFloor);
                 building.ReachedHeight = level;
-
                 await _context.SaveChangesAsync();
-                return Ok(newFloor);
+
+
+                return Ok(_mapper.Map<FloorDto>(newFloor));
             }
 
             return StatusCode(500, "Error generating floor.");

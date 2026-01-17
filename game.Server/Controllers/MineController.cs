@@ -1,8 +1,8 @@
-﻿using game.Server.Data;
+﻿using AutoMapper;
+using game.Server.Data;
+using game.Server.DTOs;
 using game.Server.Models;
 using game.Server.Services;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,31 +13,20 @@ namespace game.Server.Controllers
     public class MineController : ControllerBase
     {
         private readonly MineService _mineService;
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public MineController(MineService mineService, ApplicationDbContext context)
+        public MineController(MineService mineService, ApplicationDbContext context, IMapper mapper)
         {
             _mineService = mineService;
-            this.context = context;
-        }
-
-        [HttpGet("Blocks")]
-        public async Task<ActionResult<List<Block>>> GetAllBlocks()
-        {
-            List<Block> blocks = await context.Blocks.Include(b => b.Item).ToListAsync();
-
-            if (blocks == null || blocks.Count == 0)
-            {
-                return NotFound();
-            }
-
-            return Ok(blocks);
+            _context = context;
+            _mapper = mapper;
         }
 
         [HttpPost("Generate")]
         public async Task<IActionResult> GetMine([FromBody] GenerateMineRequest request)
         {
-            var player = await context.Players.FirstOrDefaultAsync(p => p.PlayerId == request.PlayerId);
+            var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == request.PlayerId);
 
             if (player == null)
             {
@@ -49,7 +38,7 @@ namespace game.Server.Controllers
                 return BadRequest("You can only generate a mine while on the Mine screen.");
             }
 
-            var building = await context.Buildings
+            var building = await _context.Buildings
                 .FirstOrDefaultAsync(b => b.PositionX == player.PositionX &&
                                           b.PositionY == player.PositionY &&
                                           b.BuildingType == BuildingTypes.Mine);
@@ -59,10 +48,10 @@ namespace game.Server.Controllers
                 return BadRequest("No Mine building found at your current coordinates.");
             }
 
-            var existingMine = await context.Mines.FirstOrDefaultAsync(m => m.PlayerId == request.PlayerId);
+            var existingMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == request.PlayerId);
             if (existingMine != null)
             {
-                context.Mines.Remove(existingMine);
+                _context.Mines.Remove(existingMine);
             }
 
             Mine mine = new Mine
@@ -70,7 +59,7 @@ namespace game.Server.Controllers
                 MineId = new Random().Next(),
                 PlayerId = request.PlayerId
             };
-            context.Mines.Add(mine);
+            _context.Mines.Add(mine);
 
 
             Floor mineFloor = new Floor
@@ -80,15 +69,15 @@ namespace game.Server.Controllers
                 FloorItems = new List<FloorItem>() 
             };
 
-            context.Floors.Add(mineFloor);
-            await context.SaveChangesAsync();
+            _context.Floors.Add(mineFloor);
+            await _context.SaveChangesAsync();
 
             player.FloorId = mineFloor.FloorId;
 
             player.SubPositionX = 0;
             player.SubPositionY = 0;
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
@@ -99,7 +88,7 @@ namespace game.Server.Controllers
         }
 
         [HttpGet("{mineId}/Layer/{layer}")]
-        public async Task<ActionResult<List<MineBlock>>> GetLayerBlocks(int mineId, int layer) 
+        public async Task<ActionResult<List<MineBlockDto>>> GetLayerBlocks(int mineId, int layer)
         {
             if (mineId <= 0 || layer < 0)
             {
@@ -109,7 +98,9 @@ namespace game.Server.Controllers
             try
             {
                 var blocks = await _mineService.GetOrGenerateLayersBlocksAsync(mineId, layer);
-                return Ok(blocks);
+                var blockDtos = _mapper.Map<List<MineBlockDto>>(blocks);
+
+                return Ok(blockDtos);
             }
             catch (InvalidOperationException ex)
             {
@@ -118,17 +109,19 @@ namespace game.Server.Controllers
         }
 
         [HttpGet("{mineId}/Layers")]
-        public async Task<ActionResult<List<MineLayer>>> GetLayerBlocksRange(int mineId, [FromQuery] int startLayer, [FromQuery] int endLayer)
+        public async Task<ActionResult<List<MineLayerDto>>> GetLayerBlocksRange(int mineId, [FromQuery] int startLayer, [FromQuery] int endLayer)
         {
             if (mineId <= 0 || startLayer < 0 || endLayer < 0 || startLayer > endLayer)
             {
-                return BadRequest("invalid args");
+                return BadRequest("Invalid starting arguments.");
             }
 
             try
             {
                 var layers = await _mineService.GetOrGenerateLayersBlocksAsync(mineId, startLayer, endLayer);
-                return Ok(layers);
+                var layerDtos = _mapper.Map<List<MineLayerDto>>(layers);
+
+                return Ok(layerDtos);
             }
             catch (Exception ex)
             {
@@ -137,16 +130,16 @@ namespace game.Server.Controllers
         }
 
         [HttpGet("{mineId}/Items")]
-        public async Task<ActionResult<List<FloorItem>>> GetMineItems(int mineId)
+        public async Task<ActionResult<List<MineItemDto>>> GetMineItems(int mineId)
         {
-            var mine = await context.Mines.FirstOrDefaultAsync(m => m.MineId == mineId);
+            var mine = await _context.Mines.FirstOrDefaultAsync(m => m.MineId == mineId);
 
             if (mine == null)
             {
                 return NotFound("Mine not found.");
             }
 
-            var player = await context.Players
+            var player = await _context.Players
                 .FirstOrDefaultAsync(p => p.PlayerId == mine.PlayerId);
 
             if (player == null || player.FloorId == null)
@@ -154,19 +147,21 @@ namespace game.Server.Controllers
                 return BadRequest("Player associated with this mine is not on any floor.");
             }
 
-            var items = await context.FloorItems
+            var items = await _context.FloorItems
                 .Include(fi => fi.ItemInstance)
-                    .ThenInclude(ii => ii.Item)
+                    .ThenInclude(ii => ii!.Item)
                 .Where(fi => fi.FloorId == player.FloorId)
                 .ToListAsync();
 
-            return Ok(items);
+            var itemDtos = _mapper.Map<List<MineItemDto>>(items);
+
+            return Ok(itemDtos);
         }
 
         [HttpPatch("{PlayerID}/Action/buy")]
         public async Task<ActionResult> BuyCapacity(Guid PlayerID, [FromQuery] int amount)
         {
-            var player = await context.Players
+            var player = await _context.Players
                 .Include(p => p.InventoryItems)
                     .ThenInclude(ii => ii.ItemInstance)
                         .ThenInclude(ins => ins.Item)
@@ -205,7 +200,7 @@ namespace game.Server.Controllers
                 return BadRequest($"Not enough money. Cost is {cost}.");
             }
 
-            var item = await context.Items.FirstOrDefaultAsync(i => i.ItemId == 39);
+            var item = await _context.Items.FirstOrDefaultAsync(i => i.ItemId == 39);
             if (item == null)
             {
                 return BadRequest("Configuration Error: Item 30 does not exist.");
@@ -220,8 +215,8 @@ namespace game.Server.Controllers
                 Item = item
             };
 
-            context.ItemInstances.Add(itemInstance);
-            await context.SaveChangesAsync();
+            _context.ItemInstances.Add(itemInstance);
+            await _context.SaveChangesAsync();
 
             var inventoryItem = new InventoryItem
             {
@@ -231,10 +226,10 @@ namespace game.Server.Controllers
                 IsInBank = false
             };
 
-            context.InventoryItems.Add(inventoryItem);
+            _context.InventoryItems.Add(inventoryItem);
             player.Capacity += amount;
 
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             return Ok(player);
         }
@@ -247,13 +242,13 @@ namespace game.Server.Controllers
         [HttpPatch("{PlayerID}/Action/mine")]
         public async Task<ActionResult> MineBlock(Guid PlayerID, InteractionRequest request)
         {
-            var player = await context.Players
+            var player = await _context.Players
                 .Include(p => p.InventoryItems)
                 .FirstOrDefaultAsync(p => p.PlayerId == PlayerID);
 
             if (player == null) return NotFound("Player not found");
 
-            var chosenItem = await context.InventoryItems
+            var chosenItem = await _context.InventoryItems
                 .Include(ii => ii.ItemInstance)
                     .ThenInclude(ins => ins.Item)
                 .FirstOrDefaultAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == PlayerID);
@@ -270,7 +265,7 @@ namespace game.Server.Controllers
             if (!((diffX == 1 && diffY == 0) || (diffX == 0 && diffY == 1)))
                 return BadRequest("Target is too far away.");
 
-            var mine = await context.Mines
+            var mine = await _context.Mines
                 .Include(m => m.MineLayers)
                     .ThenInclude(l => l.MineBlocks)
                         .ThenInclude(mb => mb.Block)
@@ -290,13 +285,13 @@ namespace game.Server.Controllers
 
             if (chosenItem.ItemInstance.Durability <= 0)
             {
-                context.InventoryItems.Remove(chosenItem);
-                context.ItemInstances.Remove(chosenItem.ItemInstance);
+                _context.InventoryItems.Remove(chosenItem);
+                _context.ItemInstances.Remove(chosenItem.ItemInstance);
             }
 
             if (targetBlock.Health > 0)
             {
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
                 return Ok(new { message = "Hit successful", remainingHealth = targetBlock.Health });
             }
 
@@ -312,9 +307,9 @@ namespace game.Server.Controllers
                     ItemId = targetBlock.Block.ItemId,
                     Durability = targetBlock.Block.Item.MaxDurability
                 };
-                context.ItemInstances.Add(itemInstance);
+                _context.ItemInstances.Add(itemInstance);
 
-                context.FloorItems.Add(new FloorItem
+                _context.FloorItems.Add(new FloorItem
                 {
                     FloorId = player.FloorId.Value,
                     PositionX = request.TargetX,
@@ -327,8 +322,8 @@ namespace game.Server.Controllers
             var blockName = targetBlock.Block.BlockType;
 
 
-            context.MineBlocks.Remove(targetBlock);
-            await context.SaveChangesAsync();
+            _context.MineBlocks.Remove(targetBlock);
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {
