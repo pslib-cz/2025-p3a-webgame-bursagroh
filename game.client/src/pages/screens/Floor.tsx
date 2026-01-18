@@ -7,12 +7,12 @@ import type { FloorPathParams, TileType } from '../../types'
 import { getBuildingFloorQuery, getBuildingsQuery } from '../../api/building'
 import type { Player as PlayerType } from '../../types/api/models/player'
 import SVGDisplay from '../../components/SVGDisplay'
-import Player from '../../assets/Player'
 import FloorSVG from '../../components/SVG/Floor'
 import Tile from '../../components/SVG/Tile'
 import type { Building, EnemyType } from '../../types/api/models/building'
 import { BuildingIdContext } from '../../providers/BuildingIdProvider'
 import { LayerContext } from '../../providers/LayerProvider'
+import Asset from '../../components/SVG/Asset'
 
 const mapEnemyTypeToTileType = (enemyType: EnemyType): TileType => {
     switch (enemyType) {
@@ -40,7 +40,7 @@ const mapItemIdToTileType = (itemId: number): TileType => {
         case 6:
             return "gold"
         case 7:
-            return "unobtanium"
+            return "unobtainium"
         case 10:
             return "wooden_sword"
         case 30:
@@ -120,7 +120,7 @@ const Floor = ({player, building, level}: {player: PlayerType, building: Buildin
                             )
                         }
                     })}
-                    <Player x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
+                    <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
                 </SVGDisplay>
                 Floor - {data.level}
                 <button onClick={handleClick}>close</button>

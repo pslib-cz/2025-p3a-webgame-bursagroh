@@ -43,6 +43,7 @@ export const updatePlayerScreenMutation = (playerId: string, newScreenType: Scre
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move-screen", { playerId }, {}, { newScreenType }),
         onSuccess(data) {
             queryClient.setQueryData([playerId, "player"], data)
+            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
         },
     })
 

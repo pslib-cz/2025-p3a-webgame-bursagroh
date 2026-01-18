@@ -3,8 +3,8 @@ import SVGDisplay from "../../components/SVGDisplay"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { useQuery } from "@tanstack/react-query"
 import { getPlayerQuery } from "../../api/player"
-import Player from "../../assets/Player"
 import Chunk from "../../components/SVG/Chunk"
+import Asset from "../../components/SVG/Asset"
 
 type ChunkCoords = {
     x: number,
@@ -48,7 +48,7 @@ const CityScreen = () => {
         return (
             <SVGDisplay width={"99vw"} height={"99vh"} centerX={player.data.positionX} centerY={player.data.positionY}>
                 {chunks.map((chunk) => <Chunk key={`x:${chunk.x};y:${chunk.y}`} x={chunk.x} y={chunk.y} size={chunkSize} />)}
-                <Player x={player.data.positionX} y={player.data.positionY} width={1} height={1} />
+                <Asset assetType="player" x={player.data.positionX} y={player.data.positionY} width={1} height={1} />
             </SVGDisplay>
         )
     }

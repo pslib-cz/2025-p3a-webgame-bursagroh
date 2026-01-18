@@ -1,17 +1,15 @@
 import React from "react"
 import SVGDisplay from "../../components/SVGDisplay"
-import Player from "../../assets/Player"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { getPlayerQuery, updatePlayerScreenMutation } from "../../api/player"
 import Layer from "../../components/SVG/Layer"
-import TableLeft from "../../assets/tiles/TableLeft"
-import TableRight from "../../assets/tiles/TableRight"
 import { generateMineQuery, getMineItemsQuery, rentPickMutation } from "../../api/mine"
 import { useNavigate } from "react-router"
 import Tile from "../../components/SVG/Tile"
 import type { TileType } from "../../types"
 import { MineIdContext } from "../../providers/MineIdProvider"
+import Asset from "../../components/SVG/Asset"
 
 const chunkSize = 16
 const viewDistanceInChunks = 2
@@ -45,7 +43,7 @@ const mapItemIdToTileType = (itemId: number): TileType => {
         case 6:
             return "gold"
         case 7:
-            return "unobtanium"
+            return "unobtainium"
         case 10:
             return "wooden_sword"
         case 30:
@@ -114,8 +112,8 @@ const MineScreen = () => {
 
         return (
             <SVGDisplay width={"99vw"} height={"99vh"} centerX={player.data.subPositionX} centerY={player.data.subPositionY}>
-                <TableLeft x={1} y={-3} width={1} height={1} onClick={handleLeave} />
-                <TableRight x={2} y={-3} width={1} height={1} onClick={handleBuy} />
+                <Asset assetType='table_left' x={1} y={-3} width={1} height={1} onClick={handleLeave} />
+                <Asset assetType='table_right' x={2} y={-3} width={1} height={1} onClick={handleBuy} />
 
                 <Tile x={0} y={-1} width={1} height={1} tileType="empty" />
                 <Tile x={1} y={-1} width={1} height={1} tileType="empty" />
@@ -140,7 +138,7 @@ const MineScreen = () => {
 
                 <DisplayMineItems mineId={mine.data.mine.mineId} />
                 
-                <Player x={player.data.subPositionX} y={player.data.subPositionY} width={1} height={1} />
+                <Asset assetType='player' x={player.data.subPositionX} y={player.data.subPositionY} width={1} height={1} />
             </SVGDisplay>
         )
     }

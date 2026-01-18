@@ -1,301 +1,264 @@
 import React from 'react'
 import type { AssetProps, TileType } from '../../types'
-import Rock from '../../assets/tiles/blocks/Rock'
-import Bank from '../../assets/tiles/buildings/Bank'
-import Blacksmith from '../../assets/tiles/buildings/Blacksmith'
-import Fountain from '../../assets/tiles/buildings/Fountain'
-import Mine from '../../assets/tiles/buildings/Mine'
-import Restaurant from '../../assets/tiles/buildings/Restaurant'
-import WoodenFrame from '../../assets/tiles/blocks/WoodenFrame'
-import CopperOre from '../../assets/tiles/blocks/CopperOre'
-import IronOre from '../../assets/tiles/blocks/IronOre'
-import GoldOre from '../../assets/tiles/blocks/GoldOre'
-import SilverOre from '../../assets/tiles/blocks/SilverOre'
-import UnobtainiumOre from '../../assets/tiles/blocks/UnobtainiumOre'
-import JunctionRoad from '../../assets/tiles/buildings/roads/JunctionRoad'
-import StraightRoad from '../../assets/tiles/buildings/roads/StraightRoad'
-import BuildingStraight from '../../assets/tiles/buildings/building/BuildingStraight'
-import BuildingStraightTrap from '../../assets/tiles/buildings/building/BuildingStraightTrap'
-import BuildingCorner from '../../assets/tiles/buildings/building/BuildingCorner'
-import BuildingCornerTrap from '../../assets/tiles/buildings/building/BuildingCornerTrap'
-import Grass from '../../assets/tiles/buildings/Grass'
-import Floor from '../../assets/tiles/floors/Floor'
-import FloorWall from '../../assets/tiles/floors/FloorWall'
-import FloorCorner from '../../assets/tiles/floors/FloorCorner'
-import FloorDoorLeft from '../../assets/tiles/floors/FloorDoorLeft'
-import FloorDoorRight from '../../assets/tiles/floors/FloorDoorRight'
-import FloorStairs from '../../assets/tiles/floors/FloorStairs'
-import EmptyBlock from '../../assets/tiles/blocks/EmptyBlock'
-import Zombie from '../../assets/tiles/enemies/Zombie'
-import Dragon from '../../assets/tiles/enemies/Dragon'
-import Skeleton from '../../assets/tiles/enemies/Skeleton'
-import WoodenPickaxe from '../../assets/items/pickaxe/WoodenPickaxe'
-import WoodenSword from '../../assets/items/sword/WoodenSword'
-import Wood from '../../assets/items/Wood'
-import RockItem from '../../assets/items/RockItem'
-import Copper from '../../assets/items/Copper'
-import Iron from '../../assets/items/Iron'
-import Silver from '../../assets/items/Silver'
-import Gold from '../../assets/items/Gold'
-import Unobtanium from '../../assets/items/Unobtanium'
+import Asset from './Asset'
 
 type TileSelectorProps = {
     tileType: TileType
-} & AssetProps & Omit<React.SVGProps<SVGSVGElement>, "x" | "y" | "width" | "height" | "viewBox" | "xmlns">
+} & AssetProps & Omit<React.SVGProps<SVGUseElement>, "x" | "y" | "width" | "height">
 
 const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileType, ...props}) => {
     switch (tileType) {
         case 'rock':
             return (
-                <Rock {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='rock' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wooden_frame':
             return (
-                <WoodenFrame {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='wooden_frame' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'copper_ore':
             return (
-                <CopperOre {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='copper_ore' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'iron_ore':
             return (
-                <IronOre {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='iron_ore' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'gold_ore':
             return (
-                <GoldOre {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='gold_ore' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'silver_ore':
             return (
-                <SilverOre {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='silver_ore' x={x} y={y} width={width} height={height} {...props} />
             )
-        case 'unobtanium_ore':
+        case 'unobtainium_ore':
             return (
-                <UnobtainiumOre {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='unobtainium_ore' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'bank':
             return (
-                <Bank {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='bank' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'blacksmith':
             return (
-                <Blacksmith {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='blacksmith' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'fountain':
             return (
-                <Fountain {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='fountain' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'mine':
             return (
-                <Mine {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='mine' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'restaurant':
             return (
-                <Restaurant {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='restaurant' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'road':
             return (
-                <JunctionRoad {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='road' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'road-vertical':
             return (
-                <StraightRoad {...props} x={x} y={y} width={width} height={height} placement='vertical' />
+                <Asset assetType='road-vertical' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'road-horizontal':
             return (
-                <StraightRoad {...props} x={x} y={y} width={width} height={height} placement='horizontal' />
+                <Asset assetType='road-horizontal' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-straight-top':
             return (
-                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='abandoned-straight-top' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-straight-right':
             return (
-                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='abandoned-straight-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-straight-bottom':
             return (
-                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='abandoned-straight-bottom' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-straight-left':
             return (
-                <BuildingStraight {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='abandoned-straight-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-straight-top':
             return (
-                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='abandoned-trap-straight-top' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-straight-right':
             return (
-                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='abandoned-trap-straight-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-straight-bottom':
             return (
-                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='abandoned-trap-straight-bottom' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-straight-left':
             return (
-                <BuildingStraightTrap {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='abandoned-trap-straight-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-corner-top-left':
             return (
-                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='abandoned-corner-top-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-corner-top-right':
             return (
-                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='abandoned-corner-top-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-corner-bottom-left':
             return (
-                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='abandoned-corner-bottom-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-corner-bottom-right':
             return (
-                <BuildingCorner {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='abandoned-corner-bottom-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-corner-top-left':
             return (
-                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='abandoned-trap-corner-top-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-corner-top-right':
             return (
-                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='abandoned-trap-corner-top-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-corner-bottom-left':
             return (
-                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='abandoned-trap-corner-bottom-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'abandoned-trap-corner-bottom-right':
             return (
-                <BuildingCornerTrap {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='abandoned-trap-corner-bottom-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'grass':
             return (
-                <Grass {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='grass' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'floor':
             return (
-                <Floor {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='floor' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-top':
             return (
-                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='wall-top' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-right':
             return (
-                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='wall-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-bottom':
             return (
-                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='wall-bottom' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-left':
             return (
-                <FloorWall {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='wall-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-top-left':
             return (
-                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='wall-top-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-top-right':
             return (
-                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='wall-top-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-bottom-left':
             return (
-                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='wall-bottom-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-bottom-right':
             return (
-                <FloorCorner {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='wall-bottom-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-left-top':
             return (
-                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='wall-door-left-top' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-left-right':
             return (
-                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='wall-door-left-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-left-bottom':
             return (
-                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='wall-door-left-bottom' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-left-left':
             return (
-                <FloorDoorLeft {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='wall-door-left-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-right-top':
             return (
-                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='180deg' />
+                <Asset assetType='wall-door-right-top' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-right-right':
             return (
-                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='270deg' />
+                <Asset assetType='wall-door-right-right' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-right-bottom':
             return (
-                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='0deg' />
+                <Asset assetType='wall-door-right-bottom' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wall-door-right-left':
             return (
-                <FloorDoorRight {...props} x={x} y={y} width={width} height={height} rotation='90deg' />
+                <Asset assetType='wall-door-right-left' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'stair':
             return (
-                <FloorStairs {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='stairs' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'empty':
             return (
-                <EmptyBlock {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='empty' x={x} y={y} width={width} height={height} {...props}/>
             )
         case 'zombie':
             return (
-                <Zombie {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='zombie' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'skeleton':
             return (
-                <Skeleton {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='skeleton' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'dragon':
             return (
-                <Dragon {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='dragon' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wooden_sword':
             return (
-                <WoodenSword {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='wooden_sword' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wooden_pickaxe':
             return (
-                <WoodenPickaxe {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='wooden_pickaxe' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'wood':
             return (
-                <Wood {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='wood' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'rock_item':
             return (
-                <RockItem {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='rock_item' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'copper':
             return (
-                <Copper {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='copper' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'iron':
             return (
-                <Iron {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='iron' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'silver':
             return (
-                <Silver {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='silver' x={x} y={y} width={width} height={height} {...props} />
             )
         case 'gold':
             return (
-                <Gold {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='gold' x={x} y={y} width={width} height={height} {...props} />
             )
-        case 'unobtanium':
+        case 'unobtainium':
             return (
-                <Unobtanium {...props} x={x} y={y} width={width} height={height} />
+                <Asset assetType='unobtainium' x={x} y={y} width={width} height={height} {...props} />
             )
     }
 }

@@ -1,11 +1,9 @@
 import React from "react"
-import type { AssetProps } from "../../../types"
+import { assetTypeToId } from "../../../utils/asset"
 
-type WoodenFrameProps = AssetProps & Omit<React.SVGProps<SVGSVGElement>, "x" | "y" | "width" | "height" | "viewBox" | "xmlns">
-
-const WoodenFrame: React.FC<WoodenFrameProps> = ({ x, y, width, height, ...props }) => {
+const WoodenFrame: React.FC = () => {
     return (
-        <svg {...props} x={x} y={y} width={width} height={height} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <svg id={assetTypeToId("wooden_frame")} x={0} y={0} width="100%" height="100%" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
             <rect width="64" height="64" fill="#434343" />
             <rect x="64" width="64" height="64" fill="#53300E" />
             <rect x="128" width="64" height="64" fill="#53300E" />

@@ -1,11 +1,9 @@
 import React from "react"
-import type { AssetProps } from "../../types"
+import { assetTypeToId } from "../../utils/asset"
 
-type SilverProps = AssetProps & Omit<React.SVGProps<SVGSVGElement>, "x" | "y" | "width" | "height" | "viewBox" | "xmlns">
-
-const Silver: React.FC<SilverProps> = ({ x, y, width, height, ...props }) => {
+const Silver: React.FC = () => {
     return (
-        <svg {...props} x={x} y={y} width={width} height={height} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <svg id={assetTypeToId("silver")} x={0} y={0} width="100%" height="100%" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
             <rect x="192" y="128" width="64" height="64" fill="#434343" />
             <rect x="256" y="128" width="64" height="64" fill="#434343" />
             <rect x="128" y="192" width="64" height="64" fill="#434343" />

@@ -25,7 +25,7 @@ const mapBlockTypeToTileType = (buildingType: BlockType | undefined): TileType =
         case "Silver_Ore":
             return "silver_ore"
         case "Unobtanium_Ore":
-            return "unobtanium_ore"
+            return "unobtainium_ore"
         default:
             return "rock"
     }
