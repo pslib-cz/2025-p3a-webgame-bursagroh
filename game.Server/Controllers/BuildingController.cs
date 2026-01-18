@@ -151,7 +151,7 @@ namespace game.Server.Controllers
             var mapGenerator = new MapGeneratorService();
             int combinedSeed = buildingId + level;
 
-            var generatedFloors = mapGenerator.GenerateInterior(buildingId, combinedSeed, level + 1, totalHeight);
+            var generatedFloors = mapGenerator.GenerateInterior(buildingId, combinedSeed, level + 1, totalHeight, building.PositionX, building.PositionY);
             var newFloor = generatedFloors.FirstOrDefault(f => f.Level == level);
 
             if (newFloor != null)

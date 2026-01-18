@@ -5,6 +5,35 @@ public class MapGeneratorService
     private readonly Random _rng = new Random();
     public MapGeneratorService() { }
 
+    // Logic to determine if a global coordinate is a road
+    public static bool IsRoad(int x, int y)
+    {
+        return Math.Abs(x) % 4 == 1 || Math.Abs(y) % 4 == 1;
+    }
+
+    // Maps global road adjacency to local 8x8 interior coordinates
+    public static List<(int x, int y)> GetExitCoordinates(int bX, int bY)
+    {
+        var exits = new List<(int x, int y)>();
+
+        // Check North (Street is above building) -> Exit at top of interior
+        if (IsRoad(bX, bY - 1)) { exits.Add((3, 0)); exits.Add((4, 0)); }
+
+        // Check South (Street is below building) -> Exit at bottom of interior
+        if (IsRoad(bX, bY + 1)) { exits.Add((3, 7)); exits.Add((4, 7)); }
+
+        // Check West (Street is left of building) -> Exit at left of interior
+        if (IsRoad(bX - 1, bY)) { exits.Add((0, 3)); exits.Add((0, 4)); }
+
+        // Check East (Street is right of building) -> Exit at right of interior
+        if (IsRoad(bX + 1, bY)) { exits.Add((7, 3)); exits.Add((7, 4)); }
+
+        // Fallback if the building is somehow isolated
+        if (exits.Count == 0) exits.Add((0, 0));
+
+        return exits;
+    }
+
     public List<Building> GenerateMapArea(Guid playerId, int minX, int maxX, int minY, int maxY)
     {
         var buildings = new List<Building>();
@@ -35,7 +64,7 @@ public class MapGeneratorService
         return buildings;
     }
 
-    public List<Floor> GenerateInterior(int buildingId, int combinedSeed, int floorCount, int totalBuildingHeight)
+    public List<Floor> GenerateInterior(int buildingId, int combinedSeed, int floorCount, int totalBuildingHeight, int bX, int bY)
     {
         var floors = new List<Floor>();
 
@@ -55,14 +84,28 @@ public class MapGeneratorService
                 FloorItems = new List<FloorItem>()
             };
 
+            // NEW: Reserve Exit Coordinates on the Ground Floor
+            if (isFirstFloor)
+            {
+                var exits = GetExitCoordinates(bX, bY);
+                foreach (var exit in exits)
+                {
+                    occupiedPositions.Add($"{exit.x},{exit.y}");
+                    // We don't necessarily need to add a FloorItem object unless 
+                    // your frontend needs a specific "Door" sprite to render.
+                }
+            }
+
             (int x, int y) GetFreePos()
             {
                 int nx, ny;
+                int attempts = 0;
                 do
                 {
                     nx = rng.Next(0, 8);
                     ny = rng.Next(0, 8);
-                } while (occupiedPositions.Contains($"{nx},{ny}"));
+                    attempts++;
+                } while (occupiedPositions.Contains($"{nx},{ny}") && attempts < 100);
 
                 occupiedPositions.Add($"{nx},{ny}");
                 return (nx, ny);
@@ -130,7 +173,7 @@ public class MapGeneratorService
 
     private BuildingTypes DetermineBuildingType(int x, int y)
     {
-        if (Math.Abs(x) % 4 == 1 || Math.Abs(y) % 4 == 1)
+        if (IsRoad(x, y))
         {
             return BuildingTypes.Road;
         }

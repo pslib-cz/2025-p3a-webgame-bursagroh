@@ -21,6 +21,33 @@ namespace game.Server.Controllers
             _mapper = mapper;
         }
 
+        private List<(int x, int y)> GetExitCoordinates(int buildingX, int buildingY)
+        {
+            var exits = new List<(int x, int y)>();
+
+            if (IsRoad(buildingX, buildingY - 1)) exits.Add((3, 0)); 
+            if (IsRoad(buildingX, buildingY - 1)) exits.Add((4, 0));
+
+            if (IsRoad(buildingX, buildingY + 1)) exits.Add((3, 7));
+            if (IsRoad(buildingX, buildingY + 1)) exits.Add((4, 7));
+
+            if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 3));
+            if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 4));
+
+            // Check Global East (x + 1)
+            if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 3)); 
+            if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 4));
+
+            if (!exits.Any()) exits.Add((0, 0));
+
+            return exits;
+        }
+
+        private bool IsRoad(int x, int y)
+        {
+            return Math.Abs(x) % 4 == 1 || Math.Abs(y) % 4 == 1;
+        }
+
         [HttpPost("Generate")]
         public async Task<ActionResult<PlayerDto>> Generate([FromBody] GeneratePlayerRequest request)
         {
@@ -124,10 +151,7 @@ namespace game.Server.Controllers
 
             if (request.NewScreenType == ScreenTypes.Floor && player.ScreenType == ScreenTypes.City)
             {
-                var building = await _context.Buildings.FirstOrDefaultAsync(b =>
-                    b.PositionX == player.PositionX &&
-                    b.PositionY == player.PositionY &&
-                    b.PlayerId == id);
+                var building = await _context.Buildings.FirstOrDefaultAsync(b => b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.PlayerId == id);
 
                 if (building == null) return BadRequest("No building here.");
 
@@ -139,7 +163,7 @@ namespace game.Server.Controllers
                     var mapGenerator = new MapGeneratorService();
                     int totalHeight = building.Height ?? 5;
 
-                    var generatedFloors = mapGenerator.GenerateInterior(building.BuildingId, building.BuildingId, 1, totalHeight);
+                    var generatedFloors = mapGenerator.GenerateInterior(building.BuildingId, building.BuildingId, 1, totalHeight, building.PositionX, building.PositionY);
                     floor0 = generatedFloors.FirstOrDefault(f => f.Level == 0);
 
                     if (floor0 == null) return StatusCode(500, "Generation failed.");
@@ -150,9 +174,12 @@ namespace game.Server.Controllers
                     await _context.SaveChangesAsync();
                 }
 
+                var buildingDoors = MapGeneratorService.GetExitCoordinates(building.PositionX, building.PositionY);
+                var spawnPoint = buildingDoors.First();
+
                 player.FloorId = floor0.FloorId;
-                player.SubPositionX = 0;
-                player.SubPositionY = 0;
+                player.SubPositionX = spawnPoint.x;
+                player.SubPositionY = spawnPoint.y;
             }
 
             player.ScreenType = request.NewScreenType;
@@ -175,7 +202,6 @@ namespace game.Server.Controllers
 
             if (player == null) return NotFound();
 
-            // 1. VERTICAL MOVEMENT (Stairs)
             if (player.ScreenType == ScreenTypes.Floor && request.NewFloorId.HasValue && request.NewFloorId != player.FloorId)
             {
                 var currentFloor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
@@ -194,14 +220,12 @@ namespace game.Server.Controllers
                 return Ok(_mapper.Map<PlayerDto>(player));
             }
 
-            // 2. ADJACENCY CHECK
             int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
             int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
 
             if ((Math.Abs(request.NewPositionX - currentX) + Math.Abs(request.NewPositionY - currentY)) != 1)
                 return BadRequest("Move must be exactly 1 square.");
 
-            // 3. HORIZONTAL MOVEMENT
             if (player.ScreenType == ScreenTypes.City)
             {
                 player.PositionX = request.NewPositionX;
@@ -220,17 +244,20 @@ namespace game.Server.Controllers
                             if (floor0 == null)
                             {
                                 var mapGen = new MapGeneratorService();
-                                var generated = mapGen.GenerateInterior(building.BuildingId, building.BuildingId, 1, building.Height ?? 5);
+                                var generated = mapGen.GenerateInterior(building.BuildingId, building.BuildingId, 1, building.Height ?? 5, building.PositionX, building.PositionY);
                                 floor0 = generated.First(f => f.Level == 0);
 
                                 _context.Floors.Add(floor0);
-                                // FIX: Save here to generate the FloorId before the Player tries to use it
                                 await _context.SaveChangesAsync();
                             }
+
+                            var buildingDoors = MapGeneratorService.GetExitCoordinates(building.PositionX, building.PositionY);
+                            var spawnPoint = buildingDoors.First();
+
                             player.FloorId = floor0.FloorId;
                             player.ScreenType = ScreenTypes.Floor;
-                            player.SubPositionX = 0;
-                            player.SubPositionY = 0;
+                            player.SubPositionX = spawnPoint.x;
+                            player.SubPositionY = spawnPoint.y;
                             break;
 
                         case BuildingTypes.Bank: player.ScreenType = ScreenTypes.Bank; break;
@@ -242,26 +269,24 @@ namespace game.Server.Controllers
             }
             else
             {
-                // Inside a floor/building
-                if (player.ScreenType == ScreenTypes.Floor && request.NewPositionX == 0 && request.NewPositionY == 0)
+                var exits = GetExitCoordinates(player.PositionX, player.PositionY);
+                bool isAtExit = exits.Any(e => e.x == request.NewPositionX && e.y == request.NewPositionY);
+
+                if (player.ScreenType == ScreenTypes.Floor && isAtExit)
                 {
                     var currentFloor = await _context.Floors.FindAsync(player.FloorId);
                     if (currentFloor?.Level == 0)
                     {
-                        var building = await _context.Buildings.FirstOrDefaultAsync(b => b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.PlayerId == id);
-                        if (building?.BuildingType == BuildingTypes.AbandonedTrap) return BadRequest("It's a trap! You can't leave.");
-
                         player.ScreenType = ScreenTypes.City;
                         player.FloorId = null;
                         player.SubPositionX = 0;
                         player.SubPositionY = 0;
+                        return Ok(_mapper.Map<PlayerDto>(player));
                     }
                 }
-                else
-                {
-                    player.SubPositionX = request.NewPositionX;
-                    player.SubPositionY = request.NewPositionY;
-                }
+
+                player.SubPositionX = request.NewPositionX;
+                player.SubPositionY = request.NewPositionY;
             }
 
             await _context.SaveChangesAsync();
