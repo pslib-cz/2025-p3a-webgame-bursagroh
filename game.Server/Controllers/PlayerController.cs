@@ -34,7 +34,6 @@ namespace game.Server.Controllers
             if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 3));
             if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 4));
 
-            // Check Global East (x + 1)
             if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 3)); 
             if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 4));
 
@@ -87,10 +86,14 @@ namespace game.Server.Controllers
         public async Task<ActionResult<PlayerDto>> GetPlayer(Guid id)
         {
             var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
-
             if (player == null) return NotFound();
 
-            return Ok(_mapper.Map<PlayerDto>(player));
+            var dto = _mapper.Map<PlayerDto>(player);
+
+            var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+            dto.MineId = mine?.MineId;
+
+            return Ok(dto);
         }
 
         /// <remarks>
@@ -185,7 +188,11 @@ namespace game.Server.Controllers
             player.ScreenType = request.NewScreenType;
             await _context.SaveChangesAsync();
 
-            return Ok(_mapper.Map<PlayerDto>(player));
+            var dto = _mapper.Map<PlayerDto>(player);
+            var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+            dto.MineId = mine?.MineId;
+
+            return Ok(dto);
         }
 
         /// <remarks>
@@ -230,6 +237,11 @@ namespace game.Server.Controllers
             {
                 player.PositionX = request.NewPositionX;
                 player.PositionY = request.NewPositionY;
+
+                if (player.PositionX == 0 && player.PositionY == 0)
+                {
+                    player.ScreenType = ScreenTypes.Fountain;
+                }
 
                 var building = await _context.Buildings.FirstOrDefaultAsync(b =>
                     b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.PlayerId == id);
@@ -290,7 +302,12 @@ namespace game.Server.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return Ok(_mapper.Map<PlayerDto>(player));
+
+            var dto = _mapper.Map<PlayerDto>(player);
+            var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+            dto.MineId = mine?.MineId;
+
+            return Ok(dto);
         }
 
         [HttpGet("{id}/Inventory")]
@@ -391,12 +408,19 @@ namespace game.Server.Controllers
                 return BadRequest("You can only drop items while in floor/mine.");
             }
 
+
+
             var inventoryItem = await _context.InventoryItems
                 .Include(ii => ii.ItemInstance)
                 .FirstOrDefaultAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == id);
 
             if (inventoryItem == null) {
                 return BadRequest("Item not found in the inventory.");
+            }
+
+            if (player.ActiveInventoryItemId == inventoryItem.InventoryItemId)
+            {
+                player.ActiveInventoryItemId = null;
             }
 
             var floorItem = new FloorItem
@@ -420,6 +444,40 @@ namespace game.Server.Controllers
                 x = player.SubPositionX,
                 y = player.SubPositionY
             });
+        }
+
+        [HttpPatch("{id}/Action/set-active-item")]
+        public async Task<ActionResult<PlayerDto>> SetActiveItem(Guid id, [FromBody] SetActiveItemRequest request)
+        {
+            var player = await _context.Players
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found.");
+
+            if (request.InventoryItemId == null)
+            {
+                player.ActiveInventoryItemId = null;
+            }
+            else
+            {
+                var itemExists = await _context.InventoryItems
+                    .AnyAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == id);
+
+                if (!itemExists)
+                {
+                    return BadRequest("Item not found in your inventory.");
+                }
+
+                player.ActiveInventoryItemId = request.InventoryItemId;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var dto = _mapper.Map<PlayerDto>(player);
+            var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+            dto.MineId = mine?.MineId;
+
+            return Ok(dto);
         }
 
     }

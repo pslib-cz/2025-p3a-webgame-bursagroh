@@ -244,21 +244,24 @@ namespace game.Server.Controllers
         {
             var player = await _context.Players
                 .Include(p => p.InventoryItems)
+                .Include(p => p.ActiveInventoryItem)
+                    .ThenInclude(ai => ai.ItemInstance)
+                        .ThenInclude(ins => ins.Item)
                 .FirstOrDefaultAsync(p => p.PlayerId == PlayerID);
 
             if (player == null) return NotFound("Player not found");
 
-            var chosenItem = await _context.InventoryItems
-                .Include(ii => ii.ItemInstance)
-                    .ThenInclude(ins => ins.Item)
-                .FirstOrDefaultAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == PlayerID);
+            if (player.ActiveInventoryItemId == null || player.ActiveInventoryItem == null)
+            {
+                return BadRequest("You don't have an active item selected.");
+            }
 
-            if (chosenItem == null) return BadRequest("Item not found in inventory.");
+            var chosenItem = player.ActiveInventoryItem;
+
             if (chosenItem.ItemInstance?.Item == null || !chosenItem.ItemInstance.Item.Name.Contains("Pickaxe"))
             {
-                return BadRequest("Selected item is not a pickaxe.");
+                return BadRequest("Your active item is not a pickaxe.");
             }
-                
 
             int diffX = Math.Abs(player.SubPositionX - request.TargetX);
             int diffY = Math.Abs(player.SubPositionY - request.TargetY);
@@ -279,12 +282,12 @@ namespace game.Server.Controllers
 
             if (targetBlock == null) return BadRequest("No block at target.");
 
-
             targetBlock.Health -= chosenItem.ItemInstance.Item.Damage;
             chosenItem.ItemInstance.Durability -= 1;
 
             if (chosenItem.ItemInstance.Durability <= 0)
             {
+                player.ActiveInventoryItemId = null;
                 _context.InventoryItems.Remove(chosenItem);
                 _context.ItemInstances.Remove(chosenItem.ItemInstance);
             }
@@ -320,9 +323,8 @@ namespace game.Server.Controllers
             }
 
             var blockName = targetBlock.Block.BlockType;
-
-
             _context.MineBlocks.Remove(targetBlock);
+
             await _context.SaveChangesAsync();
 
             return Ok(new
@@ -330,7 +332,8 @@ namespace game.Server.Controllers
                 message = $"Destroyed {blockName}!",
                 name = blockName.ToString(),
                 PositionX = request.TargetX,
-                PositionY = request.TargetY
+                PositionY = request.TargetY,
+                activeItemId = player.ActiveInventoryItemId 
             });
         }
     }

@@ -12,6 +12,7 @@ namespace game.Server.Models
         Restaurant,
         Blacksmith,
         Floor,
+        Fountain,
         Fight
     }
 
@@ -40,5 +41,10 @@ namespace game.Server.Models
 
         [JsonIgnore]
         public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
+
+        public int? ActiveInventoryItemId { get; set; }
+
+        [ForeignKey("ActiveInventoryItemId")]
+        public virtual InventoryItem? ActiveInventoryItem { get; set; }
     }
 }

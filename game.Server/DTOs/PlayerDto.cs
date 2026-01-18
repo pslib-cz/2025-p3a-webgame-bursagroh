@@ -12,6 +12,8 @@
         public int SubPositionX { get; set; }
         public int SubPositionY { get; set; }
         public int? FloorId { get; set; }
+        public int? MineId { get; set; }
+        public int? ActiveInventoryItemId { get; set; }
         public int Capacity { get; set; }
     }
 }
