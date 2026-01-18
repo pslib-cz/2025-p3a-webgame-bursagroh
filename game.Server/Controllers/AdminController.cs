@@ -70,7 +70,7 @@ namespace game.Server.Controllers
         }
 
         [HttpPost("{id}/SpawnSword")]
-        public async Task<ActionResult> GiveWoodenPickaxe(Guid id)
+        public async Task<ActionResult> GiveWoodenSword(Guid id)
         {
             var player = await context.Players
                 .Include(p => p.InventoryItems)
@@ -111,6 +111,51 @@ namespace game.Server.Controllers
             return Ok(new
             {
                 message = "Wooden Sword added to inventory!",
+                inventoryItemId = inventoryEntry.InventoryItemId,
+                stats = new
+                {
+                    damage = pickaxeTemplate.Damage,
+                    durability = pickaxeTemplate.MaxDurability
+                }
+            });
+        }
+
+        [HttpPost("{id}/SpawnPickaxe")]
+        public async Task<ActionResult> GiveWoodenPickaxe(Guid id)
+        {
+            var player = await context.Players
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found.");
+            if (player.InventoryItems.Count >= player.Capacity)
+            {
+                return BadRequest("Inventory is full.");
+            }
+
+            var pickaxeTemplate = await context.Items
+                .FirstOrDefaultAsync(i => i.ItemId == 30);
+
+            var newInstance = new ItemInstance
+            {
+                ItemId = pickaxeTemplate.ItemId,
+                Durability = pickaxeTemplate.MaxDurability
+            };
+            context.ItemInstances.Add(newInstance);
+
+            var inventoryEntry = new InventoryItem
+            {
+                PlayerId = id,
+                ItemInstance = newInstance,
+                IsInBank = false
+            };
+            context.InventoryItems.Add(inventoryEntry);
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Wooden Pickaxe added to inventory!",
                 inventoryItemId = inventoryEntry.InventoryItemId,
                 stats = new
                 {
