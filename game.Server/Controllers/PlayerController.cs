@@ -281,7 +281,7 @@ namespace game.Server.Controllers
             }
             else
             {
-                var exits = GetExitCoordinates(player.PositionX, player.PositionY);
+                var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
                 bool isAtExit = exits.Any(e => e.x == request.NewPositionX && e.y == request.NewPositionY);
 
                 if (player.ScreenType == ScreenTypes.Floor && isAtExit)
@@ -293,6 +293,7 @@ namespace game.Server.Controllers
                         player.FloorId = null;
                         player.SubPositionX = 0;
                         player.SubPositionY = 0;
+                        await _context.SaveChangesAsync();
                         return Ok(_mapper.Map<PlayerDto>(player));
                     }
                 }

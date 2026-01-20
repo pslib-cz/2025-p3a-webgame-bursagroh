@@ -31,6 +31,8 @@ namespace game.Server.Data
         public DbSet<Enemy> Enemies { get; set; }
         public DbSet<Chest> Chests { get; set; }
 
+        public DbSet<Save> Saves { get; set; }
+
         public DbSet<BlueprintPlayer> BlueprintPlayers { get; set; }
 
 

@@ -110,16 +110,6 @@ namespace game.Server.Controllers
                 return BadRequest($"Building only has {building.Height} floors (Levels 0 to {building.Height - 1}). Level {level} is out of bounds.");
             }
 
-            if (level > 0)
-            {
-                var currentPlayerFloor = await _context.Floors.FindAsync(player.FloorId);
-
-                if ((currentPlayerFloor == null || currentPlayerFloor.BuildingId != buildingId || currentPlayerFloor.Level != level - 1) && currentPlayerFloor.Level != level)
-                {
-                    return BadRequest($"Cannot generate floor {level} unless you are standing on floor {level - 1}. Do not forget that you have to use the player move endpoint to get assigned into the 0th level.");
-                }
-            }
-
             var floorsBelowCount = await _context.Floors
                 .Where(f => f.BuildingId == buildingId && f.Level < level)
                 .CountAsync();
@@ -204,89 +194,131 @@ namespace game.Server.Controllers
 
             var floorItem = await _context.FloorItems
                 .Include(fi => fi.Enemy)
+                .Include(fi => fi.Chest)
                 .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
                                            fi.PositionX == request.TargetX &&
-                                           fi.PositionY == request.TargetY &&
-                                           fi.FloorItemType == FloorItemType.Enemy);
+                                           fi.PositionY == request.TargetY);
 
-            if (floorItem?.Enemy == null) {
-                return BadRequest("No enemy at target coordinates.");
-            }
-            
+            if (floorItem == null) return BadRequest("Nothing to interact with here.");
 
-            var targetEnemy = floorItem.Enemy;
-
-            if (targetEnemy.EnemyType != EnemyType.Zombie &&
-                targetEnemy.EnemyType != EnemyType.Skeleton &&
-                targetEnemy.EnemyType != EnemyType.Dragon)
+            if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)
             {
-                return BadRequest("Invalid enemy type.");
-            }
-
-            int diffX = Math.Abs(player.SubPositionX - request.TargetX);
-            int diffY = Math.Abs(player.SubPositionY - request.TargetY);
-
-            bool isWithinReach = (diffX + diffY) <= 1;
-
-            if (!isWithinReach) {
-                return BadRequest("Enemy is too far away.");
-            } 
-
-
-            int damageDealt = 1;
-
-            if (request.InventoryItemId.HasValue && request.InventoryItemId.Value != 0)
-            {
-                var chosenItem = player.InventoryItems
-                    .FirstOrDefault(ii => ii.InventoryItemId == request.InventoryItemId.Value);
-
-                if (chosenItem != null && chosenItem.ItemInstance?.Item != null &&
-                    chosenItem.ItemInstance.Item.Name.Contains("Sword"))
+                if (player.SubPositionX != request.TargetX || player.SubPositionY != request.TargetY)
                 {
-                    damageDealt = chosenItem.ItemInstance.Item.Damage;
+                    return BadRequest("You must be standing directly on the chest to open it.");
+                }
+
+                var random = new Random();
+
+                int[] ids = { 10, 11, 12, 13, 14, 15, 16 };
+
+                int scatterCount = random.Next(2, 6);
+
+                var emptyTiles = new List<(int x, int y)>();
+                for (int x = floorItem.PositionX - 1; x <= floorItem.PositionX + 1; x++)
+                {
+                    for (int y = floorItem.PositionY - 1; y <= floorItem.PositionY + 1; y++)
+                    {
+                        bool isOccupied = await _context.FloorItems.AnyAsync(f =>
+                            f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
+
+                        if (!isOccupied) emptyTiles.Add((x, y));
+                    }
+                }
+
+                for (int i = 0; i < scatterCount; i++)
+                {
+                    int randomSwordId = ids[random.Next(ids.Length)];
+
+                    var itemTemplate = await _context.Items.AsNoTracking()
+                        .FirstOrDefaultAsync(it => it.ItemId == randomSwordId);
+
+                    if (itemTemplate == null) continue;
+
+                    var newItemInstance = new ItemInstance
+                    {
+                        ItemId = randomSwordId,
+                        Durability = itemTemplate.MaxDurability,
+                        ChestId = null
+                    };
+
+                    _context.ItemInstances.Add(newItemInstance);
+
+                    (int x, int y) dropPos = (floorItem.PositionX, floorItem.PositionY);
+                    if (emptyTiles.Any())
+                    {
+                        int index = random.Next(emptyTiles.Count);
+                        dropPos = emptyTiles[index];
+                        emptyTiles.RemoveAt(index);
+                    }
+
+                    _context.FloorItems.Add(new FloorItem
+                    {
+                        FloorId = (int)player.FloorId!,
+                        PositionX = dropPos.x,
+                        PositionY = dropPos.y,
+                        FloorItemType = FloorItemType.Item,
+                        ItemInstance = newItemInstance
+                    });
+                }
+
+                _context.Chests.Remove(floorItem.Chest);
+                _context.FloorItems.Remove(floorItem);
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "BOOM! The chest explodes!", itemsDropped = scatterCount });
+            }
+
+            if (floorItem.FloorItemType == FloorItemType.Enemy && floorItem.Enemy != null)
+            {
+                var targetEnemy = floorItem.Enemy;
+                int diffX = Math.Abs(player.SubPositionX - request.TargetX);
+                int diffY = Math.Abs(player.SubPositionY - request.TargetY);
+
+                if ((diffX + diffY) > 1) return BadRequest("Enemy is too far away.");
+
+                int damageDealt = 1;
+                if (request.InventoryItemId.HasValue && request.InventoryItemId.Value != 0)
+                {
+                    var chosenItem = player.InventoryItems
+                        .FirstOrDefault(ii => ii.InventoryItemId == request.InventoryItemId.Value);
+
+                    if (chosenItem?.ItemInstance?.Item != null && chosenItem.ItemInstance.Item.ItemType == ItemTypes.Sword)
+                    {
+                        damageDealt = chosenItem.ItemInstance.Item.Damage; //
+                    }
+                    else
+                    {
+                        return BadRequest("Selected item is not a sword.");
+                    }
+                }
+
+                targetEnemy.Health -= damageDealt;
+
+                if (targetEnemy.Health > 0)
+                {
+                    await _context.SaveChangesAsync();
+                    return Ok(new { message = $"Hit for {damageDealt} damage!", health = targetEnemy.Health });
+                }
+
+                if (targetEnemy.ItemInstanceId.HasValue)
+                {
+                    floorItem.FloorItemType = FloorItemType.Item;
+                    floorItem.ItemInstanceId = targetEnemy.ItemInstanceId;
+                    floorItem.Enemy = null;
                 }
                 else
                 {
-                    return BadRequest("Selected item is not a sword. Use null for fists.");
+                    _context.FloorItems.Remove(floorItem);
                 }
-            }
 
-            targetEnemy.Health -= damageDealt;
-
-            if (targetEnemy.Health > 0)
-            {
+                _context.Enemies.Remove(targetEnemy);
                 await _context.SaveChangesAsync();
-                return Ok(new
-                {
-                    message = $"You hit the {targetEnemy.EnemyType} for {damageDealt} damage.",
-                    remainingHealth = targetEnemy.Health
-                });
+
+                return Ok(new { message = $"Defeated the {targetEnemy.EnemyType}!" });
             }
 
-            var lootInstance = await _context.ItemInstances
-                .Include(i => i.Item)
-                .FirstOrDefaultAsync(i => i.ItemInstanceId == targetEnemy.ItemInstanceId);
-
-            if (lootInstance != null)
-            {
-                floorItem.FloorItemType = FloorItemType.Item;
-                floorItem.Enemy = null;
-                floorItem.ItemInstanceId = lootInstance.ItemInstanceId;
-                _context.Enemies.Remove(targetEnemy);
-            }
-            else
-            {
-                _context.FloorItems.Remove(floorItem);
-                _context.Enemies.Remove(targetEnemy);
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = $"Successfully defeated the {targetEnemy.EnemyType}!",
-                lootDropped = lootInstance?.Item?.Name ?? "Nothing"
-            });
+            return BadRequest("Invalid interaction.");
         }
     }
 }
