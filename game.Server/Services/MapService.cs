@@ -59,8 +59,7 @@ public class MapGeneratorService
         for (int i = 0; i < floorCount; i++)
         {
             Random rng = new Random(combinedSeed + i);
-
-            bool isFirstFloor = (i == 0);
+            bool isEvenFloor = (i % 2 == 0);
             bool isRealLastFloor = (i == totalBuildingHeight - 1);
 
             var occupiedPositions = new HashSet<string>();
@@ -72,13 +71,26 @@ public class MapGeneratorService
                 FloorItems = new List<FloorItem>()
             };
 
-            if (isFirstFloor)
+            int downX = isEvenFloor ? 2 : 5;
+            int upX = isEvenFloor ? 5 : 2;
+            int stairY = 2;
+
+            occupiedPositions.Add($"{downX},{stairY}");
+            occupiedPositions.Add($"{upX},{stairY}");
+
+            if (i > 0)
+            {
+                floor.FloorItems.Add(new FloorItem { PositionX = downX, PositionY = stairY, FloorItemType = FloorItemType.Stair });
+            }
+            else
             {
                 var exits = GetExitCoordinates(bX, bY);
-                foreach (var exit in exits)
-                {
-                    occupiedPositions.Add($"{exit.x},{exit.y}");
-                }
+                foreach (var exit in exits) occupiedPositions.Add($"{exit.x},{exit.y}");
+            }
+
+            if (!isRealLastFloor)
+            {
+                floor.FloorItems.Add(new FloorItem { PositionX = upX, PositionY = stairY, FloorItemType = FloorItemType.Stair });
             }
 
             (int x, int y) GetFreePos()
@@ -96,18 +108,6 @@ public class MapGeneratorService
                 return (nx, ny);
             }
 
-            if (!isFirstFloor)
-            {
-                floor.FloorItems.Add(new FloorItem { PositionX = 2, PositionY = 2, FloorItemType = FloorItemType.Stair });
-                occupiedPositions.Add("2,2");
-            }
-
-            if (!isRealLastFloor)
-            {
-                floor.FloorItems.Add(new FloorItem { PositionX = 5, PositionY = 2, FloorItemType = FloorItemType.Stair });
-                occupiedPositions.Add("5,2");
-            }
-
             int chestCount = rng.Next(1, 4);
             for (int c = 0; c < chestCount; c++)
             {
@@ -121,6 +121,7 @@ public class MapGeneratorService
                 });
             }
 
+            int enemyCount = isRealLastFloor ? rng.Next(1, 3) : rng.Next(2, 5);
             if (isRealLastFloor)
             {
                 var pos = GetFreePos();
@@ -133,14 +134,11 @@ public class MapGeneratorService
                 });
             }
 
-            int enemyCount = isRealLastFloor ? rng.Next(1, 3) : rng.Next(2, 5);
             var randomEnemyPool = Enum.GetValues<EnemyType>().Where(t => t != EnemyType.Dragon).ToList();
-
             for (int e = 0; e < enemyCount; e++)
             {
                 var pos = GetFreePos();
                 var selectedType = randomEnemyPool[rng.Next(randomEnemyPool.Count)];
-
                 floor.FloorItems.Add(new FloorItem
                 {
                     PositionX = pos.x,
@@ -152,7 +150,6 @@ public class MapGeneratorService
 
             floors.Add(floor);
         }
-
         return floors;
     }
 

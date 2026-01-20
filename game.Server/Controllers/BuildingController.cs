@@ -266,7 +266,7 @@ namespace game.Server.Controllers
                 _context.FloorItems.Remove(floorItem);
 
                 await _context.SaveChangesAsync();
-                return Ok(new { message = "BOOM! The chest explodes!", itemsDropped = scatterCount });
+                return Ok(new { message = "Chest exploded!", itemsDropped = scatterCount });
             }
 
             if (floorItem.FloorItemType == FloorItemType.Enemy && floorItem.Enemy != null)
@@ -285,7 +285,7 @@ namespace game.Server.Controllers
 
                     if (chosenItem?.ItemInstance?.Item != null && chosenItem.ItemInstance.Item.ItemType == ItemTypes.Sword)
                     {
-                        damageDealt = chosenItem.ItemInstance.Item.Damage; //
+                        damageDealt = chosenItem.ItemInstance.Item.Damage; 
                     }
                     else
                     {
