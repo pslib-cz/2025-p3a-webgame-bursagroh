@@ -1,0 +1,59 @@
+.container {
+    background-color: var(--darker);
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    fill: var(--light);
+}
+
+.heading {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
+
+.subHeader {
+    
+}
+
+.subHeading {
+    font-size: var(--h4);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
+
+.statContainer {
+    background-color: var(--dark);
+    padding: 0.25rem 0.5rem;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--h4);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+    fill: var(--light);
+}
+
+.hand {
+    background-color: var(--dark);
+    padding: 0.5rem;
+}

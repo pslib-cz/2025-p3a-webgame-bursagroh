@@ -1,0 +1,16 @@
+.container {
+    height: 100vh;
+    background-color: var(--darker);
+}
+
+.innerContainer {
+    position: relative;
+}
+
+.uiContainer {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: flex;
+    gap: 1rem;
+}
