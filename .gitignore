@@ -362,7 +362,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-game.Server/game.db
-game.Server/game.db-shm
-game.Server/game.db-wal
-game.Server/Migrations/
