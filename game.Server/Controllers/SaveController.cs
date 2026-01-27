@@ -1,3 +1,4 @@
+using AutoMapper;
 using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,12 @@ namespace game.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public SaveController(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+
+        public SaveController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
 
@@ -25,33 +29,97 @@ namespace game.Server.Controllers
 
             if (save == null)
             {
-                return NotFound("No player associated with this SaveString.");
+                return NotFound("No player associated with this savestring.");
             }
 
-            return Ok(save.PlayerId);
+            return Ok(new { playerId = save.PlayerId });
         }
 
-
-        [HttpGet("Nigger/{playerId}")]
-        public async Task<ActionResult<string>> GetSaveString(Guid playerId)
+        [HttpPost("CreateString/{playerId}")]
+        public async Task<ActionResult> ClonePlayerRecord(Guid playerId)
         {
-            var playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
-            if (!playerExists) return NotFound("Player not found.");
+            var originalPlayer = await _context.Players
+                .Include(p => p.InventoryItems).ThenInclude(ii => ii.ItemInstance)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.PlayerId == playerId);
 
-            var save = await _context.Saves.FirstOrDefaultAsync(s => s.PlayerId == playerId);
+            if (originalPlayer == null) return NotFound("Player not found.");
 
-            if (save == null)
+            var clonedPlayer = new Player();
+            _context.Entry(clonedPlayer).CurrentValues.SetValues(originalPlayer);
+            clonedPlayer.PlayerId = Guid.NewGuid();
+            clonedPlayer.Name = originalPlayer.Name;
+            clonedPlayer.InventoryItems = new List<InventoryItem>();
+            clonedPlayer.Floor = null;
+
+            _context.Players.Add(clonedPlayer);
+
+            var originalBuildings = await _context.Buildings
+                .Include(b => b.Floors)
+                .Where(b => b.PlayerId == playerId)
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var oldBuilding in originalBuildings)
             {
-                save = new Save
-                {
-                    PlayerId = playerId,
-                    SaveString = Guid.NewGuid().ToString().Substring(0, 8).ToUpper()
-                };
-                _context.Saves.Add(save);
+                var oldBuildingId = oldBuilding.BuildingId;
+                var newBuilding = new Building();
+                _context.Entry(newBuilding).CurrentValues.SetValues(oldBuilding);
+
+                newBuilding.BuildingId = 0; 
+                newBuilding.PlayerId = clonedPlayer.PlayerId;
+                newBuilding.Floors = new List<Floor>();
+
+                _context.Buildings.Add(newBuilding);
                 await _context.SaveChangesAsync();
+
+                if (oldBuilding.Floors != null)
+                {
+                    foreach (var oldFloor in oldBuilding.Floors)
+                    {
+                        var oldFloorId = oldFloor.FloorId;
+                        var newFloor = new Floor
+                        {
+                            BuildingId = newBuilding.BuildingId,
+                            Level = oldFloor.Level
+                        };
+
+                        _context.Floors.Add(newFloor);
+                        await _context.SaveChangesAsync();
+                        if (originalPlayer.FloorId == oldFloorId)
+                        {
+                            clonedPlayer.FloorId = newFloor.FloorId;
+                        }
+                    }
+                }
             }
 
-            return Ok(save.SaveString);
+            foreach (var originalInvItem in originalPlayer.InventoryItems)
+            {
+                if (originalInvItem.ItemInstance == null) continue;
+
+                var newInstance = new ItemInstance { ItemId = originalInvItem.ItemInstance.ItemId };
+                _context.ItemInstances.Add(newInstance);
+                await _context.SaveChangesAsync();
+
+                _context.InventoryItems.Add(new InventoryItem
+                {
+                    PlayerId = clonedPlayer.PlayerId,
+                    ItemInstanceId = newInstance.ItemInstanceId,
+                    IsInBank = originalInvItem.IsInBank
+                });
+            }
+
+            var newSave = new Save
+            {
+                PlayerId = clonedPlayer.PlayerId,
+                SaveString = Guid.NewGuid().ToString().Substring(0, 8).ToUpper()
+            };
+            _context.Saves.Add(newSave);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { NewSaveString = newSave.SaveString });
         }
     }
 }
