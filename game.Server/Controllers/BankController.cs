@@ -24,71 +24,94 @@ namespace game.Server.Controllers
         [HttpGet("{id}")]
         public ActionResult<IEnumerable<BankInventoryDto>> GetPlayerBankInventory(Guid id)
         {
-            var items = _context.InventoryItems
+            try
+            {
+                var items = _context.InventoryItems
                 .Where(i => i.PlayerId == id && i.IsInBank)
                 .ProjectTo<BankInventoryDto>(_mapper.ConfigurationProvider)
                 .ToList();
 
-            return items.Any() ? Ok(items) : NoContent();
+                return items.Any() ? Ok(items) : NoContent();
+            } catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+            
         }
 
         [HttpPatch("{id}/Action/transfer")]
         public async Task<ActionResult<int>> TransferMoney(Guid id, [FromBody] MovePlayerMoneyRequest request)
         {
-            if (request.Amount <= 0)
+            try 
             {
-                return BadRequest("amount < 0");
+                if (request.Amount <= 0)
+                {
+                    return BadRequest("amount < 0");
+                }
+
+                Player? player = _context.Players.Where(i => i.PlayerId == id).FirstOrDefault();
+
+                if (player == null)
+                {
+                    return NotFound();
+                }
+
+                int amountToTransfer = request.Amount;
+                bool isToBank = request.Direction == Direction.ToBank;
+
+                player.Money += isToBank ? -amountToTransfer : amountToTransfer;
+                player.BankBalance += isToBank ? amountToTransfer : -amountToTransfer;
+
+                if (player.Money < 0 || player.BankBalance < 0)
+                {
+                    return BadRequest("insufficient funds");
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Ok(player.BankBalance);
             }
-
-            Player? player = _context.Players.Where(i => i.PlayerId == id).FirstOrDefault();
-
-            if (player == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
-
-            int amountToTransfer = request.Amount;
-            bool isToBank = request.Direction == Direction.ToBank;
-
-            player.Money += isToBank ? -amountToTransfer : amountToTransfer;
-            player.BankBalance += isToBank ? amountToTransfer : -amountToTransfer;
-
-            if (player.Money < 0 || player.BankBalance < 0)
-            {
-                return BadRequest("insufficient funds");
-            }
-
-            await _context.SaveChangesAsync();
-
-            return Ok(player.BankBalance);
+            
         }
 
         [HttpPatch("{id}/Action/move")] 
         public async Task<IActionResult> MoveInventoryItem(Guid id, [FromBody] MoveInventoryItemRequest request)
         {
-            if (request.InventoryItemId <= 0)
+            try 
             {
-                return BadRequest();
+                if (request.InventoryItemId <= 0)
+                {
+                    return BadRequest();
+                }
+
+                InventoryItem? item = await _context.InventoryItems
+                    .Where(i => i.InventoryItemId == request.InventoryItemId)
+                    .SingleOrDefaultAsync();
+
+                if (item == null)
+                {
+                    return NotFound();
+                }
+
+                if (item.PlayerId != id)
+                {
+                    return Forbid();
+                }
+
+                item.IsInBank = !item.IsInBank;
+
+                await _context.SaveChangesAsync();
+                return Ok(item);
             }
-
-            InventoryItem? item = await _context.InventoryItems
-                .Where(i => i.InventoryItemId == request.InventoryItemId)
-                .SingleOrDefaultAsync();
-
-            if (item == null)
+            catch (Exception ex)
             {
-                return NotFound();
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
-
-            if (item.PlayerId != id)
-            {
-                return Forbid();
-            }
-
-            item.IsInBank = !item.IsInBank;
-
-            await _context.SaveChangesAsync();
-            return Ok(item);
+            
         }
     }
 }
