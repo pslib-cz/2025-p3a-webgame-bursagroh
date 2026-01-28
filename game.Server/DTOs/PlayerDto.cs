@@ -15,5 +15,8 @@
         public int? MineId { get; set; }
         public int? ActiveInventoryItemId { get; set; }
         public int Capacity { get; set; }
+
+        public int Health { get; set; }
+
     }
 }

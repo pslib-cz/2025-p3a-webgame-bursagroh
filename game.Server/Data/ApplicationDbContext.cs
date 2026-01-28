@@ -247,13 +247,13 @@ namespace game.Server.Data
             });
 
             modelBuilder.Entity<Item>().HasData(
-                new Item { ItemId = 1, Name = "Wooden Frame",         Description = "Wooden Frame",        ItemType = ItemTypes.Block,   ChangeOfGenerating = 20 },
-                new Item { ItemId = 2, Name = "Rock",                 Description = "Rock",                ItemType = ItemTypes.Block,   ChangeOfGenerating = 80 },
-                new Item { ItemId = 3, Name = "Copper Ore",           Description = "Copper Ore",          ItemType = ItemTypes.Block,   ChangeOfGenerating = 15 },
-                new Item { ItemId = 4, Name = "Iron Ore",             Description = "Iron Ore",            ItemType = ItemTypes.Block,   ChangeOfGenerating = 15 },
-                new Item { ItemId = 5, Name = "Silver Ore",           Description = "Silver Ore",          ItemType = ItemTypes.Block,   ChangeOfGenerating = 10 },
-                new Item { ItemId = 6, Name = "Gold Ore",             Description = "Gold Ore",            ItemType = ItemTypes.Block,   ChangeOfGenerating = 10 },
-                new Item { ItemId = 7, Name = "Unobtainium Ore",      Description = "Unobtainium Ore",     ItemType = ItemTypes.Block,   ChangeOfGenerating = 2 },
+                new Item { ItemId = 1, Name = "Wooden Frame",         Description = "Wooden Frame",        ItemType = ItemTypes.Block,   ChangeOfGenerating = 6 },
+                new Item { ItemId = 2, Name = "Rock",                 Description = "Rock",                ItemType = ItemTypes.Block,   ChangeOfGenerating = 95 },
+                new Item { ItemId = 3, Name = "Copper Ore",           Description = "Copper Ore",          ItemType = ItemTypes.Block,   ChangeOfGenerating = 7 },
+                new Item { ItemId = 4, Name = "Iron Ore",             Description = "Iron Ore",            ItemType = ItemTypes.Block,   ChangeOfGenerating = 6 },
+                new Item { ItemId = 5, Name = "Silver Ore",           Description = "Silver Ore",          ItemType = ItemTypes.Block,   ChangeOfGenerating = 7 },
+                new Item { ItemId = 6, Name = "Gold Ore",             Description = "Gold Ore",            ItemType = ItemTypes.Block,   ChangeOfGenerating = 6 },
+                new Item { ItemId = 7, Name = "Unobtainium Ore",      Description = "Unobtainium Ore",     ItemType = ItemTypes.Block,   ChangeOfGenerating = 1 },
                 
                 new Item { ItemId = 10, Name = "Wooden Sword",        Description = "Wooden Sword",        ItemType = ItemTypes.Sword,   Weight = 1, Damage = 10, MaxDurability = 20 },
                 new Item { ItemId = 11, Name = "Rock Sword",          Description = "Rock Sword",          ItemType = ItemTypes.Sword,   Weight = 1, Damage = 20, MaxDurability = 40 },
@@ -295,22 +295,102 @@ namespace game.Server.Data
                 .Navigation(b => b.Craftings)
                 .AutoInclude();
 
-            modelBuilder.Entity<Blueprint>(entity =>
-            {
-                entity.HasData(
-                    new Blueprint { BlueprintId = 1, ItemId = 10, Price = 5 },
-                    new Blueprint { BlueprintId = 2, ItemId = 30, Price = 5 }
-                );
-            });
+            modelBuilder.Entity<Blueprint>().HasData(
+                // Swords
+                new Blueprint { BlueprintId = 1, ItemId = 10, Price = 5 },   // Wooden Sword
+                new Blueprint { BlueprintId = 3, ItemId = 11, Price = 10 },  // Rock Sword
+                new Blueprint { BlueprintId = 4, ItemId = 12, Price = 20 },  // Copper Sword
+                new Blueprint { BlueprintId = 5, ItemId = 13, Price = 40 },  // Iron Sword
+                new Blueprint { BlueprintId = 6, ItemId = 14, Price = 80 },  // Silver Sword
+                new Blueprint { BlueprintId = 7, ItemId = 15, Price = 150 }, // Gold Sword
+                new Blueprint { BlueprintId = 8, ItemId = 16, Price = 500 }, // Unobtainium Sword
 
-            modelBuilder.Entity<Crafting>(entity =>
-            {
-                entity.HasData(
-                    new Crafting { CraftingId = 1, BlueprintId = 1, ItemId = 1, Amount = 2 },
-                    new Crafting { CraftingId = 2, BlueprintId = 2, ItemId = 1, Amount = 3 }
-                );
-            });
-            
+                // Axes
+                new Blueprint { BlueprintId = 9, ItemId = 20, Price = 5 },   // Wooden Axe
+                new Blueprint { BlueprintId = 10, ItemId = 21, Price = 10 }, // Rock Axe
+                new Blueprint { BlueprintId = 11, ItemId = 22, Price = 20 }, // Copper Axe
+                new Blueprint { BlueprintId = 12, ItemId = 23, Price = 40 }, // Iron Axe
+                new Blueprint { BlueprintId = 13, ItemId = 24, Price = 80 }, // Silver Axe
+                new Blueprint { BlueprintId = 14, ItemId = 25, Price = 150 },// Gold Axe
+                new Blueprint { BlueprintId = 15, ItemId = 26, Price = 500 },// Unobtainium Axe
+
+                // Pickaxes
+                new Blueprint { BlueprintId = 2, ItemId = 30, Price = 5 },   // Wooden Pickaxe
+                new Blueprint { BlueprintId = 16, ItemId = 31, Price = 10 }, // Rock Pickaxe
+                new Blueprint { BlueprintId = 17, ItemId = 32, Price = 20 }, // Copper Pickaxe
+                new Blueprint { BlueprintId = 18, ItemId = 33, Price = 40 }, // Iron Pickaxe
+                new Blueprint { BlueprintId = 19, ItemId = 34, Price = 80 }, // Silver Pickaxe
+                new Blueprint { BlueprintId = 20, ItemId = 35, Price = 150 },// Gold Pickaxe
+                new Blueprint { BlueprintId = 21, ItemId = 36, Price = 500 } // Unobtainium Pickaxe
+            );
+
+            modelBuilder.Entity<Crafting>().HasData(
+                // --- WOODEN TIER (Basics) ---
+                new Crafting { CraftingId = 1, BlueprintId = 1, ItemId = 1, Amount = 2 },  // Wooden Sword: 2 Wood
+                new Crafting { CraftingId = 2, BlueprintId = 2, ItemId = 1, Amount = 3 },  // Wooden Pickaxe: 3 Wood
+                new Crafting { CraftingId = 40, BlueprintId = 9, ItemId = 1, Amount = 3 }, // Wooden Axe: 3 Wood
+
+                // --- SWORDS (Wood + Material) ---
+                // Rock Sword: 2 Wood + 3 Rock = 5
+                new Crafting { CraftingId = 3, BlueprintId = 3, ItemId = 1, Amount = 2 },
+                new Crafting { CraftingId = 4, BlueprintId = 3, ItemId = 2, Amount = 3 },
+                // Copper Sword: 2 Wood + 5 Copper = 7
+                new Crafting { CraftingId = 5, BlueprintId = 4, ItemId = 1, Amount = 2 },
+                new Crafting { CraftingId = 6, BlueprintId = 4, ItemId = 3, Amount = 5 },
+                // Iron Sword: 3 Wood + 6 Iron = 9
+                new Crafting { CraftingId = 7, BlueprintId = 5, ItemId = 1, Amount = 3 },
+                new Crafting { CraftingId = 8, BlueprintId = 5, ItemId = 4, Amount = 6 },
+                // Silver Sword: 3 Wood + 8 Silver = 11
+                new Crafting { CraftingId = 9, BlueprintId = 6, ItemId = 1, Amount = 3 },
+                new Crafting { CraftingId = 10, BlueprintId = 6, ItemId = 5, Amount = 8 },
+                // Gold Sword: 4 Wood + 9 Gold = 13
+                new Crafting { CraftingId = 11, BlueprintId = 7, ItemId = 1, Amount = 4 },
+                new Crafting { CraftingId = 12, BlueprintId = 7, ItemId = 6, Amount = 9 },
+                // Unobtainium Sword: 5 Wood + 10 Unobtainium = 15 (MAX)
+                new Crafting { CraftingId = 13, BlueprintId = 8, ItemId = 1, Amount = 5 },
+                new Crafting { CraftingId = 14, BlueprintId = 8, ItemId = 7, Amount = 10 },
+
+                // --- AXES ---
+                // Rock Axe: 3 Wood + 3 Rock = 6
+                new Crafting { CraftingId = 16, BlueprintId = 10, ItemId = 1, Amount = 3 },
+                new Crafting { CraftingId = 17, BlueprintId = 10, ItemId = 2, Amount = 3 },
+                // Copper Axe: 3 Wood + 5 Copper = 8
+                new Crafting { CraftingId = 41, BlueprintId = 11, ItemId = 1, Amount = 3 },
+                new Crafting { CraftingId = 42, BlueprintId = 11, ItemId = 3, Amount = 5 },
+                // Iron Axe: 4 Wood + 7 Iron = 11
+                new Crafting { CraftingId = 18, BlueprintId = 12, ItemId = 1, Amount = 4 },
+                new Crafting { CraftingId = 19, BlueprintId = 12, ItemId = 4, Amount = 7 },
+                // Silver Axe: 4 Wood + 9 Silver = 13
+                new Crafting { CraftingId = 43, BlueprintId = 13, ItemId = 1, Amount = 4 },
+                new Crafting { CraftingId = 44, BlueprintId = 13, ItemId = 5, Amount = 9 },
+                // Gold Axe: 5 Wood + 10 Gold = 15 (MAX)
+                new Crafting { CraftingId = 45, BlueprintId = 14, ItemId = 1, Amount = 5 },
+                new Crafting { CraftingId = 46, BlueprintId = 14, ItemId = 6, Amount = 10 },
+                // Unobtainium Axe: 5 Wood + 10 Unobtainium = 15 (MAX)
+                new Crafting { CraftingId = 20, BlueprintId = 15, ItemId = 1, Amount = 5 },
+                new Crafting { CraftingId = 21, BlueprintId = 15, ItemId = 7, Amount = 10 },
+
+                // --- PICKAXES ---
+                // Rock Pickaxe: 3 Wood + 4 Rock = 7
+                new Crafting { CraftingId = 22, BlueprintId = 16, ItemId = 1, Amount = 3 },
+                new Crafting { CraftingId = 23, BlueprintId = 16, ItemId = 2, Amount = 4 },
+                // Copper Pickaxe: 3 Wood + 6 Copper = 9
+                new Crafting { CraftingId = 47, BlueprintId = 17, ItemId = 1, Amount = 3 },
+                new Crafting { CraftingId = 48, BlueprintId = 17, ItemId = 3, Amount = 6 },
+                // Iron Pickaxe: 4 Wood + 8 Iron = 12
+                new Crafting { CraftingId = 49, BlueprintId = 18, ItemId = 1, Amount = 4 },
+                new Crafting { CraftingId = 50, BlueprintId = 18, ItemId = 4, Amount = 8 },
+                // Silver Pickaxe: 4 Wood + 8 Silver = 12
+                new Crafting { CraftingId = 24, BlueprintId = 19, ItemId = 1, Amount = 4 },
+                new Crafting { CraftingId = 25, BlueprintId = 19, ItemId = 5, Amount = 8 },
+                // Gold Pickaxe: 5 Wood + 10 Gold = 15 (MAX)
+                new Crafting { CraftingId = 51, BlueprintId = 20, ItemId = 1, Amount = 5 },
+                new Crafting { CraftingId = 52, BlueprintId = 20, ItemId = 6, Amount = 10 },
+                // Unobtainium Pickaxe: 5 Wood + 10 Unobtainium = 15 (MAX)
+                new Crafting { CraftingId = 26, BlueprintId = 21, ItemId = 1, Amount = 5 },
+                new Crafting { CraftingId = 27, BlueprintId = 21, ItemId = 7, Amount = 10 }
+            );
+
             modelBuilder.Entity<BlueprintPlayer>()
                 .HasKey(bp => new { bp.PlayerId, bp.BlueprintId });
 
