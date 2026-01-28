@@ -70,7 +70,7 @@ namespace game.Server.Controllers
         }
 
         [HttpPost("{id}/SpawnSword")]
-        public async Task<ActionResult> GiveWoodenPickaxe(Guid id)
+        public async Task<ActionResult> GiveWoodenSword(Guid id)
         {
             var player = await context.Players
                 .Include(p => p.InventoryItems)
@@ -120,6 +120,51 @@ namespace game.Server.Controllers
             });
         }
 
+        [HttpPost("{id}/SpawnPickaxe")]
+        public async Task<ActionResult> GiveWoodenPickaxe(Guid id)
+        {
+            var player = await context.Players
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found.");
+            if (player.InventoryItems.Count >= player.Capacity)
+            {
+                return BadRequest("Inventory is full.");
+            }
+
+            var pickaxeTemplate = await context.Items
+                .FirstOrDefaultAsync(i => i.ItemId == 30);
+
+            var newInstance = new ItemInstance
+            {
+                ItemId = pickaxeTemplate.ItemId,
+                Durability = pickaxeTemplate.MaxDurability
+            };
+            context.ItemInstances.Add(newInstance);
+
+            var inventoryEntry = new InventoryItem
+            {
+                PlayerId = id,
+                ItemInstance = newInstance,
+                IsInBank = false
+            };
+            context.InventoryItems.Add(inventoryEntry);
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Wooden Pickaxe added to inventory!",
+                inventoryItemId = inventoryEntry.InventoryItemId,
+                stats = new
+                {
+                    damage = pickaxeTemplate.Damage,
+                    durability = pickaxeTemplate.MaxDurability
+                }
+            });
+        }
+
         [HttpPost("{id}/FreeMoney")]
         /// <remarks>
         /// - test purposes
@@ -135,6 +180,56 @@ namespace game.Server.Controllers
             player.Money += 10000000;
             await context.SaveChangesAsync();
             return Ok(player);
+        }
+
+        [HttpPost("{id}/SpawnHealingPotion")]
+        public async Task<ActionResult> GiveHealingPotion(Guid id)
+        {
+            // 1. Fetch player and check existence
+            var player = await context.Players
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found.");
+
+            if (player.InventoryItems.Count >= player.Capacity)
+            {
+                return BadRequest("Inventory is full.");
+            }
+
+
+            var potionTemplate = await context.Items
+                .FirstOrDefaultAsync(i => i.ItemId == 40);
+
+            if (potionTemplate == null)
+            {
+                return BadRequest("Healing Potion template (ID 40) not found in database.");
+            }
+
+            var newInstance = new ItemInstance
+            {
+                ItemId = potionTemplate.ItemId,
+                Durability = potionTemplate.MaxDurability
+            };
+            context.ItemInstances.Add(newInstance);
+
+            var inventoryEntry = new InventoryItem
+            {
+                PlayerId = id,
+                ItemInstance = newInstance,
+                IsInBank = false
+            };
+            context.InventoryItems.Add(inventoryEntry);
+
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Healing Potion added to inventory!",
+                inventoryItemId = inventoryEntry.InventoryItemId,
+                itemName = potionTemplate.Name
+            });
         }
     }
 }

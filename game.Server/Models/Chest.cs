@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace game.Server.Models
 {
@@ -8,5 +7,6 @@ namespace game.Server.Models
         [Key]
         public int ChestId { get; set; }
         public int FloorItemId { get; set; }
+        public virtual ICollection<ItemInstance>? ItemInstances { get; set; }
     }
 }
