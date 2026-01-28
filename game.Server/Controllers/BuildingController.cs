@@ -291,51 +291,22 @@ namespace game.Server.Controllers
 
                 if (floorItem.FloorItemType == FloorItemType.Enemy && floorItem.Enemy != null)
                 {
-                    var targetEnemy = floorItem.Enemy;
-                    int diffX = Math.Abs(player.SubPositionX - request.TargetX);
-                    int diffY = Math.Abs(player.SubPositionY - request.TargetY);
-
-                    if ((diffX + diffY) > 1) return BadRequest("Enemy is too far away.");
-
-                    int damageDealt = 1;
-                    if (request.InventoryItemId.HasValue && request.InventoryItemId.Value != 0)
+                    if (player.SubPositionX == request.TargetX && player.SubPositionY == request.TargetY)
                     {
-                        var chosenItem = player.InventoryItems
-                            .FirstOrDefault(ii => ii.InventoryItemId == request.InventoryItemId.Value);
-
-                        if (chosenItem?.ItemInstance?.Item != null && chosenItem.ItemInstance.Item.ItemType == ItemTypes.Sword)
-                        {
-                            damageDealt = chosenItem.ItemInstance.Item.Damage;
-                        }
-                        else
-                        {
-                            return BadRequest("Selected item is not a sword.");
-                        }
-                    }
-
-                    targetEnemy.Health -= damageDealt;
-
-                    if (targetEnemy.Health > 0)
-                    {
+                        player.ScreenType = ScreenTypes.Fight;
                         await _context.SaveChangesAsync();
-                        return Ok(new { message = $"Hit for {damageDealt} damage!", health = targetEnemy.Health });
-                    }
 
-                    if (targetEnemy.ItemInstanceId.HasValue)
-                    {
-                        floorItem.FloorItemType = FloorItemType.Item;
-                        floorItem.ItemInstanceId = targetEnemy.ItemInstanceId;
-                        floorItem.Enemy = null;
+                        return Ok(new
+                        {
+                            message = "Entering combat!",
+                            screenType = ScreenTypes.Fight.ToString(),
+                            enemyType = floorItem.Enemy.EnemyType.ToString()
+                        });
                     }
                     else
                     {
-                        _context.FloorItems.Remove(floorItem);
+                        return BadRequest("You must step on the enemy to initiate a fight.");
                     }
-
-                    _context.Enemies.Remove(targetEnemy);
-                    await _context.SaveChangesAsync();
-
-                    return Ok(new { message = $"Defeated the {targetEnemy.EnemyType}!" });
                 }
 
                 return BadRequest("Invalid interaction.");
@@ -344,7 +315,84 @@ namespace game.Server.Controllers
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
         }
+
+        [HttpPatch("{id}/Action/use")]
+        public async Task<ActionResult> UseItem(Guid id)
+        {
+            try
+            {
+                var player = await _context.Players
+                    .Include(p => p.ActiveInventoryItem)
+                        .ThenInclude(ai => ai.ItemInstance)
+                            .ThenInclude(ii => ii.Item)
+                    .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+                if (player == null) return NotFound("Player not found.");
+
+                if (player.ScreenType != ScreenTypes.Fight)
+                {
+                    return BadRequest("You can only use items during a fight.");
+                }
+
+                var floorItem = await _context.FloorItems
+                    .Include(fi => fi.Enemy)
+                    .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
+                                               fi.PositionX == player.SubPositionX &&
+                                               fi.PositionY == player.SubPositionY);
+
+                if (floorItem?.Enemy == null)
+                {
+                    player.ScreenType = ScreenTypes.Floor;
+                    await _context.SaveChangesAsync();
+                    return BadRequest("No enemy found here.");
+                }
+
+                var targetEnemy = floorItem.Enemy;
+                int damageDealt = 1;
+                if (player.ActiveInventoryItem?.ItemInstance?.Item != null)
+                {
+                    if (player.ActiveInventoryItem.ItemInstance.Item.ItemType == ItemTypes.Sword)
+                    {
+                        damageDealt = player.ActiveInventoryItem.ItemInstance.Item.Damage;
+                    }
+                }
+
+                targetEnemy.Health -= damageDealt;
+
+                if (targetEnemy.Health > 0)
+                {
+                    await _context.SaveChangesAsync();
+                    return Ok(new
+                    {
+                        message = $"You hit the {targetEnemy.EnemyType} for {damageDealt} damage!",
+                        enemyHealth = targetEnemy.Health
+                    });
+                }
+
+                if (targetEnemy.ItemInstanceId.HasValue)
+                {
+                    floorItem.FloorItemType = FloorItemType.Item;
+                    floorItem.ItemInstanceId = targetEnemy.ItemInstanceId;
+                    floorItem.Enemy = null;
+                }
+                else
+                {
+                    _context.FloorItems.Remove(floorItem);
+                }
+
+                _context.Enemies.Remove(targetEnemy);
+                player.ScreenType = ScreenTypes.Floor;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = $"Defeated the {targetEnemy.EnemyType}!", victory = true });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+        }
+
     }
 }
