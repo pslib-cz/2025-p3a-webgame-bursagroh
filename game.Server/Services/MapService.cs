@@ -2,8 +2,8 @@
 
 public class MapGeneratorService
 {
-    private readonly Random _rng = new Random();
     public MapGeneratorService() { }
+
     public static bool IsRoad(int x, int y)
     {
         return Math.Abs(x) % 4 == 1 || Math.Abs(y) % 4 == 1;
@@ -22,7 +22,7 @@ public class MapGeneratorService
         return exits;
     }
 
-    public List<Building> GenerateMapArea(Guid playerId, int minX, int maxX, int minY, int maxY)
+    public List<Building> GenerateMapArea(Guid playerId, int minX, int maxX, int minY, int maxY, int globalSeed)
     {
         var buildings = new List<Building>();
 
@@ -30,7 +30,10 @@ public class MapGeneratorService
         {
             for (int y = minY; y <= maxY; y++)
             {
-                BuildingTypes type = DetermineBuildingType(x, y);
+                int coordinateSeed = HashCode.Combine(globalSeed, x, y);
+                Random coordRng = new Random(coordinateSeed);
+
+                BuildingTypes type = DetermineBuildingType(x, y, coordRng);
                 int absX = Math.Abs(x);
                 int absY = Math.Abs(y);
 
@@ -52,18 +55,18 @@ public class MapGeneratorService
         return buildings;
     }
 
-    public List<Floor> GenerateInterior(int buildingId, int combinedSeed, int floorCount, int totalBuildingHeight, int bX, int bY)
+    public List<Floor> GenerateInterior(int buildingId, int globalSeed, int floorCount, int totalBuildingHeight, int bX, int bY)
     {
         var floors = new List<Floor>();
+        int buildingSeed = HashCode.Combine(globalSeed, bX, bY);
 
         for (int i = 0; i < floorCount; i++)
         {
-            Random rng = new Random(combinedSeed + i);
+            Random rng = new Random(buildingSeed + i);
             bool isEvenFloor = (i % 2 == 0);
             bool isRealLastFloor = (i == totalBuildingHeight - 1);
 
             var occupiedPositions = new HashSet<string>();
-
             var floor = new Floor
             {
                 BuildingId = buildingId,
@@ -153,14 +156,11 @@ public class MapGeneratorService
         return floors;
     }
 
-    private BuildingTypes DetermineBuildingType(int x, int y)
+    private BuildingTypes DetermineBuildingType(int x, int y, Random coordRng)
     {
-        if (IsRoad(x, y))
-        {
-            return BuildingTypes.Road;
-        }
+        if (IsRoad(x, y)) return BuildingTypes.Road;
 
-        if (_rng.NextDouble() < 0.10)
+        if (coordRng.NextDouble() < 0.10)
         {
             return BuildingTypes.AbandonedTrap;
         }

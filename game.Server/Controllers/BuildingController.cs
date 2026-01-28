@@ -27,8 +27,8 @@ namespace game.Server.Controllers
         {
             try
             {
-                var playerExists = await _context.Players.AsNoTracking().AnyAsync(p => p.PlayerId == playerId);
-                if (!playerExists) return NotFound();
+                var player = await _context.Players.FindAsync(playerId);
+                if (player == null) return NotFound();
 
                 int minX = left;
                 int maxX = left + width - 1;
@@ -43,7 +43,7 @@ namespace game.Server.Controllers
                     .ToListAsync();
 
                 var mapGenerator = new MapGeneratorService();
-                var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY);
+                var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY, player.Seed);
 
                 var existingCoords = new HashSet<(int, int)>(
                     existingBuildings.Select(b => (b.PositionX, b.PositionY))
