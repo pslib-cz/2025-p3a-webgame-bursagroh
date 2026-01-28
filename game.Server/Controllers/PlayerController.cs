@@ -61,6 +61,7 @@ namespace game.Server.Controllers
                     BankBalance = 0,
                     Capacity = 10,
                     Seed = new Random().Next(),
+                    Health = 10,
 
                     PositionX = 0,
                     PositionY = 0,
@@ -541,5 +542,53 @@ namespace game.Server.Controllers
 
         }
 
+        [HttpPatch("{id}/Action/use")]
+        public async Task<ActionResult<PlayerDto>> UseActiveItem(Guid id)
+        {
+            try
+            {
+                var player = await _context.Players
+                    .Include(p => p.ActiveInventoryItem)
+                        .ThenInclude(ai => ai.ItemInstance)
+                    .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+                if (player == null) return NotFound("Player not found.");
+
+                if (player.ActiveInventoryItemId == null || player.ActiveInventoryItem == null)
+                {
+                    return BadRequest("You aren't holding anything to use.");
+                }
+
+                var activeItem = player.ActiveInventoryItem;
+
+                if (activeItem.ItemInstance.ItemId == 40)
+                {
+                    if (player.Health >= 20)
+                    {
+                        return BadRequest("You are already at full health!");
+                    }
+
+                    player.Health = Math.Min(20, player.Health + 5);
+                    var instanceToDelete = activeItem.ItemInstance;
+                    player.ActiveInventoryItemId = null;
+
+                    _context.InventoryItems.Remove(activeItem);
+                    _context.ItemInstances.Remove(instanceToDelete);
+                }
+                else
+                {
+                    return BadRequest($"The {activeItem.ItemInstance.ItemId} is not a consumable item.");
+                }
+
+                await _context.SaveChangesAsync();
+
+                var dto = _mapper.Map<PlayerDto>(player);
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }

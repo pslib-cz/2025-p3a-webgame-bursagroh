@@ -181,5 +181,55 @@ namespace game.Server.Controllers
             await context.SaveChangesAsync();
             return Ok(player);
         }
+
+        [HttpPost("{id}/SpawnHealingPotion")]
+        public async Task<ActionResult> GiveHealingPotion(Guid id)
+        {
+            // 1. Fetch player and check existence
+            var player = await context.Players
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found.");
+
+            if (player.InventoryItems.Count >= player.Capacity)
+            {
+                return BadRequest("Inventory is full.");
+            }
+
+
+            var potionTemplate = await context.Items
+                .FirstOrDefaultAsync(i => i.ItemId == 40);
+
+            if (potionTemplate == null)
+            {
+                return BadRequest("Healing Potion template (ID 40) not found in database.");
+            }
+
+            var newInstance = new ItemInstance
+            {
+                ItemId = potionTemplate.ItemId,
+                Durability = potionTemplate.MaxDurability
+            };
+            context.ItemInstances.Add(newInstance);
+
+            var inventoryEntry = new InventoryItem
+            {
+                PlayerId = id,
+                ItemInstance = newInstance,
+                IsInBank = false
+            };
+            context.InventoryItems.Add(inventoryEntry);
+
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Healing Potion added to inventory!",
+                inventoryItemId = inventoryEntry.InventoryItemId,
+                itemName = potionTemplate.Name
+            });
+        }
     }
 }

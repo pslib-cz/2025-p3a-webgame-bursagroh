@@ -39,9 +39,9 @@ namespace game.Server.Models
         public int Capacity { get; set; } = 20;
         public int Seed { get; set; } = 0;
 
-        public int Health { get; set; } = 100;
+        public int Health { get; set; } = 20;
 
-            [JsonIgnore]
+        [JsonIgnore]
         public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
 
         public int? ActiveInventoryItemId { get; set; }
