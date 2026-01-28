@@ -18,6 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<MineService>();
 builder.Services.AddSingleton<MapGeneratorService>();
+builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
+
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend",

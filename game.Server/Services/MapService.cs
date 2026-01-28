@@ -88,7 +88,11 @@ public class MapGeneratorService
             else
             {
                 var exits = GetExitCoordinates(bX, bY);
-                foreach (var exit in exits) occupiedPositions.Add($"{exit.x},{exit.y}");
+                foreach (var exit in exits)
+                {
+                    occupiedPositions.Add($"{exit.x},{exit.y}");
+                }
+                    
             }
 
             if (!isRealLastFloor)
