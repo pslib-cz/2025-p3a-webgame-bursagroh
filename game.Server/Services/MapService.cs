@@ -2,10 +2,27 @@
 
 public class MapGeneratorService
 {
-    private readonly Random _rng = new Random();
     public MapGeneratorService() { }
 
-    public List<Building> GenerateMapArea(Guid playerId, int minX, int maxX, int minY, int maxY)
+    public static bool IsRoad(int x, int y)
+    {
+        return Math.Abs(x) % 4 == 1 || Math.Abs(y) % 4 == 1;
+    }
+
+    public static List<(int x, int y)> GetExitCoordinates(int bX, int bY)
+    {
+        var exits = new List<(int x, int y)>();
+
+        if (IsRoad(bX, bY - 1)) { exits.Add((3, 0)); exits.Add((4, 0)); }
+        if (IsRoad(bX, bY + 1)) { exits.Add((3, 7)); exits.Add((4, 7)); }
+        if (IsRoad(bX - 1, bY)) { exits.Add((0, 3)); exits.Add((0, 4)); }
+        if (IsRoad(bX + 1, bY)) { exits.Add((7, 3)); exits.Add((7, 4)); }
+        if (exits.Count == 0) exits.Add((0, 0));
+
+        return exits;
+    }
+
+    public List<Building> GenerateMapArea(Guid playerId, int minX, int maxX, int minY, int maxY, int globalSeed)
     {
         var buildings = new List<Building>();
 
@@ -13,7 +30,10 @@ public class MapGeneratorService
         {
             for (int y = minY; y <= maxY; y++)
             {
-                BuildingTypes type = DetermineBuildingType(x, y);
+                int coordinateSeed = HashCode.Combine(globalSeed, x, y);
+                Random coordRng = new Random(coordinateSeed);
+
+                BuildingTypes type = DetermineBuildingType(x, y, coordRng);
                 int absX = Math.Abs(x);
                 int absY = Math.Abs(y);
 
@@ -35,19 +55,18 @@ public class MapGeneratorService
         return buildings;
     }
 
-    public List<Floor> GenerateInterior(int buildingId, int combinedSeed, int floorCount, int totalBuildingHeight)
+    public List<Floor> GenerateInterior(int buildingId, int globalSeed, int floorCount, int totalBuildingHeight, int bX, int bY)
     {
         var floors = new List<Floor>();
+        int buildingSeed = HashCode.Combine(globalSeed, bX, bY);
 
         for (int i = 0; i < floorCount; i++)
         {
-            Random rng = new Random(combinedSeed + i);
-
-            bool isFirstFloor = (i == 0);
+            Random rng = new Random(buildingSeed + i);
+            bool isEvenFloor = (i % 2 == 0);
             bool isRealLastFloor = (i == totalBuildingHeight - 1);
 
             var occupiedPositions = new HashSet<string>();
-
             var floor = new Floor
             {
                 BuildingId = buildingId,
@@ -55,29 +74,45 @@ public class MapGeneratorService
                 FloorItems = new List<FloorItem>()
             };
 
-            (int x, int y) GetFreePos()
-            {
-                int nx, ny;
-                do
-                {
-                    nx = rng.Next(0, 8);
-                    ny = rng.Next(0, 8);
-                } while (occupiedPositions.Contains($"{nx},{ny}"));
+            int downX = isEvenFloor ? 2 : 5;
+            int upX = isEvenFloor ? 5 : 2;
+            int stairY = 2;
 
-                occupiedPositions.Add($"{nx},{ny}");
-                return (nx, ny);
+            occupiedPositions.Add($"{downX},{stairY}");
+            occupiedPositions.Add($"{upX},{stairY}");
+
+            if (i > 0)
+            {
+                floor.FloorItems.Add(new FloorItem { PositionX = downX, PositionY = stairY, FloorItemType = FloorItemType.Stair });
             }
-
-            if (!isFirstFloor)
+            else
             {
-                floor.FloorItems.Add(new FloorItem { PositionX = 2, PositionY = 2, FloorItemType = FloorItemType.Stair });
-                occupiedPositions.Add("2,2");
+                var exits = GetExitCoordinates(bX, bY);
+                foreach (var exit in exits)
+                {
+                    occupiedPositions.Add($"{exit.x},{exit.y}");
+                }
+                    
             }
 
             if (!isRealLastFloor)
             {
-                floor.FloorItems.Add(new FloorItem { PositionX = 5, PositionY = 2, FloorItemType = FloorItemType.Stair });
-                occupiedPositions.Add("5,2");
+                floor.FloorItems.Add(new FloorItem { PositionX = upX, PositionY = stairY, FloorItemType = FloorItemType.Stair });
+            }
+
+            (int x, int y) GetFreePos()
+            {
+                int nx, ny;
+                int attempts = 0;
+                do
+                {
+                    nx = rng.Next(0, 8);
+                    ny = rng.Next(0, 8);
+                    attempts++;
+                } while (occupiedPositions.Contains($"{nx},{ny}") && attempts < 100);
+
+                occupiedPositions.Add($"{nx},{ny}");
+                return (nx, ny);
             }
 
             int chestCount = rng.Next(1, 4);
@@ -93,6 +128,7 @@ public class MapGeneratorService
                 });
             }
 
+            int enemyCount = isRealLastFloor ? rng.Next(1, 3) : rng.Next(2, 5);
             if (isRealLastFloor)
             {
                 var pos = GetFreePos();
@@ -105,14 +141,11 @@ public class MapGeneratorService
                 });
             }
 
-            int enemyCount = isRealLastFloor ? rng.Next(1, 3) : rng.Next(2, 5);
             var randomEnemyPool = Enum.GetValues<EnemyType>().Where(t => t != EnemyType.Dragon).ToList();
-
             for (int e = 0; e < enemyCount; e++)
             {
                 var pos = GetFreePos();
                 var selectedType = randomEnemyPool[rng.Next(randomEnemyPool.Count)];
-
                 floor.FloorItems.Add(new FloorItem
                 {
                     PositionX = pos.x,
@@ -124,18 +157,14 @@ public class MapGeneratorService
 
             floors.Add(floor);
         }
-
         return floors;
     }
 
-    private BuildingTypes DetermineBuildingType(int x, int y)
+    private BuildingTypes DetermineBuildingType(int x, int y, Random coordRng)
     {
-        if (Math.Abs(x) % 4 == 1 || Math.Abs(y) % 4 == 1)
-        {
-            return BuildingTypes.Road;
-        }
+        if (IsRoad(x, y)) return BuildingTypes.Road;
 
-        if (_rng.NextDouble() < 0.10)
+        if (coordRng.NextDouble() < 0.10)
         {
             return BuildingTypes.AbandonedTrap;
         }

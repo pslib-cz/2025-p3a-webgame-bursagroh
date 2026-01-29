@@ -1,4 +1,6 @@
-﻿using game.Server.Data;
+﻿using AutoMapper;
+using game.Server.Data;
+using game.Server.DTOs;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,51 +12,61 @@ namespace game.Server.Controllers
     [Route("api/[controller]")]
     public class RecipeController : ControllerBase
     {
-        private readonly ApplicationDbContext context;
+        private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public RecipeController(ApplicationDbContext context)
+        public RecipeController(ApplicationDbContext context, IMapper mapper)
         {
-            this.context = context;
+            _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Recipe>>> GetAllRecipes()
+        public async Task<ActionResult<List<RecipeDto>>> GetAllRecipes()
         {
-            List<Recipe> recipes = await context.Recipes.Include(r => r.Ingrediences).ToListAsync();
+            var recipes = await _context.Recipes
+                .Include(r => r.Ingrediences)
+                .ToListAsync();
 
-            if (recipes == null || recipes.Count == 0)
+            if (recipes == null || !recipes.Any())
             {
                 return NoContent();
             }
 
-            return Ok(recipes);
+            var recipeDtos = _mapper.Map<List<RecipeDto>>(recipes);
+
+            return Ok(recipeDtos);
         }
 
         [HttpGet("Random")]
-        public async Task<ActionResult<List<Recipe>>> GetRandomRecipe()
+        public async Task<ActionResult> GetRandomRecipe()
         {
-            List<Recipe> recipes = await context.Recipes.Include(r => r.Ingrediences).ToListAsync();
+            var recipes = await _context.Recipes.ToListAsync();
 
             if (recipes == null || recipes.Count == 0)
             {
                 return NoContent();
             }
 
-            Recipe? randomRecipe = recipes.OrderBy(r => Guid.NewGuid()).FirstOrDefault();
-            return Ok(randomRecipe);
+            var randomRecipe = recipes.OrderBy(r => Guid.NewGuid()).FirstOrDefault();
+
+            return Ok(new[]
+            {
+                new { name = randomRecipe?.Name }
+            });
         }
 
         [HttpPatch("{recipeId}/Action/start")]
         public async Task<ActionResult> StartRecipe(int recipeId, [FromBody] StartRecipeRequest request)
         {
-            var recipeExists = await context.Recipes.AnyAsync(r => r.RecipeId == recipeId);
+            var recipeExists = await _context.Recipes.AnyAsync(r => r.RecipeId == recipeId);
 
             if (!recipeExists)
             {
                 return NotFound("Recept nenalezen.");
             }
 
-            var activeRecipeTime = await context.RecipeTimes
+            var activeRecipeTime = await _context.RecipeTimes
                 .FirstOrDefaultAsync(rt => rt.RecipeId == recipeId
                                         && rt.PlayerId == request.PlayerId
                                         && rt.EndTime == null); 
@@ -71,8 +83,8 @@ namespace game.Server.Controllers
                 EndTime = null
             };
 
-            context.RecipeTimes.Add(newRecipeTime);
-            await context.SaveChangesAsync();
+            _context.RecipeTimes.Add(newRecipeTime);
+            await _context.SaveChangesAsync();
 
 
             return NoContent();
@@ -81,7 +93,7 @@ namespace game.Server.Controllers
         [HttpPatch("{recipeId}/Action/end")]
         public async Task<ActionResult> EndRecipe(int recipeId, [FromBody] EndRecipeRequest request)
         {
-            Recipe? recipe = await context.Recipes
+            Recipe? recipe = await _context.Recipes
                 .Include(r => r.Ingrediences)
                 .FirstOrDefaultAsync(r => r.RecipeId == recipeId);
 
@@ -107,7 +119,7 @@ namespace game.Server.Controllers
                 return BadRequest("mas to spatne");
             }
 
-            RecipeTime? activeRecipeTime = await context.RecipeTimes
+            RecipeTime? activeRecipeTime = await _context.RecipeTimes
                 .Where(rt => rt.RecipeId == recipeId && rt.PlayerId == request.PlayerId)
                 .OrderByDescending(rt => rt.StartTime)
                 .FirstOrDefaultAsync(rt => rt.EndTime == null); 
@@ -119,16 +131,16 @@ namespace game.Server.Controllers
 
             DateTime endTime = DateTime.UtcNow;
             activeRecipeTime.EndTime = endTime;
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             TimeSpan? duration = activeRecipeTime.EndTime - activeRecipeTime.StartTime;
 
-            Player? player = await context.Players.FindAsync(request.PlayerId);
+            Player? player = await _context.Players.FindAsync(request.PlayerId);
             if (player != null)
             {
 
                 player.Money += 20;
-                await context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
             }
 
             return Ok(new 
@@ -138,24 +150,10 @@ namespace game.Server.Controllers
             });
         }
 
-        [HttpGet("AllTimes")]
-        public async Task<ActionResult<List<RecipeTime>>> GetAllRecipeTimes()
-        {
-
-            var recipeTimes = await context.RecipeTimes.ToListAsync();
-
-            if (recipeTimes == null || recipeTimes.Count == 0)
-            {
-                return NoContent();
-            }
-
-            return Ok(recipeTimes);
-        }
-
         [HttpGet("Leaderboard")]
         public async Task<ActionResult<List<RecipeTime>>> GetRecipeLeaderboard()
         {
-            List<RecipeTime> completedTimes = await context.RecipeTimes
+            List<RecipeTime> completedTimes = await _context.RecipeTimes
                 .Where(rt => rt.EndTime > rt.StartTime)
                 .ToListAsync();
 

@@ -104,7 +104,7 @@ const Floor = ({player, building, level}: {player: PlayerType, building: Buildin
                             const targetFloorId = item.positionX > 3 ? floorAbove.data?.floorId : floorBelow.data?.floorId
 
                             return (
-                                <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType='stair' targetLevel={targetLevel} targetFloorId={targetFloorId} />
+                                <Tile z-index={100} key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType='stair' targetLevel={targetLevel} targetFloorId={targetFloorId} />
                             )
                         }
 

@@ -10,6 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<MineService>();
 builder.Services.AddSingleton<MapGeneratorService>();
+builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
+
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend",
