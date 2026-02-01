@@ -9,9 +9,11 @@ import styles from "./game.module.css"
 import NavBar from "../../components/NavBar"
 import Inventory from "../../components/Inventory"
 import PlayerUI from "../../components/PlayerUI"
+import GameProviders from "../../providers/game"
+import Map from "../../components/Map"
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const screenTypeToURL = (screenType: ScreenType, level: number | undefined) => {
+export const screenTypeToURL = (screenType: ScreenType) => {
     switch (screenType) {
         case "City":
             return "/game/city"
@@ -24,9 +26,11 @@ export const screenTypeToURL = (screenType: ScreenType, level: number | undefine
         case "Blacksmith":
             return "/game/blacksmith"
         case "Floor":
-            return `/game/floor/${level}`
+            return `/game/floor`
         case "Fight":
             return "/game/fight"
+        case "Fountain":
+            return "/game/fountain"
     }
 }
 
@@ -44,7 +48,7 @@ const ProperScreenChecker = () => {
     }
 
     if (isSuccess) {
-        if (screenTypeToURL(data.screenType, data.floor?.level) != location.pathname) {
+        if (screenTypeToURL(data.screenType) != location.pathname) {
             return <WrongScreen />
         }
 
@@ -60,16 +64,19 @@ const Game = () => {
     }
 
     return (
-        <div className={styles.container}>
-            <NavBar />
-            <div className={styles.innerContainer}>
-                <ProperScreenChecker />
-                <div className={styles.uiContainer}>
-                    <PlayerUI />
-                    <Inventory />
+        <GameProviders>
+            <div className={styles.container}>
+                <Map />
+                <NavBar />
+                <div className={styles.innerContainer}>
+                    <ProperScreenChecker />
+                    <div className={styles.uiContainer}>
+                        <PlayerUI />
+                        <Inventory />
+                    </div>
                 </div>
             </div>
-        </div>
+        </GameProviders>
     )
 }
 

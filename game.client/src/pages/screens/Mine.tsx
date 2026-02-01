@@ -11,7 +11,7 @@ import type { TileType } from "../../types"
 import { MineIdContext } from "../../providers/MineIdProvider"
 import Asset from "../../components/SVG/Asset"
 
-const chunkSize = 16
+const chunkSize = 8
 const viewDistanceInChunks = 2
 
 const getLayerList = (playerPositionY: number, viewDistanceInChunks: number, chunkSize: number): Array<number> => {

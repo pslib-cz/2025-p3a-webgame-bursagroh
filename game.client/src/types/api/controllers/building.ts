@@ -29,6 +29,15 @@ export interface APIGetBuildingFloor extends GenericGET {
     }
 }
 
+export interface APIGetFloor extends GenericGET {
+    params: {
+        floorId: number
+    }
+    res: {
+        200: Floor
+    }
+}
+
 export interface APIInteractInBuilding extends GenericPATCH {
     params: {
         playerId: string

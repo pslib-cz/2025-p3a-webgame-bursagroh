@@ -14,6 +14,7 @@ import FightScreen from "./pages/screens/Fight.tsx"
 import MineScreen from "./pages/screens/Mine.tsx"
 import RestaurantScreen from "./pages/screens/Restaurant.tsx"
 import FloorScreen from "./pages/screens/Floor.tsx"
+import FountainScreen from "./pages/screens/Fountain.tsx"
 
 const router = createBrowserRouter([
     {
@@ -56,8 +57,12 @@ const router = createBrowserRouter([
                         Component: RestaurantScreen
                     },
                     {
-                        path: "floor/:level",
+                        path: "floor",
                         Component: FloorScreen
+                    },
+                    {
+                        path: "fountain",
+                        Component: FountainScreen
                     }
                 ]
             }

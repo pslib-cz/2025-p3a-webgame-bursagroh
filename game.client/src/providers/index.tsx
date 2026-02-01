@@ -12,7 +12,7 @@ const Providers: React.FC<React.PropsWithChildren> = ({ children }) => {
     return (
         <>
             <QueryProvider>
-                {providers.reduce(
+                {providers.reduceRight(
                     (acc, Provider) => (
                         <Provider>{acc}</Provider>
                     ),

@@ -7,6 +7,7 @@ export interface APIBankInventory extends GenericGET {
     }
     res: {
         200: Array<InventoryItem>
+        204: []
     }
 }
 

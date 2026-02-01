@@ -1,41 +1,35 @@
-import type { Floor } from "./building"
-
-export type ScreenType = "City" | "Bank" | "Mine" | "Restaurant" | "Blacksmith" | "Floor" | "Fight"
+export type ScreenType = "City" | "Bank" | "Mine" | "Restaurant" | "Blacksmith" | "Floor" | "Fight" | "Fountain"
 
 export type Player = {
-    playerId: string,
-    name: string,
-    money: number,
-    bankBalance: number,
-    screenType: ScreenType,
-    positionX: number,
-    positionY: number,
-    subPositionX: number,
-    subPositionY: number,
-    floorId: number | null,
-    floor: Floor | null,
-    capacity: number,
-    seed: number
+    playerId: string
+    name: string
+    money: number
+    bankBalance: number
+    screenType: ScreenType
+    positionX: number
+    positionY: number
+    subPositionX: number
+    subPositionY: number
+    floorId: number | null
+    mineId: number | null
+    activeInventoryItemId: number | null
+    capacity: number
+    health: number
 }
 
 export type InventoryItem = {
-    inventoryItemId: number,
-    playerId: string,
-    itemInstanceId: number,
-    isInBank: boolean,
+    inventoryItemId: number
     itemInstance: {
-      itemInstanceId: number,
-      itemId: number,
-      durability: number,
-      item: {
-        itemId: number,
-        name: string,
-        description: string,
-        itemType: number,
-        weight: number,
-        damage: number,
-        maxDurability: number,
-        changeOfGenerating: number
-      }
+        itemInstanceId: number
+        durability: number
+        item: {
+            itemId: number
+            name: string
+            description: string
+            itemType: string
+            weight: number
+            damage: number
+            maxDurability: number
+        }
     }
 }

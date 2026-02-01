@@ -1,10 +1,12 @@
-import React from "react"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import React, { type JSX } from "react"
+import { useMutation } from "@tanstack/react-query"
 import { updatePlayerScreenMutation } from "../../api/player"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
-import { endRecipeMutation, getRandomRecipeMutation, getRecipesQuery, startRecipeMutation } from "../../api/recipe"
+import { endRecipeMutation, getRandomRecipeMutation, startRecipeMutation } from "../../api/recipe"
 import type { IngredienceType, Recipe } from "../../types/api/models/recipe"
 import { useNavigate } from "react-router"
+import { RecipesContext } from "../../providers/game/RecipesProvider"
+import Burger from "../../components/Burger"
 
 const RestaurantScreen = () => {
     const navigate = useNavigate()
@@ -19,7 +21,7 @@ const RestaurantScreen = () => {
     const [currentBurgerStack, setCurrentBurgerStack] = React.useState<Array<IngredienceType>>([])
     const [currentBurger, setCurrentBurger] = React.useState<Recipe>()
 
-    const recipes = useQuery(getRecipesQuery())
+    const recipes = React.useContext(RecipesContext)!.recipes!
 
     const handleClose = async () => {
         await updatePlayerScreenAsync()
@@ -48,57 +50,55 @@ const RestaurantScreen = () => {
         setCurrentBurgerStack(prev => [...prev, ingredienceType])
     }
 
-    if (recipes.isLoading) {
-        return <div>Loading...</div>
-    }
-
-    if (recipes.isError) {
-        return <div>Error loading recipes</div>
-    }
-
-    if (recipes.isSuccess) {
-        if (isMaking) {
-            return (
-                <>
-                    <div>Restaurant</div>
-                    <p>Make this: {currentBurger?.name}</p>
-                    <button onClick={handleStop}>finish</button>
-                    <button onClick={() => addIngredience("BunDown")}>Add Bun Down</button>
-                    <button onClick={() => addIngredience("Meat")}>Add Meat</button>
-                    <button onClick={() => addIngredience("Cheese")}>Add Cheese</button>
-                    <button onClick={() => addIngredience("Salad")}>Add Salad</button>
-                    <button onClick={() => addIngredience("Tomato")}>Add Tomato</button>
-                    <button onClick={() => addIngredience("Bacon")}>Add Bacon</button>
-                    <button onClick={() => addIngredience("Sauce")}>Add Sauce</button>
-                    <button onClick={() => addIngredience("BunUp")}>Add Bun Up</button>
-                    <button onClick={() => setCurrentBurgerStack([])}>Clear</button>
-                    {currentBurgerStack.map((ingredience, index) => (
-                        <div key={index}>
-                            {index + 1}. {ingredience}
-                        </div>
-                    ))}
-                </>
-            )
-        }
-
-        return (
-            <>
-                <div>Restaurant</div>
+    let cookingSection: JSX.Element | null = null
+    if (isMaking) {
+        cookingSection = (
+            <div>
+                <span>time</span>
+                <Burger burger={{recipeId: currentBurger?.recipeId ?? -1, name: currentBurger?.name ?? "", ingrediences: currentBurgerStack.map((ingredienceType, index) => ({order: index, ingredienceType}))}} />
+                <button onClick={handleStop}>finish</button>
+                <button onClick={() => addIngredience("BunDown")}>Add Bun Down</button>
+                <button onClick={() => addIngredience("Meat")}>Add Meat</button>
+                <button onClick={() => addIngredience("Cheese")}>Add Cheese</button>
+                <button onClick={() => addIngredience("Salad")}>Add Salad</button>
+                <button onClick={() => addIngredience("Tomato")}>Add Tomato</button>
+                <button onClick={() => addIngredience("Bacon")}>Add Bacon</button>
+                <button onClick={() => addIngredience("Sauce")}>Add Sauce</button>
+                <button onClick={() => addIngredience("BunUp")}>Add Bun Up</button>
+                <button onClick={() => setCurrentBurgerStack([])}>Clear</button>
+            </div>
+        )
+    } else {
+        cookingSection = (
+            <div>
                 <button onClick={handleStart}>make burger</button>
-                <button onClick={handleClose}>close</button>
-                {recipes.data.map((recipe) => (
-                    <div key={recipe.recipeId}>
-                        <p>{recipe.name}</p>
-                        {recipe.ingrediences.sort((a, b) => a.order - b.order).map((ingredience, index) => (
-                            <div key={index}>
-                                {ingredience.order}. {ingredience.ingredienceType}
-                            </div>
-                        ))}
-                    </div>
-                ))}
-            </>
+            </div>
         )
     }
+
+    return (
+        <div>
+            <div>
+                <span>Recipes</span>
+                <span>Leaderboard</span>
+                {recipes.map((recipe) => (
+                    <div key={recipe.recipeId}>
+                        <Burger burger={recipe} />
+                        <div>
+                            <span>1. Player1 - 10</span>
+                            <span>2. Anonym - 8</span>
+                            <span>3. Player3 - 5</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <div>
+                <span>Cooking</span>
+                <button onClick={handleClose}>close</button>
+                {cookingSection}
+            </div>
+        </div>
+    )
 }
 
 export default RestaurantScreen

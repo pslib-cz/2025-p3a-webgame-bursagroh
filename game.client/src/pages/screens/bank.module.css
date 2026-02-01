@@ -1,0 +1,63 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.bankContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 0.5rem;
+    position: relative;
+    background-color: var(--darker);
+    margin-top: 1rem;
+}
+
+.heading {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+    text-align: center;
+}
+
+.transferContainer {
+    display: flex;
+    align-items: center;
+    background-color: var(--dark);
+    padding: 0.5rem;
+    gap: 1rem;
+}
+
+.transferSubContainer {
+    display: flex;
+    align-items: center;
+}
+
+.itemContainer {
+    background-color: var(--dark);
+    padding: 1rem;
+}
+
+.close {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    fill: var(--light);
+}
+
+.money {
+    fill: var(--light);
+}
+
+.balance {
+    color: var(--light);
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+}

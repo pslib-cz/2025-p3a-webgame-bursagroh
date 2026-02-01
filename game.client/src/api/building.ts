@@ -13,6 +13,12 @@ export const getBuildingFloorQuery = (playerId: string, buildingId: number, leve
         queryFn: () => api.get("/api/Building/{buildingId}/Interior/{level}", {buildingId, level}, {playerId}),
     })
 
+export const getFloorQuery = (playerId: string, floorId: number) =>
+    queryOptions({
+        queryKey: [playerId, "floor", floorId],
+        queryFn: () => api.get("/api/Building/Floor/{floorId}", {floorId}, {}),
+    })
+
 export const interactInBuildingMutation = (playerId: string, buildingId: number, level: number, inventoryItemId: number, targetX: number, targetY: number) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Building/{playerId}/Action/interact", { playerId }, {}, { inventoryItemId, targetX, targetY }),

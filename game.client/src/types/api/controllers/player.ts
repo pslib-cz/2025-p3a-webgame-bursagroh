@@ -78,3 +78,15 @@ export interface APIPlayerItemDrop extends GenericPATCH {
         200: object
     }
 }
+
+export interface APIPlayerItemEquip extends GenericPATCH {
+    params: {
+        playerId: string
+    }
+    body: {
+        inventoryItemId: number
+    }
+    res: {
+        200: object
+    }
+}

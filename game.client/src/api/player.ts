@@ -66,3 +66,11 @@ export const dropItemMutation = (playerId: string, mineId: number, buildingId: n
             queryClient.invalidateQueries({queryKey: [playerId, "building", buildingId, level]})
         },
     })
+
+export const equipItemMutation = (playerId: string) =>
+    mutationOptions({
+        mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/set-active-item", { playerId }, {}, { inventoryItemId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+        },
+    })

@@ -1,0 +1,49 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.fountainContainer {
+    background-color: var(--darker);
+    margin-top: 1rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.25rem;
+}
+
+.heading {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
+
+.close {
+    fill: var(--light);
+}
+
+.transferContainer {
+    background-color: var(--dark);
+    padding: 0.5rem;
+}
+
+.transferText {
+    color: var(--light);
+    font-size: var(--h4);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+}

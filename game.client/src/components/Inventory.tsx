@@ -1,21 +1,25 @@
 import React from 'react'
-import { PlayerIdContext } from "../providers/PlayerIdProvider"
-import { /*useMutation,*/ useQuery } from "@tanstack/react-query"
-import { /*dropItemMutation,*/ getPlayerInventoryQuery, getPlayerQuery } from "../api/player"
 // import { MineIdContext } from "../providers/MineIdProvider"
 // import { BuildingIdContext } from "../providers/BuildingIdProvider"
 // import { LayerContext } from "../providers/LayerProvider"
 import styles from "./inventory.module.css"
 import CloseIcon from '../assets/icons/CloseIcon'
-import Item from './Item'
+import InventoryItem from './item/InventoryItem'
+import { countInventoryItems, removeEquippedItemFromInventory } from '../utils/inventory'
+import { PlayerContext } from '../providers/game/PlayerProvider'
+import { InventoryContext } from '../providers/game/InventoryProvider'
+import { IsOpenInventoryContext } from '../providers/game/IsOpenInventoryProvider'
+import ConditionalDisplay from './wrappers/ConditionalDisplay'
 
 const Inventory = () => {
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
     // const mineId = React.useContext(MineIdContext)!.mineId
     // const buildingId = React.useContext(BuildingIdContext)!.buildingId
     // const layer = React.useContext(LayerContext)!.layer
-    const player = useQuery(getPlayerQuery(playerId))
-    const inventory = useQuery(getPlayerInventoryQuery(playerId))
+
+
+    const player = React.useContext(PlayerContext)!.player!
+    const inventory = React.useContext(InventoryContext)!.inventory!
+    const {isOpen} = React.useContext(IsOpenInventoryContext)!
 
     // const {mutateAsync: dropItemAsync} = useMutation(dropItemMutation(playerId, mineId ?? -1, buildingId ?? -1, layer ?? -1))
 
@@ -23,29 +27,24 @@ const Inventory = () => {
     //     await dropItemAsync(inventoryItemId)
     // }
 
-    if (player.isError || inventory.isError) {
-        return <div>Error</div>
-    }
+    const updatedInventory = removeEquippedItemFromInventory([...inventory], player.activeInventoryItemId)
+    const inventoryItems = countInventoryItems(updatedInventory)
 
-    if (player.isPending || inventory.isPending) {
-        return <div>Loading...</div>
-    }
-
-    if (player.isSuccess && inventory.isSuccess) {
-        return (
+    return (
+        <ConditionalDisplay condition={isOpen}>
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <h3 className={styles.heading}>Inventory</h3>
+                    <span className={styles.heading}>Inventory</span>
                     <CloseIcon className={styles.close} width={24} height={24} />
                 </div>
                 <div className={styles.itemContainer}>
-                    {inventory.data.map((item) => (
-                        <Item item={item} key={item.inventoryItemId} />
+                    {Object.entries(inventoryItems).map(([itemId, count]) => (
+                        <InventoryItem item={updatedInventory.find(item => item.itemInstance.item.itemId === Number(itemId))!} count={count} key={itemId} />
                     ))}
                 </div>
             </div>
-        )
-    }
+        </ConditionalDisplay>
+    )
 }
 
 export default Inventory

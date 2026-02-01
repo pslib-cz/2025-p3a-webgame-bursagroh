@@ -59,3 +59,8 @@ export type AssetProps = {
 export type FloorPathParams = {
     level: string
 }
+
+export type ChunkCoords = {
+    x: number,
+    y: number
+}

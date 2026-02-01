@@ -4,7 +4,7 @@ import { api, queryClient } from "."
 export const getBankInventoryQuery = (playerId: string) =>
     queryOptions({
         queryKey: [playerId, "bank"],
-        queryFn: () => api.get("/api/Bank/{playerId}", { playerId }, {}),
+        queryFn: () => api.getWith204("/api/Bank/{playerId}", { playerId }, {}),
     })
 
 export const moveBankItemMutation = (playerId: string, inventoryItemId: number) =>
