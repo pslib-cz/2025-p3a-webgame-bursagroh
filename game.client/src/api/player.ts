@@ -4,7 +4,7 @@ import type { ScreenType } from "../types/api/models/player"
 
 export const generatePlayerMutation = (playerName?: string) =>
     mutationOptions({
-        mutationFn: () => api.post("/api/Player/generate", {}, {}, { name: playerName || "" }),
+        mutationFn: () => api.post("/api/Player/Generate", {}, {}, { name: playerName || "" }),
         onSuccess(data) {
             queryClient.setQueryData([data.playerId, "player"], data)
         },

@@ -1,8 +1,8 @@
 import type { APIBankInventory, APIBankItemMove, APIBankMoneyTransfer } from "./controllers/bank"
 import type { APIBuyBlueprint, APICraftBlueprint, APIGetBlueprints, APIGetPlayerBlueprints } from "./controllers/blueprint"
-import type { APIGetBuildingFloor, APIGetBuildings, APIGetFloor, APIInteractInBuilding } from "./controllers/building"
+import type { APIGetBuildings, APIGetFloor } from "./controllers/building"
 import type { APIGenerateMine, APIGetMineItems, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
-import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerItemDrop, APIPlayerItemEquip, APIPlayerItemPick, APIPlayerMove, APIPlayerMoveScreen } from "./controllers/player"
+import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerItemDrop, APIPlayerItemEquip, APIPlayerItemPick, APIPlayerMove, APIPlayerMoveScreen, APIPlayerUse } from "./controllers/player"
 import type { APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
 
 export type StringifyAble = string | number
@@ -66,9 +66,8 @@ export interface API extends GenericAPI {
     get: {
         "/api/Player/{playerId}": APIPlayerGetById
         "/api/Player/{playerId}/Inventory": APIPlayerInventory
-        "/api/Bank/{playerId}": APIBankInventory
-        "/api/Building/{playerId}": APIGetBuildings
-        "/api/Building/{buildingId}/Interior/{level}": APIGetBuildingFloor
+        "/api/Bank/Inventory": APIBankInventory
+        "/api/Building": APIGetBuildings
         "/api/Building/Floor/{floorId}": APIGetFloor
         "/api/Mine/{mineId}/Layer/{layer}": APIGetMineLayer
         "/api/Mine/{mineId}/Layers": APIGetMineLayers
@@ -79,8 +78,8 @@ export interface API extends GenericAPI {
         "/api/Blueprint/Player/{playerId}": APIGetPlayerBlueprints
     }
     post: {
-        "/api/Player/generate": APIPlayerGenerate
-        "/api/Mine/Generate": APIGenerateMine
+        "/api/Player/Generate": APIPlayerGenerate
+        "/api/Mine/Regenerate": APIGenerateMine
     }
     put: {
 
@@ -90,20 +89,20 @@ export interface API extends GenericAPI {
         "/api/Player/{playerId}/Action/move-screen": APIPlayerMoveScreen
         "/api/Player/{playerId}/Action/pick": APIPlayerItemPick
         "/api/Player/{playerId}/Action/drop": APIPlayerItemDrop
-        "/api/Bank/{playerId}/Action/move": APIBankItemMove
-        "/api/Bank/{playerId}/Action/transfer": APIBankMoneyTransfer
-        "/api/Mine/{playerId}/Action/mine": APIMineMine
-        "/api/Mine/{playerId}/Action/buy": APIMineRent
+        "/api/Bank/Action/move": APIBankItemMove
+        "/api/Bank/Action/transfer": APIBankMoneyTransfer
+        "/api/Mine/{mineId}/Action/mine": APIMineMine
+        "/api/Mine/Action/buy": APIMineRent
         "/api/Recipe/{recipeId}/Action/start": APIRecipeStart
         "/api/Recipe/{recipeId}/Action/end": APIRecipeEnd
         "/api/Blueprint/{blueprintId}/Action/buy": APIBuyBlueprint
         "/api/Blueprint/{blueprintId}/Action/craft": APICraftBlueprint
-        "/api/Building/{playerId}/Action/interact": APIInteractInBuilding
         "/api/Player/{playerId}/Action/set-active-item": APIPlayerItemEquip
+        "/api/Player/{playerId}/Action/use": APIPlayerUse
     }
     delete: {
 
     }
 }
 
-export type NoContentURL = "/api/Player/{playerId}/Inventory" | "/api/Bank/{playerId}"
+export type NoContentURL = "/api/Player/{playerId}/Inventory" | "/api/Bank/Inventory"

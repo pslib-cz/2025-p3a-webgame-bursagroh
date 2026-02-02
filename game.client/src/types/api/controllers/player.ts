@@ -36,7 +36,6 @@ export interface APIPlayerMove extends GenericPATCH {
     body: {
         newPositionX: number
         newPositionY: number
-        newFloorId: number | null
     }
     res: {
         200: Player
@@ -85,6 +84,15 @@ export interface APIPlayerItemEquip extends GenericPATCH {
     }
     body: {
         inventoryItemId: number
+    }
+    res: {
+        200: object
+    }
+}
+
+export interface APIPlayerUse extends GenericPATCH {
+    params: {
+        playerId: string
     }
     res: {
         200: object

@@ -2,7 +2,7 @@ import type { GenericGET, GenericPATCH } from ".."
 import type { InventoryItem } from "../models/player"
 
 export interface APIBankInventory extends GenericGET {
-    params: {
+    query: {
         playerId: string
     }
     res: {
@@ -12,7 +12,7 @@ export interface APIBankInventory extends GenericGET {
 }
 
 export interface APIBankItemMove extends GenericPATCH {
-    params: {
+    query: {
         playerId: string
     }
     body: {
@@ -24,7 +24,7 @@ export interface APIBankItemMove extends GenericPATCH {
 }
 
 export interface APIBankMoneyTransfer extends GenericPATCH {
-    params: {
+    query: {
         playerId: string
     }
     body: {

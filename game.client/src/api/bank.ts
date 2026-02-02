@@ -4,12 +4,12 @@ import { api, queryClient } from "."
 export const getBankInventoryQuery = (playerId: string) =>
     queryOptions({
         queryKey: [playerId, "bank"],
-        queryFn: () => api.getWith204("/api/Bank/{playerId}", { playerId }, {}),
+        queryFn: () => api.getWith204("/api/Bank/Inventory", {}, { playerId }),
     })
 
 export const moveBankItemMutation = (playerId: string, inventoryItemId: number) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Bank/{playerId}/Action/move", { playerId }, {}, { inventoryItemId }),
+        mutationFn: () => api.patch("/api/Bank/Action/move", {}, { playerId }, { inventoryItemId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "bank"] })
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
@@ -18,7 +18,7 @@ export const moveBankItemMutation = (playerId: string, inventoryItemId: number) 
 
 export const moveBankMoneyMutation = (playerId: string) =>
     mutationOptions({
-        mutationFn: ({ amount, direction }: { amount: number; direction: "ToPlayer" | "ToBank" }) => api.patch("/api/Bank/{playerId}/Action/transfer", { playerId }, {}, { amount, direction }),
+        mutationFn: ({ amount, direction }: { amount: number; direction: "ToPlayer" | "ToBank" }) => api.patch("/api/Bank/Action/transfer", {}, { playerId }, { amount, direction }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },

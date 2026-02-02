@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260127122338_tst")]
-    partial class tst
+    [Migration("20260202194834_rebase")]
+    partial class rebase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -51,6 +51,21 @@ namespace game.Server.Migrations
                             RecipeId = 1,
                             StartTime = new DateTime(2025, 12, 13, 10, 0, 0, 0, DateTimeKind.Utc)
                         });
+                });
+
+            modelBuilder.Entity("Save", b =>
+                {
+                    b.Property<Guid>("PlayerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SaveString")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PlayerId");
+
+                    b.ToTable("Saves");
                 });
 
             modelBuilder.Entity("game.Server.Models.Block", b =>
@@ -163,9 +178,123 @@ namespace game.Server.Migrations
                         },
                         new
                         {
+                            BlueprintId = 3,
+                            ItemId = 11,
+                            Price = 10
+                        },
+                        new
+                        {
+                            BlueprintId = 4,
+                            ItemId = 12,
+                            Price = 20
+                        },
+                        new
+                        {
+                            BlueprintId = 5,
+                            ItemId = 13,
+                            Price = 40
+                        },
+                        new
+                        {
+                            BlueprintId = 6,
+                            ItemId = 14,
+                            Price = 80
+                        },
+                        new
+                        {
+                            BlueprintId = 7,
+                            ItemId = 15,
+                            Price = 150
+                        },
+                        new
+                        {
+                            BlueprintId = 8,
+                            ItemId = 16,
+                            Price = 500
+                        },
+                        new
+                        {
+                            BlueprintId = 9,
+                            ItemId = 20,
+                            Price = 5
+                        },
+                        new
+                        {
+                            BlueprintId = 10,
+                            ItemId = 21,
+                            Price = 10
+                        },
+                        new
+                        {
+                            BlueprintId = 11,
+                            ItemId = 22,
+                            Price = 20
+                        },
+                        new
+                        {
+                            BlueprintId = 12,
+                            ItemId = 23,
+                            Price = 40
+                        },
+                        new
+                        {
+                            BlueprintId = 13,
+                            ItemId = 24,
+                            Price = 80
+                        },
+                        new
+                        {
+                            BlueprintId = 14,
+                            ItemId = 25,
+                            Price = 150
+                        },
+                        new
+                        {
+                            BlueprintId = 15,
+                            ItemId = 26,
+                            Price = 500
+                        },
+                        new
+                        {
                             BlueprintId = 2,
                             ItemId = 30,
                             Price = 5
+                        },
+                        new
+                        {
+                            BlueprintId = 16,
+                            ItemId = 31,
+                            Price = 10
+                        },
+                        new
+                        {
+                            BlueprintId = 17,
+                            ItemId = 32,
+                            Price = 20
+                        },
+                        new
+                        {
+                            BlueprintId = 18,
+                            ItemId = 33,
+                            Price = 40
+                        },
+                        new
+                        {
+                            BlueprintId = 19,
+                            ItemId = 34,
+                            Price = 80
+                        },
+                        new
+                        {
+                            BlueprintId = 20,
+                            ItemId = 35,
+                            Price = 150
+                        },
+                        new
+                        {
+                            BlueprintId = 21,
+                            ItemId = 36,
+                            Price = 500
                         });
                 });
 
@@ -281,6 +410,265 @@ namespace game.Server.Migrations
                             Amount = 3,
                             BlueprintId = 2,
                             ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 40,
+                            Amount = 3,
+                            BlueprintId = 9,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 3,
+                            Amount = 2,
+                            BlueprintId = 3,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 4,
+                            Amount = 3,
+                            BlueprintId = 3,
+                            ItemId = 2
+                        },
+                        new
+                        {
+                            CraftingId = 5,
+                            Amount = 2,
+                            BlueprintId = 4,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 6,
+                            Amount = 5,
+                            BlueprintId = 4,
+                            ItemId = 3
+                        },
+                        new
+                        {
+                            CraftingId = 7,
+                            Amount = 3,
+                            BlueprintId = 5,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 8,
+                            Amount = 6,
+                            BlueprintId = 5,
+                            ItemId = 4
+                        },
+                        new
+                        {
+                            CraftingId = 9,
+                            Amount = 3,
+                            BlueprintId = 6,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 10,
+                            Amount = 8,
+                            BlueprintId = 6,
+                            ItemId = 5
+                        },
+                        new
+                        {
+                            CraftingId = 11,
+                            Amount = 4,
+                            BlueprintId = 7,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 12,
+                            Amount = 9,
+                            BlueprintId = 7,
+                            ItemId = 6
+                        },
+                        new
+                        {
+                            CraftingId = 13,
+                            Amount = 5,
+                            BlueprintId = 8,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 14,
+                            Amount = 10,
+                            BlueprintId = 8,
+                            ItemId = 7
+                        },
+                        new
+                        {
+                            CraftingId = 16,
+                            Amount = 3,
+                            BlueprintId = 10,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 17,
+                            Amount = 3,
+                            BlueprintId = 10,
+                            ItemId = 2
+                        },
+                        new
+                        {
+                            CraftingId = 41,
+                            Amount = 3,
+                            BlueprintId = 11,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 42,
+                            Amount = 5,
+                            BlueprintId = 11,
+                            ItemId = 3
+                        },
+                        new
+                        {
+                            CraftingId = 18,
+                            Amount = 4,
+                            BlueprintId = 12,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 19,
+                            Amount = 7,
+                            BlueprintId = 12,
+                            ItemId = 4
+                        },
+                        new
+                        {
+                            CraftingId = 43,
+                            Amount = 4,
+                            BlueprintId = 13,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 44,
+                            Amount = 9,
+                            BlueprintId = 13,
+                            ItemId = 5
+                        },
+                        new
+                        {
+                            CraftingId = 45,
+                            Amount = 5,
+                            BlueprintId = 14,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 46,
+                            Amount = 10,
+                            BlueprintId = 14,
+                            ItemId = 6
+                        },
+                        new
+                        {
+                            CraftingId = 20,
+                            Amount = 5,
+                            BlueprintId = 15,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 21,
+                            Amount = 10,
+                            BlueprintId = 15,
+                            ItemId = 7
+                        },
+                        new
+                        {
+                            CraftingId = 22,
+                            Amount = 3,
+                            BlueprintId = 16,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 23,
+                            Amount = 4,
+                            BlueprintId = 16,
+                            ItemId = 2
+                        },
+                        new
+                        {
+                            CraftingId = 47,
+                            Amount = 3,
+                            BlueprintId = 17,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 48,
+                            Amount = 6,
+                            BlueprintId = 17,
+                            ItemId = 3
+                        },
+                        new
+                        {
+                            CraftingId = 49,
+                            Amount = 4,
+                            BlueprintId = 18,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 50,
+                            Amount = 8,
+                            BlueprintId = 18,
+                            ItemId = 4
+                        },
+                        new
+                        {
+                            CraftingId = 24,
+                            Amount = 4,
+                            BlueprintId = 19,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 25,
+                            Amount = 8,
+                            BlueprintId = 19,
+                            ItemId = 5
+                        },
+                        new
+                        {
+                            CraftingId = 51,
+                            Amount = 5,
+                            BlueprintId = 20,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 52,
+                            Amount = 10,
+                            BlueprintId = 20,
+                            ItemId = 6
+                        },
+                        new
+                        {
+                            CraftingId = 26,
+                            Amount = 5,
+                            BlueprintId = 21,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 27,
+                            Amount = 10,
+                            BlueprintId = 21,
+                            ItemId = 7
                         });
                 });
 
@@ -855,7 +1243,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 1,
-                            ChangeOfGenerating = 20,
+                            ChangeOfGenerating = 6,
                             Damage = 0,
                             Description = "Wooden Frame",
                             ItemType = 4,
@@ -866,7 +1254,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 2,
-                            ChangeOfGenerating = 80,
+                            ChangeOfGenerating = 95,
                             Damage = 0,
                             Description = "Rock",
                             ItemType = 4,
@@ -877,7 +1265,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 3,
-                            ChangeOfGenerating = 15,
+                            ChangeOfGenerating = 7,
                             Damage = 0,
                             Description = "Copper Ore",
                             ItemType = 4,
@@ -888,7 +1276,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 4,
-                            ChangeOfGenerating = 15,
+                            ChangeOfGenerating = 6,
                             Damage = 0,
                             Description = "Iron Ore",
                             ItemType = 4,
@@ -899,7 +1287,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 5,
-                            ChangeOfGenerating = 10,
+                            ChangeOfGenerating = 7,
                             Damage = 0,
                             Description = "Silver Ore",
                             ItemType = 4,
@@ -910,7 +1298,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 6,
-                            ChangeOfGenerating = 10,
+                            ChangeOfGenerating = 6,
                             Damage = 0,
                             Description = "Gold Ore",
                             ItemType = 4,
@@ -921,7 +1309,7 @@ namespace game.Server.Migrations
                         new
                         {
                             ItemId = 7,
-                            ChangeOfGenerating = 2,
+                            ChangeOfGenerating = 1,
                             Damage = 0,
                             Description = "Unobtainium Ore",
                             ItemType = 4,
@@ -1170,6 +1558,39 @@ namespace game.Server.Migrations
                             MaxDurability = 15,
                             Name = "Rented Pickaxe",
                             Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 40,
+                            ChangeOfGenerating = 0,
+                            Damage = 1,
+                            Description = "This thing heals",
+                            ItemType = 3,
+                            MaxDurability = 1,
+                            Name = "Healing Potion",
+                            Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 41,
+                            ChangeOfGenerating = 0,
+                            Damage = 1,
+                            Description = "+5 hp",
+                            ItemType = 3,
+                            MaxDurability = 1,
+                            Name = "God Potion",
+                            Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 42,
+                            ChangeOfGenerating = 0,
+                            Damage = 1,
+                            Description = "+5 inventory space",
+                            ItemType = 3,
+                            MaxDurability = 1,
+                            Name = "Muscle Potion",
+                            Weight = 1
                         });
                 });
 
@@ -1179,6 +1600,9 @@ namespace game.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("ChestId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Durability")
                         .HasColumnType("INTEGER");
 
@@ -1186,6 +1610,8 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("ItemInstanceId");
+
+                    b.HasIndex("ChestId");
 
                     b.HasIndex("ItemId");
 
@@ -1288,6 +1714,9 @@ namespace game.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("ActiveInventoryItemId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("BankBalance")
                         .HasColumnType("INTEGER");
 
@@ -1295,6 +1724,15 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("FloorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Health")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaxHealth")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MineId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Money")
@@ -1324,6 +1762,8 @@ namespace game.Server.Migrations
 
                     b.HasKey("PlayerId");
 
+                    b.HasIndex("ActiveInventoryItemId");
+
                     b.HasIndex("FloorId");
 
                     b.ToTable("Players");
@@ -1334,6 +1774,9 @@ namespace game.Server.Migrations
                             PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
                             BankBalance = 0,
                             Capacity = 10,
+                            Health = 20,
+                            MaxHealth = 20,
+                            MineId = 0,
                             Money = 100,
                             Name = "Seeded Player",
                             PositionX = 0,
@@ -1558,11 +2001,17 @@ namespace game.Server.Migrations
 
             modelBuilder.Entity("game.Server.Models.ItemInstance", b =>
                 {
+                    b.HasOne("game.Server.Models.Chest", "Chest")
+                        .WithMany("ItemInstances")
+                        .HasForeignKey("ChestId");
+
                     b.HasOne("game.Server.Models.Item", "Item")
                         .WithMany()
                         .HasForeignKey("ItemId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Chest");
 
                     b.Navigation("Item");
                 });
@@ -1616,9 +2065,15 @@ namespace game.Server.Migrations
 
             modelBuilder.Entity("game.Server.Models.Player", b =>
                 {
+                    b.HasOne("game.Server.Models.InventoryItem", "ActiveInventoryItem")
+                        .WithMany()
+                        .HasForeignKey("ActiveInventoryItemId");
+
                     b.HasOne("game.Server.Models.Floor", "Floor")
                         .WithMany()
                         .HasForeignKey("FloorId");
+
+                    b.Navigation("ActiveInventoryItem");
 
                     b.Navigation("Floor");
                 });
@@ -1631,6 +2086,11 @@ namespace game.Server.Migrations
             modelBuilder.Entity("game.Server.Models.Building", b =>
                 {
                     b.Navigation("Floors");
+                });
+
+            modelBuilder.Entity("game.Server.Models.Chest", b =>
+                {
+                    b.Navigation("ItemInstances");
                 });
 
             modelBuilder.Entity("game.Server.Models.Floor", b =>

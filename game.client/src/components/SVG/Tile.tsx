@@ -8,7 +8,6 @@ import type { ScreenType } from "../../types/api/models/player"
 import { useNavigate } from "react-router"
 import { ActiveItemContext } from "../../providers/ActiveItemProvider"
 import { mineMineBlockMutation } from "../../api/mine"
-import { interactInBuildingMutation } from "../../api/building"
 
 type TileProps = {
     tileType: TileType
@@ -110,8 +109,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, screenType))
     const { mutateAsync: updatePlayerFloorAsync } = useMutation(updatePlayerFloorMutation(playerId, x, y, targetFloorId!))
-    const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(playerId, mineId ?? -1, activeItem.activeItemInventoryItemId ?? -1, x, y))
-    const {mutateAsync: interactInBuildingAsync} = useMutation(interactInBuildingMutation(playerId, targetBuildingId ?? -1, targetLevel ?? -1, activeItem.activeItemInventoryItemId ?? -1, x, y))
+    const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(playerId, mineId ?? -1, x, y))
     const {mutateAsync: pickItemAsync} = useMutation(pickItemMutation(playerId, mineId ?? -1, targetBuildingId ?? -1, targetLevel ?? -1))
 
     const handleClick = async () => {
@@ -163,7 +161,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "zombie":
             case "skeleton":
             case "dragon":
-                await interactInBuildingAsync()
+                // await interactInBuildingAsync()
                 break
             case "wooden_sword":
             case "wooden_pickaxe":
