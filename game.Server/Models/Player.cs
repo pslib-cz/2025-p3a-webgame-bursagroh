@@ -13,7 +13,8 @@ namespace game.Server.Models
         Blacksmith,
         Floor,
         Fountain,
-        Fight
+        Fight,
+        Win
     }
 
     public class Player
