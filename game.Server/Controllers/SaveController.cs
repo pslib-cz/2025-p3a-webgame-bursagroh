@@ -1,4 +1,5 @@
 using AutoMapper;
+using CrypticWizard.RandomWordGenerator;
 using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,12 @@ namespace game.Server.Controllers
     public class SaveController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly WordGenerator _generator;
 
-        private readonly IMapper _mapper;
-
-        public SaveController(ApplicationDbContext context, IMapper mapper)
+        public SaveController(ApplicationDbContext context, WordGenerator generator)
         {
             _context = context;
-            _mapper = mapper;
+            _generator = generator;
         }
 
 
@@ -167,13 +167,13 @@ namespace game.Server.Controllers
                 var newSave = new Save
                 {
                     PlayerId = clonedPlayer.PlayerId,
-                    SaveString = Guid.NewGuid().ToString().Substring(0, 8).ToUpper()
+                    SaveString = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 5)) //dodelat check na duplicitu
                 };
                 _context.Saves.Add(newSave);
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new { NewSaveString = newSave.SaveString, NewPlayerId = clonedPlayer.PlayerId });
+                return Ok(new { newSave.SaveString, clonedPlayer.PlayerId });
             }
             catch (Exception ex)
             {

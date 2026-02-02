@@ -17,6 +17,7 @@
         public int Capacity { get; set; }
 
         public int Health { get; set; }
+        public int MaxHealth { get; set; }
 
     }
 }
