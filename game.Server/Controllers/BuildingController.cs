@@ -22,7 +22,7 @@ namespace game.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{playerId}")]
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
         {
             try

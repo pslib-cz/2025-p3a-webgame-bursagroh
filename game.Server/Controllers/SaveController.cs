@@ -39,7 +39,7 @@ namespace game.Server.Controllers
 
 
 
-        [HttpPost("CreateString/{playerId}")]
+        [HttpPost("Save")]
         public async Task<ActionResult> ClonePlayerRecord(Guid playerId)
         {
             try

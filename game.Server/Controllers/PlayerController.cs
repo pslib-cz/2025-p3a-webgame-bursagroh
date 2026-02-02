@@ -82,6 +82,8 @@ namespace game.Server.Controllers
 
                 _context.Players.Add(player);
                 _context.Buildings.AddRange(fixedBuildings);
+
+
                 await _context.SaveChangesAsync();
 
                 Mine mine = new Mine
@@ -245,6 +247,9 @@ namespace game.Server.Controllers
 
                 if (player == null) return NotFound();
 
+
+                var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+
                 int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
                 int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
 
@@ -283,41 +288,23 @@ namespace game.Server.Controllers
                                 player.SubPositionY = spawnPoint.y;
                                 break;
 
-                            case BuildingTypes.Bank:
-                                player.ScreenType = ScreenTypes.Bank;
-                                break;
-
+                            case BuildingTypes.Bank: player.ScreenType = ScreenTypes.Bank; break;
                             case BuildingTypes.Mine:
                                 player.ScreenType = ScreenTypes.Mine;
+                                if (playerMine != null) _context.Mines.Remove(playerMine);
 
-                                var existingMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
-                                if (existingMine != null)
-                                {
-                                    _context.Mines.Remove(existingMine);
-                                }
+                                playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
+                                _context.Mines.Add(playerMine);
 
-                                Mine mineRecord = new Mine
-                                {
-                                    MineId = new Random().Next(),
-                                    PlayerId = id
-                                };
-                                _context.Mines.Add(mineRecord);
-
-                                Floor mineFloor = new Floor
-                                {
-                                    BuildingId = building.BuildingId,
-                                    Level = 0,
-                                    FloorItems = new List<FloorItem>()
-                                };
+                                Floor mineFloor = new Floor { BuildingId = building.BuildingId, Level = 0, FloorItems = new List<FloorItem>() };
                                 _context.Floors.Add(mineFloor);
 
                                 await _context.SaveChangesAsync();
-                                await _mineService.GetOrGenerateLayersBlocksAsync(mineRecord.MineId, 0, 4);
+                                await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
                                 player.FloorId = mineFloor.FloorId;
                                 player.SubPositionX = 0;
                                 player.SubPositionY = 0;
-
                                 break;
 
                             case BuildingTypes.Restaurant: player.ScreenType = ScreenTypes.Restaurant; break;
@@ -327,6 +314,19 @@ namespace game.Server.Controllers
                 }
                 else
                 {
+                    if (player.ScreenType == ScreenTypes.Mine && playerMine != null)
+                    {
+                        var blockAtTarget = await _context.MineBlocks
+                            .AnyAsync(mb => mb.MineLayer.MineId == playerMine.MineId &&
+                                            mb.MineLayer.Depth == request.NewPositionY &&
+                                            mb.Index == request.NewPositionX);
+
+                        if (blockAtTarget)
+                        {
+                            return BadRequest("Movement blocked by a mine block.");
+                        }
+                    }
+
                     var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
                     bool isAtExit = exits.Any(e => e.x == request.NewPositionX && e.y == request.NewPositionY);
 
@@ -357,8 +357,7 @@ namespace game.Server.Controllers
                         if (player.SubPositionX == upStairsX && player.SubPositionY == 2)
                         {
                             int nextLevel = currentFloorData.Level + 1;
-                            var nextFloor = await _context.Floors
-                                .FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == nextLevel);
+                            var nextFloor = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == nextLevel);
 
                             if (nextFloor == null)
                             {
@@ -379,8 +378,7 @@ namespace game.Server.Controllers
                         }
                         else if (player.SubPositionX == downStairsX && player.SubPositionY == 2 && currentFloorData.Level > 0)
                         {
-                            var prevFloor = await _context.Floors
-                                .FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == currentFloorData.Level - 1);
+                            var prevFloor = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == currentFloorData.Level - 1);
                             if (prevFloor != null) player.FloorId = prevFloor.FloorId;
                         }
                     }
@@ -388,8 +386,7 @@ namespace game.Server.Controllers
 
                 await _context.SaveChangesAsync();
                 var dto = _mapper.Map<PlayerDto>(player);
-                var finalMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
-                dto.MineId = finalMine?.MineId;
+                dto.MineId = playerMine?.MineId;
                 return Ok(dto);
             }
             catch (Exception ex)
