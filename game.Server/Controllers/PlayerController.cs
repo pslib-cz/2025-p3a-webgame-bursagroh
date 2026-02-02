@@ -228,28 +228,10 @@ namespace game.Server.Controllers
             try
             {
                 var player = await _context.Players
-                .Include(p => p.Floor)
-                .FirstOrDefaultAsync(p => p.PlayerId == id);
+                    .Include(p => p.Floor)
+                    .FirstOrDefaultAsync(p => p.PlayerId == id);
 
                 if (player == null) return NotFound();
-
-                if (player.ScreenType == ScreenTypes.Floor && request.NewFloorId.HasValue && request.NewFloorId != player.FloorId)
-                {
-                    var currentFloor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
-                    var targetFloor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == request.NewFloorId);
-
-                    if (targetFloor == null || currentFloor == null) return BadRequest("Floor doesn't exist.");
-                    if (targetFloor.BuildingId != currentFloor.BuildingId) return BadRequest("Cannot move between buildings vertically.");
-
-                    int levelDiff = targetFloor.Level - currentFloor.Level;
-                    if (levelDiff == 1 && (player.SubPositionX != 5 || player.SubPositionY != 2)) return BadRequest("Must be at (5,2) to go UP.");
-                    if (levelDiff == -1 && (player.SubPositionX != 2 || player.SubPositionY != 2)) return BadRequest("Must be at (2,2) to go DOWN.");
-                    if (Math.Abs(levelDiff) > 1) return BadRequest("One floor at a time.");
-
-                    player.FloorId = request.NewFloorId;
-                    await _context.SaveChangesAsync();
-                    return Ok(_mapper.Map<PlayerDto>(player));
-                }
 
                 int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
                 int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
@@ -262,10 +244,7 @@ namespace game.Server.Controllers
                     player.PositionX = request.NewPositionX;
                     player.PositionY = request.NewPositionY;
 
-                    if (player.PositionX == 0 && player.PositionY == 0)
-                    {
-                        player.ScreenType = ScreenTypes.Fountain;
-                    }
+                    if (player.PositionX == 0 && player.PositionY == 0) player.ScreenType = ScreenTypes.Fountain;
 
                     var building = await _context.Buildings.FirstOrDefaultAsync(b =>
                         b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.PlayerId == id);
@@ -282,20 +261,15 @@ namespace game.Server.Controllers
                                     var mapGen = new MapGeneratorService();
                                     var generated = mapGen.GenerateInterior(building.BuildingId, building.BuildingId, 1, building.Height ?? 5, building.PositionX, building.PositionY);
                                     floor0 = generated.First(f => f.Level == 0);
-
                                     _context.Floors.Add(floor0);
                                     await _context.SaveChangesAsync();
                                 }
-
-                                var buildingDoors = MapGeneratorService.GetExitCoordinates(building.PositionX, building.PositionY);
-                                var spawnPoint = buildingDoors.First();
-
+                                var spawnPoint = MapGeneratorService.GetExitCoordinates(building.PositionX, building.PositionY).First();
                                 player.FloorId = floor0.FloorId;
                                 player.ScreenType = ScreenTypes.Floor;
                                 player.SubPositionX = spawnPoint.x;
                                 player.SubPositionY = spawnPoint.y;
                                 break;
-
                             case BuildingTypes.Bank: player.ScreenType = ScreenTypes.Bank; break;
                             case BuildingTypes.Mine: player.ScreenType = ScreenTypes.Mine; break;
                             case BuildingTypes.Restaurant: player.ScreenType = ScreenTypes.Restaurant; break;
@@ -324,20 +298,57 @@ namespace game.Server.Controllers
 
                     player.SubPositionX = request.NewPositionX;
                     player.SubPositionY = request.NewPositionY;
+
+                    var currentFloorData = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+                    if (currentFloorData != null)
+                    {
+                        bool isEven = currentFloorData.Level % 2 == 0;
+                        int upStairsX = isEven ? 5 : 2;
+                        int downStairsX = isEven ? 2 : 5;
+
+                        if (player.SubPositionX == upStairsX && player.SubPositionY == 2)
+                        {
+                            int nextLevel = currentFloorData.Level + 1;
+                            var nextFloor = await _context.Floors
+                                .FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == nextLevel);
+
+                            if (nextFloor == null)
+                            {
+                                var building = await _context.Buildings.FindAsync(currentFloorData.BuildingId);
+                                if (building != null && (!building.Height.HasValue || nextLevel < building.Height.Value))
+                                {
+                                    var mapGen = new MapGeneratorService();
+                                    var generated = mapGen.GenerateInterior(building.BuildingId, building.BuildingId, nextLevel + 1, building.Height ?? 5, building.PositionX, building.PositionY);
+                                    nextFloor = generated.FirstOrDefault(f => f.Level == nextLevel);
+                                    if (nextFloor != null)
+                                    {
+                                        _context.Floors.Add(nextFloor);
+                                        await _context.SaveChangesAsync();
+                                    }
+                                }
+                            }
+                            if (nextFloor != null) player.FloorId = nextFloor.FloorId;
+                        }
+
+                        else if (player.SubPositionX == downStairsX && player.SubPositionY == 2 && currentFloorData.Level > 0)
+                        {
+                            var prevFloor = await _context.Floors
+                                .FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == currentFloorData.Level - 1);
+                            if (prevFloor != null) player.FloorId = prevFloor.FloorId;
+                        }
+                    }
                 }
 
                 await _context.SaveChangesAsync();
-
                 var dto = _mapper.Map<PlayerDto>(player);
                 var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
                 dto.MineId = mine?.MineId;
-
                 return Ok(dto);
-            } catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("{id}/Inventory")]
