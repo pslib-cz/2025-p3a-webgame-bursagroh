@@ -78,40 +78,38 @@ namespace game.Server.Controllers
             
         }
 
-        [HttpPatch("{id}/Action/move")] 
-        public async Task<IActionResult> MoveInventoryItem(Guid id, [FromBody] MoveInventoryItemRequest request)
+        [HttpPatch("{id}/Action/move")]
+        public async Task<IActionResult> MoveInventoryItems(Guid id, [FromBody] MoveInventoryItemRequest request)
         {
-            try 
+            try
             {
-                if (request.InventoryItemId <= 0)
+                if (request.InventoryItemIds == null || !request.InventoryItemIds.Any())
                 {
-                    return BadRequest();
+                    return BadRequest("No item IDs provided.");
                 }
 
-                InventoryItem? item = await _context.InventoryItems
-                    .Where(i => i.InventoryItemId == request.InventoryItemId)
-                    .SingleOrDefaultAsync();
+                var items = await _context.InventoryItems
+                    .Where(i => i.PlayerId == id && request.InventoryItemIds.Contains(i.InventoryItemId))
+                    .ToListAsync();
 
-                if (item == null)
+                if (!items.Any())
                 {
-                    return NotFound();
+                    return NotFound("No matching items found for this player.");
                 }
 
-                if (item.PlayerId != id)
+                foreach (var item in items)
                 {
-                    return Forbid();
+                    item.IsInBank = !item.IsInBank;
                 }
-
-                item.IsInBank = !item.IsInBank;
 
                 await _context.SaveChangesAsync();
-                return Ok(item);
+
+                return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-            
         }
     }
 }

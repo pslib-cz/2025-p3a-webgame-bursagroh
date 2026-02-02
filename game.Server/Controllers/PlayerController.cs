@@ -2,6 +2,7 @@ using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Models;
+using game.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Numerics;
@@ -14,11 +15,13 @@ namespace game.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly MineService _mineService;
 
-        public PlayerController(ApplicationDbContext context, IMapper mapper)
+        public PlayerController(ApplicationDbContext context, IMapper mapper, MineService mineService)
         {
             _context = context;
             _mapper = mapper;
+            _mineService = mineService;
         }
 
         private List<(int x, int y)> GetExitCoordinates(int buildingX, int buildingY)
@@ -279,8 +282,44 @@ namespace game.Server.Controllers
                                 player.SubPositionX = spawnPoint.x;
                                 player.SubPositionY = spawnPoint.y;
                                 break;
-                            case BuildingTypes.Bank: player.ScreenType = ScreenTypes.Bank; break;
-                            case BuildingTypes.Mine: player.ScreenType = ScreenTypes.Mine; break;
+
+                            case BuildingTypes.Bank:
+                                player.ScreenType = ScreenTypes.Bank;
+                                break;
+
+                            case BuildingTypes.Mine:
+                                player.ScreenType = ScreenTypes.Mine;
+
+                                var existingMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+                                if (existingMine != null)
+                                {
+                                    _context.Mines.Remove(existingMine);
+                                }
+
+                                Mine mineRecord = new Mine
+                                {
+                                    MineId = new Random().Next(),
+                                    PlayerId = id
+                                };
+                                _context.Mines.Add(mineRecord);
+
+                                Floor mineFloor = new Floor
+                                {
+                                    BuildingId = building.BuildingId,
+                                    Level = 0,
+                                    FloorItems = new List<FloorItem>()
+                                };
+                                _context.Floors.Add(mineFloor);
+
+                                await _context.SaveChangesAsync();
+                                await _mineService.GetOrGenerateLayersBlocksAsync(mineRecord.MineId, 0, 4);
+
+                                player.FloorId = mineFloor.FloorId;
+                                player.SubPositionX = 0;
+                                player.SubPositionY = 0;
+
+                                break;
+
                             case BuildingTypes.Restaurant: player.ScreenType = ScreenTypes.Restaurant; break;
                             case BuildingTypes.Blacksmith: player.ScreenType = ScreenTypes.Blacksmith; break;
                         }
@@ -338,7 +377,6 @@ namespace game.Server.Controllers
                             }
                             if (nextFloor != null) player.FloorId = nextFloor.FloorId;
                         }
-
                         else if (player.SubPositionX == downStairsX && player.SubPositionY == 2 && currentFloorData.Level > 0)
                         {
                             var prevFloor = await _context.Floors
@@ -350,8 +388,8 @@ namespace game.Server.Controllers
 
                 await _context.SaveChangesAsync();
                 var dto = _mapper.Map<PlayerDto>(player);
-                var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
-                dto.MineId = mine?.MineId;
+                var finalMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+                dto.MineId = finalMine?.MineId;
                 return Ok(dto);
             }
             catch (Exception ex)

@@ -43,6 +43,8 @@ namespace game.Server.Models
         public int Health { get; set; } = 20;
         public int MaxHealth { get; set; } = 20;
 
+        public int MineId { get; set; }
+
         [JsonIgnore]
         public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
 

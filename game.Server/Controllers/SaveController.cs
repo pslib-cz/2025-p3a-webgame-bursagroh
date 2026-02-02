@@ -37,6 +37,8 @@ namespace game.Server.Controllers
             return Ok(new { playerId = save.PlayerId });
         }
 
+
+
         [HttpPost("CreateString/{playerId}")]
         public async Task<ActionResult> ClonePlayerRecord(Guid playerId)
         {
@@ -54,20 +56,19 @@ namespace game.Server.Controllers
                 clonedPlayer.PlayerId = Guid.NewGuid();
                 clonedPlayer.Name = originalPlayer.Name;
                 clonedPlayer.InventoryItems = new List<InventoryItem>();
-                clonedPlayer.FloorId = null; 
+                clonedPlayer.FloorId = null;
                 clonedPlayer.Floor = null;
 
                 _context.Players.Add(clonedPlayer);
                 await _context.SaveChangesAsync();
 
-                var originalBuildings = await _context.Buildings //prepsat, zatim ai generated
+                var originalBuildings = await _context.Buildings
                     .Include(b => b.Floors).ThenInclude(f => f.FloorItems).ThenInclude(fi => fi.Chest)
                     .Include(b => b.Floors).ThenInclude(f => f.FloorItems).ThenInclude(fi => fi.Enemy)
                     .Include(b => b.Floors).ThenInclude(f => f.FloorItems).ThenInclude(fi => fi.ItemInstance)
                     .Where(b => b.PlayerId == playerId)
                     .AsNoTracking()
                     .ToListAsync();
-
 
                 foreach (var oldBuilding in originalBuildings)
                 {
@@ -93,7 +94,7 @@ namespace game.Server.Controllers
                             };
 
                             _context.Floors.Add(newFloor);
-                            await _context.SaveChangesAsync(); 
+                            await _context.SaveChangesAsync();
 
                             if (originalPlayer.FloorId == oldFloor.FloorId)
                             {
@@ -112,7 +113,6 @@ namespace game.Server.Controllers
                                         FloorItemType = oldFI.FloorItemType
                                     };
 
- 
                                     if (oldFI.Chest != null)
                                     {
                                         newFI.Chest = new Chest();
@@ -144,6 +144,51 @@ namespace game.Server.Controllers
                     }
                 }
 
+                var originalMine = await _context.Mines
+                    .Include(m => m.MineLayers)
+                        .ThenInclude(l => l.MineBlocks)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.PlayerId == playerId);
+
+                if (originalMine != null)
+                {
+                    var newMine = new Mine
+                    {
+                        MineId = new Random().Next(),
+                        PlayerId = clonedPlayer.PlayerId
+                    };
+                    _context.Mines.Add(newMine);
+                    await _context.SaveChangesAsync();
+
+                    if (originalMine.MineLayers != null)
+                    {
+                        foreach (var oldLayer in originalMine.MineLayers)
+                        {
+                            var newLayer = new MineLayer
+                            {
+                                MineId = newMine.MineId,
+                                Depth = oldLayer.Depth
+                            };
+                            _context.MineLayers.Add(newLayer);
+                            await _context.SaveChangesAsync();
+
+                            if (oldLayer.MineBlocks != null)
+                            {
+                                foreach (var oldBlock in oldLayer.MineBlocks)
+                                {
+                                    _context.MineBlocks.Add(new MineBlock
+                                    {
+                                        MineLayerId = newLayer.MineLayerID,
+                                        BlockId = oldBlock.BlockId,
+                                        Index = oldBlock.Index,
+                                        Health = oldBlock.Health
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+
                 foreach (var originalInvItem in originalPlayer.InventoryItems)
                 {
                     if (originalInvItem.ItemInstance == null) continue;
@@ -167,7 +212,7 @@ namespace game.Server.Controllers
                 var newSave = new Save
                 {
                     PlayerId = clonedPlayer.PlayerId,
-                    SaveString = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 5)) //dodelat check na duplicitu
+                    SaveString = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 5))
                 };
                 _context.Saves.Add(newSave);
 
