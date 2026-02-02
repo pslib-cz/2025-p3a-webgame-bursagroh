@@ -61,7 +61,6 @@ namespace game.Server.Controllers
                     BankBalance = 0,
                     Capacity = 10,
                     Seed = new Random().Next(),
-                    Health = 10,
 
                     PositionX = 0,
                     PositionY = 0,
@@ -82,7 +81,17 @@ namespace game.Server.Controllers
                 _context.Buildings.AddRange(fixedBuildings);
                 await _context.SaveChangesAsync();
 
-                return Ok(_mapper.Map<PlayerDto>(player));
+                Mine mine = new Mine
+                {
+                    MineId = new Random().Next(),
+                    PlayerId = player.PlayerId
+                };
+                _context.Mines.Add(mine);
+
+                var playerDto2 = _mapper.Map<PlayerDto>(player);
+                playerDto2.MineId = mine.MineId;
+
+                return Ok(playerDto2);
             }
             catch (Exception ex)
             {
