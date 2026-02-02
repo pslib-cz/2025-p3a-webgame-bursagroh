@@ -35,6 +35,7 @@ const router = createBrowserRouter([
                     {
                         path: "city",
                         Component: CityScreen
+                        
                     },
                     {
                         path: "bank",

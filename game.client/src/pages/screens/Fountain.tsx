@@ -5,8 +5,11 @@ import { PlayerIdContext } from '../../providers/PlayerIdProvider'
 import { useNavigate } from 'react-router'
 import CloseIcon from '../../assets/icons/CloseIcon'
 import styles from './fountain.module.css'
+import useBlur from '../../hooks/useBlur'
 
 const FountainScreen = () => {
+    useBlur(true)
+    
     const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     

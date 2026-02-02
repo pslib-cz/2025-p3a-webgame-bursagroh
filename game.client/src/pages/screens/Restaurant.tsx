@@ -7,8 +7,11 @@ import type { IngredienceType, Recipe } from "../../types/api/models/recipe"
 import { useNavigate } from "react-router"
 import { RecipesContext } from "../../providers/game/RecipesProvider"
 import Burger from "../../components/Burger"
+import useBlur from "../../hooks/useBlur"
 
 const RestaurantScreen = () => {
+    useBlur(true)
+    
     const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
@@ -54,8 +57,8 @@ const RestaurantScreen = () => {
     if (isMaking) {
         cookingSection = (
             <div>
-                <span>time</span>
-                <Burger burger={{recipeId: currentBurger?.recipeId ?? -1, name: currentBurger?.name ?? "", ingrediences: currentBurgerStack.map((ingredienceType, index) => ({order: index, ingredienceType}))}} />
+                <span>{currentBurger?.name}</span>
+                <Burger burger={{recipeId: currentBurger?.recipeId ?? -1, name: "", ingrediences: currentBurgerStack.map((ingredienceType, index) => ({order: index, ingredienceType}))}} />
                 <button onClick={handleStop}>finish</button>
                 <button onClick={() => addIngredience("BunDown")}>Add Bun Down</button>
                 <button onClick={() => addIngredience("Meat")}>Add Meat</button>

@@ -11,7 +11,7 @@ export type Player = {
     subPositionX: number
     subPositionY: number
     floorId: number | null
-    mineId: number | null
+    mineId: number
     activeInventoryItemId: number | null
     capacity: number
     health: number

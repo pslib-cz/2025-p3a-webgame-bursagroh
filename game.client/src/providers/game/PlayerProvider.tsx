@@ -3,6 +3,7 @@ import React from "react"
 import { getPlayerQuery } from "../../api/player"
 import { PlayerIdContext } from "../PlayerIdProvider"
 import type { Player } from "../../types/api/models/player"
+import { DEFAULT_PLAYER_ID } from "../../constants/player"
 
 type PlayerContextType = {
     isError: boolean
@@ -15,8 +16,12 @@ type PlayerContextType = {
 export const PlayerContext = React.createContext<PlayerContextType | null>(null)
 
 const PlayerProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const {data: player, isError, isPending, isSuccess} = useQuery(getPlayerQuery(playerId))
+    const playerId = React.useContext(PlayerIdContext)!.playerId
+    const {data: player, isError, isPending, isSuccess} = useQuery(getPlayerQuery(playerId ?? DEFAULT_PLAYER_ID))
+
+    if (!playerId) {
+        return <PlayerContext.Provider value={{ player: undefined, isError: false, isPending: false, isSuccess: true }}>{children}</PlayerContext.Provider>
+    }
 
     return <PlayerContext.Provider value={{ player, isError, isPending, isSuccess }}>{children}</PlayerContext.Provider>
 }

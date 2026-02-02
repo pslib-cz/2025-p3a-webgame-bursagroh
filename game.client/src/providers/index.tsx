@@ -5,19 +5,25 @@ import ActiveItemProvider from "./ActiveItemProvider"
 import MineIdProvider from "./MineIdProvider"
 import BuildingIdProvider from "./BuildingIdProvider"
 import LayerProvider from "./LayerProvider"
+import PlayerProvider, { PlayerContext } from "./game/PlayerProvider"
+import IsBluredProvider from "./IsBluredProvider"
+import MapProvider from "./MapProvider"
+import FloorProvider, { FloorContext } from "./FloorProvider"
+import ProviderGroupLoadingWrapper from "../components/wrappers/ProviderGroupLoadingWrapper"
+import type { TLoadingWrapperContextState } from "../components/wrappers/LoadingWrapper"
 
-const providers = [PlayerIdProvider, MineIdProvider, BuildingIdProvider, LayerProvider, ActiveItemProvider]
+const providers = [PlayerIdProvider, PlayerProvider, MineIdProvider, BuildingIdProvider, LayerProvider, ActiveItemProvider, IsBluredProvider, MapProvider]
+const contextsToLoad = [PlayerContext] as Array<React.Context<TLoadingWrapperContextState>>
 
 const Providers: React.FC<React.PropsWithChildren> = ({ children }) => {
     return (
         <>
             <QueryProvider>
-                {providers.reduceRight(
-                    (acc, Provider) => (
-                        <Provider>{acc}</Provider>
-                    ),
-                    children
-                )}
+                <ProviderGroupLoadingWrapper providers={providers} contextsToLoad={contextsToLoad}>
+                    <ProviderGroupLoadingWrapper providers={[FloorProvider]} contextsToLoad={[FloorContext as React.Context<TLoadingWrapperContextState>]}>
+                        {children}
+                    </ProviderGroupLoadingWrapper>
+                </ProviderGroupLoadingWrapper>
             </QueryProvider>
         </>
     )

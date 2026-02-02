@@ -11,6 +11,7 @@ import { equipItemMutation } from '../api/player'
 import { useMutation } from '@tanstack/react-query'
 import HandItem from './item/HandItem'
 import { IsOpenInventoryContext } from '../providers/game/IsOpenInventoryProvider'
+import ArrayDisplay from './wrappers/ArrayDisplay'
 
 const PlayerUI = () => {
     const player = React.useContext(PlayerContext)!.player!
@@ -53,9 +54,9 @@ const PlayerUI = () => {
                 <span className={styles.subHeading}>Hand</span>
             </div>
             <div className={styles.hand} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
-                {inventory.filter(item => item.inventoryItemId === player.activeInventoryItemId).map(item => (
+                <ArrayDisplay elements={inventory.filter(item => item.inventoryItemId === player.activeInventoryItemId).map(item => (
                     <HandItem item={item} key={item.inventoryItemId} />
-                ))}
+                ))} ifEmpty={<span className={styles.text}>Empty hand</span>} />
             </div>
         </div>
     )

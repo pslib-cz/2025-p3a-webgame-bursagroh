@@ -10,7 +10,7 @@ import NavBar from "../../components/NavBar"
 import Inventory from "../../components/Inventory"
 import PlayerUI from "../../components/PlayerUI"
 import GameProviders from "../../providers/game"
-import Map from "../../components/Map"
+import Layer from "../../components/wrappers/layer/Layer"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const screenTypeToURL = (screenType: ScreenType) => {
@@ -60,22 +60,25 @@ const Game = () => {
     const { playerId } = React.useContext(PlayerIdContext)!
 
     if (playerId === null) {
-        return <div>Loading...</div>
+        return (
+            <Layer layer={1}>
+                <div>Loading...</div>
+            </Layer>
+        )
     }
 
     return (
         <GameProviders>
-            <div className={styles.container}>
-                <Map />
+            <Layer layer={1}>
                 <NavBar />
-                <div className={styles.innerContainer}>
-                    <ProperScreenChecker />
-                    <div className={styles.uiContainer}>
-                        <PlayerUI />
-                        <Inventory />
-                    </div>
+                <ProperScreenChecker />
+            </Layer>
+            <Layer layer={2}>
+                <div className={styles.uiContainer}>
+                    <PlayerUI />
+                    <Inventory />
                 </div>
-            </div>
+            </Layer>
         </GameProviders>
     )
 }

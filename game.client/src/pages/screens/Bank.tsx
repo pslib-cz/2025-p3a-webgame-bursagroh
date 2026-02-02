@@ -14,6 +14,7 @@ import CloseIcon from "../../assets/icons/CloseIcon"
 import BankInventoryItem from "../../components/item/BankInventoryItem"
 import { countInventoryItems, removeEquippedItemFromInventory } from "../../utils/inventory"
 import BankItem from "../../components/item/BankItem"
+import useBlur from "../../hooks/useBlur"
 
 // const InventoryItem = ({ playerId, item }: { playerId: string, item: InventoryItemType }) => {
 //     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, item.inventoryItemId))
@@ -46,6 +47,8 @@ import BankItem from "../../components/item/BankItem"
 // }
 
 const BankScreen = () => {
+    useBlur(true)
+    
     const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 

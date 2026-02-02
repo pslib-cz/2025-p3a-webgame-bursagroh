@@ -1,15 +1,7 @@
-.container {
-    
-}
-
-.innerContainer {
-    position: relative;
-}
-
 .uiContainer {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
+    margin-top: calc(1rem + var(--navbar-height));
+    margin-left: 1rem;
     display: flex;
     gap: 1rem;
+    width: max-content;
 }

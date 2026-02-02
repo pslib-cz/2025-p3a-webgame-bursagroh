@@ -3,8 +3,11 @@ import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { ActiveItemContext } from "../../providers/ActiveItemProvider"
 import { useQuery } from "@tanstack/react-query"
 import { getPlayerQuery } from "../../api/player"
+import useBlur from "../../hooks/useBlur"
 
 const FightScreen = () => {
+    useBlur(true)
+    
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const activeItem = React.useContext(ActiveItemContext)!.activeItemInventoryItemId!
 
