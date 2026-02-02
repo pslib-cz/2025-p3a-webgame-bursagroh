@@ -2,6 +2,6 @@
 {
     public class MoveInventoryItemRequest
     {
-        public int InventoryItemId { get; set; }
+        public List<int> InventoryItemIds { get; set; } = new();
     }
 }

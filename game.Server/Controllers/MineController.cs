@@ -5,6 +5,8 @@ using game.Server.Models;
 using game.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.Intrinsics.Arm;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace game.Server.Controllers
 {
@@ -23,7 +25,8 @@ namespace game.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpPost("Generate")]
+
+        [HttpPost("Regenerate")]
         public async Task<IActionResult> GetMine([FromBody] GenerateMineRequest request)
         {
             try
@@ -54,6 +57,7 @@ namespace game.Server.Controllers
                 if (existingMine != null)
                 {
                     _context.Mines.Remove(existingMine);
+                    await _context.SaveChangesAsync();
                 }
 
                 Mine mine = new Mine
@@ -63,19 +67,20 @@ namespace game.Server.Controllers
                 };
                 _context.Mines.Add(mine);
 
-
                 Floor mineFloor = new Floor
                 {
                     BuildingId = building.BuildingId,
                     Level = 0,
                     FloorItems = new List<FloorItem>()
                 };
-
                 _context.Floors.Add(mineFloor);
+
                 await _context.SaveChangesAsync();
+                await _mineService.GetOrGenerateLayersBlocksAsync(mine.MineId, 1, 5);
+
 
                 player.FloorId = mineFloor.FloorId;
-
+                player.MineId = mine.MineId; 
                 player.SubPositionX = 0;
                 player.SubPositionY = 0;
 
@@ -83,12 +88,11 @@ namespace game.Server.Controllers
 
                 return Ok(new
                 {
-                    Mine = mine,
-                    Floor = mineFloor,
-                    Message = "Mine generated and player moved to mine floor."
+                    mine.MineId,
+                    Message = "Mine regenerated and player moved to mine floor."
                 });
-            } 
-            catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
@@ -179,8 +183,8 @@ namespace game.Server.Controllers
             }
         }
 
-        [HttpPatch("{PlayerID}/Action/buy")]
-        public async Task<ActionResult> BuyCapacity(Guid PlayerID, [FromQuery] int amount)
+        [HttpPatch("Action/Buy")]
+        public async Task<ActionResult> BuyCapacity(Guid playerId, [FromQuery] int amount)
         {
 
             try
@@ -189,7 +193,7 @@ namespace game.Server.Controllers
                 .Include(p => p.InventoryItems)
                     .ThenInclude(ii => ii.ItemInstance)
                         .ThenInclude(ins => ins.Item)
-                .FirstOrDefaultAsync(p => p.PlayerId == PlayerID);
+                .FirstOrDefaultAsync(p => p.PlayerId == playerId);
 
                 if (player == null)
                 {
@@ -244,7 +248,7 @@ namespace game.Server.Controllers
 
                 var inventoryItem = new InventoryItem
                 {
-                    PlayerId = PlayerID,
+                    PlayerId = playerId,
                     ItemInstanceId = itemInstance.ItemInstanceId,
                     ItemInstance = itemInstance,
                     IsInBank = false
@@ -268,19 +272,28 @@ namespace game.Server.Controllers
         /// - mine layer je y, index x
         /// - hrac musi stat vedle blocku ktery chce tezit
         /// </remarks>
-        [HttpPatch("{PlayerID}/Action/mine")]
-        public async Task<ActionResult> MineBlock(Guid PlayerID, MineInteractionRequest request)
+        [HttpPatch("{mineId}/Action/Mine")]
+        public async Task<ActionResult> MineBlock(int mineId, MineInteractionRequest request)
         {
             try
             {
-                var player = await _context.Players
-                .Include(p => p.InventoryItems)
-                .Include(p => p.ActiveInventoryItem)
-                    .ThenInclude(ai => ai.ItemInstance)
-                        .ThenInclude(ins => ins.Item)
-                .FirstOrDefaultAsync(p => p.PlayerId == PlayerID);
+                var mine = await _context.Mines
+                    .Include(m => m.MineLayers)
+                        .ThenInclude(l => l.MineBlocks)
+                            .ThenInclude(mb => mb.Block)
+                                .ThenInclude(b => b.Item)
+                    .FirstOrDefaultAsync(m => m.MineId == mineId);
 
-                if (player == null) return NotFound("Player not found");
+                if (mine == null) return NotFound("Mine not found.");
+                var player = await _context.Players
+                    .Include(p => p.InventoryItems)
+                    .Include(p => p.ActiveInventoryItem)
+                        .ThenInclude(ai => ai.ItemInstance)
+                            .ThenInclude(ins => ins.Item)
+                    .FirstOrDefaultAsync(p => p.PlayerId == mine.PlayerId);
+
+                if (player == null) return NotFound("Player associated with this mine not found.");
+
 
                 if (player.ActiveInventoryItemId == null || player.ActiveInventoryItem == null)
                 {
@@ -288,25 +301,17 @@ namespace game.Server.Controllers
                 }
 
                 var chosenItem = player.ActiveInventoryItem;
-
                 if (chosenItem.ItemInstance?.Item == null || !chosenItem.ItemInstance.Item.Name.Contains("Pickaxe"))
                 {
                     return BadRequest("Your active item is not a pickaxe.");
                 }
+
 
                 int diffX = Math.Abs(player.SubPositionX - request.TargetX);
                 int diffY = Math.Abs(player.SubPositionY - request.TargetY);
                 if (!((diffX == 1 && diffY == 0) || (diffX == 0 && diffY == 1)))
                     return BadRequest("Target is too far away.");
 
-                var mine = await _context.Mines
-                    .Include(m => m.MineLayers)
-                        .ThenInclude(l => l.MineBlocks)
-                            .ThenInclude(mb => mb.Block)
-                                .ThenInclude(b => b.Item)
-                    .FirstOrDefaultAsync(m => m.PlayerId == PlayerID);
-
-                if (mine == null) return BadRequest("Mine not found.");
 
                 var targetLayer = mine.MineLayers.FirstOrDefault(l => l.Depth == request.TargetY);
                 var targetBlock = targetLayer?.MineBlocks.FirstOrDefault(mb => mb.Index == request.TargetX);
@@ -366,7 +371,8 @@ namespace game.Server.Controllers
                     PositionY = request.TargetY,
                     activeItemId = player.ActiveInventoryItemId
                 });
-            } catch (Exception ex) 
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }

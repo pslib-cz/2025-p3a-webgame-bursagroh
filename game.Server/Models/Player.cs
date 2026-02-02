@@ -13,7 +13,8 @@ namespace game.Server.Models
         Blacksmith,
         Floor,
         Fountain,
-        Fight
+        Fight,
+        Win
     }
 
     public class Player
@@ -40,6 +41,9 @@ namespace game.Server.Models
         public int Seed { get; set; } = 0;
 
         public int Health { get; set; } = 20;
+        public int MaxHealth { get; set; } = 20;
+
+        public int MineId { get; set; }
 
         [JsonIgnore]
         public virtual ICollection<InventoryItem> InventoryItems { get; set; } = new List<InventoryItem>();
