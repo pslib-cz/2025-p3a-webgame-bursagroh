@@ -22,24 +22,7 @@ namespace game.Server.Controllers
             _generator = generator;
         }
 
-
-        [HttpGet("{saveString}")]
-        public async Task<ActionResult<Guid>> GetPlayerId(string saveString)
-        {
-            var save = await _context.Saves
-                .FirstOrDefaultAsync(s => s.SaveString == saveString);
-
-            if (save == null)
-            {
-                return NotFound("No player associated with this savestring.");
-            }
-
-            return Ok(new { playerId = save.PlayerId });
-        }
-
-
-
-        [HttpPost("Save")]
+        [HttpPost]
         public async Task<ActionResult> ClonePlayerRecord(Guid playerId)
         {
             try
@@ -219,6 +202,163 @@ namespace game.Server.Controllers
                 await _context.SaveChangesAsync();
 
                 return Ok(new { newSave.SaveString, clonedPlayer.PlayerId });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        [HttpPost("/api/Load")]
+        public async Task<ActionResult> LoadSnapshot(string saveString, Guid targetPlayerId)
+        {
+            try
+            {
+                var saveEntry = await _context.Saves.FirstOrDefaultAsync(s => s.SaveString == saveString);
+                if (saveEntry == null) return NotFound("Save string not found.");
+                var sourceId = saveEntry.PlayerId;
+
+
+                var sourcePlayer = await _context.Players
+                    .Include(p => p.InventoryItems).ThenInclude(ii => ii.ItemInstance)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(p => p.PlayerId == sourceId);
+
+                if (sourcePlayer == null) return NotFound("Source player not found.");
+
+                var targetPlayer = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == targetPlayerId);
+                if (targetPlayer == null) return NotFound("Target player not found.");
+
+                var oldBuildings = await _context.Buildings.Where(b => b.PlayerId == targetPlayerId).ToListAsync();
+                _context.Buildings.RemoveRange(oldBuildings);
+
+                var oldMine = await _context.Mines.Where(m => m.PlayerId == targetPlayerId).ToListAsync();
+                _context.Mines.RemoveRange(oldMine);
+
+                var oldInv = await _context.InventoryItems.Where(i => i.PlayerId == targetPlayerId).ToListAsync();
+                _context.InventoryItems.RemoveRange(oldInv);
+
+                await _context.SaveChangesAsync();
+                _context.Entry(targetPlayer).CurrentValues.SetValues(sourcePlayer);
+                targetPlayer.PlayerId = targetPlayerId;
+                targetPlayer.Name = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 1));
+                targetPlayer.InventoryItems = new List<InventoryItem>();
+                targetPlayer.FloorId = null;
+
+                await _context.SaveChangesAsync();
+
+                var sourceBuildings = await _context.Buildings
+                    .Include(b => b.Floors).ThenInclude(f => f.FloorItems).ThenInclude(fi => fi.Chest)
+                    .Include(b => b.Floors).ThenInclude(f => f.FloorItems).ThenInclude(fi => fi.Enemy)
+                    .Include(b => b.Floors).ThenInclude(f => f.FloorItems).ThenInclude(fi => fi.ItemInstance)
+                    .Where(b => b.PlayerId == sourceId)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                foreach (var oldBuilding in sourceBuildings)
+                {
+                    var newBuilding = new Building();
+                    _context.Entry(newBuilding).CurrentValues.SetValues(oldBuilding);
+                    newBuilding.BuildingId = 0;
+                    newBuilding.PlayerId = targetPlayer.PlayerId;
+                    newBuilding.Floors = new List<Floor>();
+
+                    _context.Buildings.Add(newBuilding);
+                    await _context.SaveChangesAsync();
+
+                    if (oldBuilding.Floors != null)
+                    {
+                        foreach (var oldFloor in oldBuilding.Floors)
+                        {
+                            var newFloor = new Floor
+                            {
+                                BuildingId = newBuilding.BuildingId,
+                                Level = oldFloor.Level,
+                                FloorItems = new List<FloorItem>()
+                            };
+                            _context.Floors.Add(newFloor);
+                            await _context.SaveChangesAsync();
+
+                            if (sourcePlayer.FloorId == oldFloor.FloorId) targetPlayer.FloorId = newFloor.FloorId;
+
+                            foreach (var oldFI in oldFloor.FloorItems)
+                            {
+                                var newFI = new FloorItem
+                                {
+                                    FloorId = newFloor.FloorId,
+                                    PositionX = oldFI.PositionX,
+                                    PositionY = oldFI.PositionY,
+                                    FloorItemType = oldFI.FloorItemType,
+                                    Chest = oldFI.Chest != null ? new Chest() : null,
+                                    Enemy = oldFI.Enemy != null ? new Enemy
+                                    {
+                                        EnemyType = oldFI.Enemy.EnemyType,
+                                        Health = oldFI.Enemy.Health,
+                                        ItemInstanceId = oldFI.Enemy.ItemInstanceId
+                                    } : null,
+                                    ItemInstance = oldFI.ItemInstance != null ? new ItemInstance
+                                    {
+                                        ItemId = oldFI.ItemInstance.ItemId,
+                                        Durability = oldFI.ItemInstance.Durability
+                                    } : null
+                                };
+                                _context.FloorItems.Add(newFI);
+                            }
+                        }
+                    }
+                }
+
+                var sourceMine = await _context.Mines
+                    .Include(m => m.MineLayers).ThenInclude(l => l.MineBlocks)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.PlayerId == sourceId);
+
+                if (sourceMine != null)
+                {
+                    var newMine = new Mine { MineId = new Random().Next(), PlayerId = targetPlayer.PlayerId };
+                    _context.Mines.Add(newMine);
+                    await _context.SaveChangesAsync();
+
+                    foreach (var oldLayer in sourceMine.MineLayers)
+                    {
+                        var newLayer = new MineLayer { MineId = newMine.MineId, Depth = oldLayer.Depth };
+                        _context.MineLayers.Add(newLayer);
+                        await _context.SaveChangesAsync();
+
+                        foreach (var oldBlock in oldLayer.MineBlocks)
+                        {
+                            _context.MineBlocks.Add(new MineBlock
+                            {
+                                MineLayerId = newLayer.MineLayerID,
+                                BlockId = oldBlock.BlockId,
+                                Index = oldBlock.Index,
+                                Health = oldBlock.Health
+                            });
+                        }
+                    }
+                }
+
+                foreach (var originalInvItem in sourcePlayer.InventoryItems)
+                {
+                    if (originalInvItem.ItemInstance == null) continue;
+                    var newInstance = new ItemInstance
+                    {
+                        ItemId = originalInvItem.ItemInstance.ItemId,
+                        Durability = originalInvItem.ItemInstance.Durability
+                    };
+                    _context.ItemInstances.Add(newInstance);
+                    await _context.SaveChangesAsync();
+
+                    _context.InventoryItems.Add(new InventoryItem
+                    {
+                        PlayerId = targetPlayer.PlayerId,
+                        ItemInstanceId = newInstance.ItemInstanceId,
+                        IsInBank = originalInvItem.IsInBank
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Snapshot loaded", newName = targetPlayer.Name });
             }
             catch (Exception ex)
             {

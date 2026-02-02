@@ -280,7 +280,10 @@ namespace game.Server.Data
                 new Item { ItemId = 36, Name = "Unobtainium Pickaxe", Description = "Unobtainium Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 7, MaxDurability = 240 },
 
                 new Item { ItemId = 39, Name = "Rented Pickaxe", Description = "Rented Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 15 },
-                new Item { ItemId = 40, Name = "Healing Potion", Description = "This thing heals", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 }
+
+                new Item { ItemId = 40, Name = "Healing Potion", Description = "This thing heals", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
+                new Item { ItemId = 41, Name = "God Potion", Description = "+5 hp", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
+                new Item { ItemId = 42, Name = "Muscle Potion", Description = "+5 inventory space", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 }
 
             );
             modelBuilder.Entity<Block>().HasData(
