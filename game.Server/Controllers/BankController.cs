@@ -21,13 +21,13 @@ namespace game.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<IEnumerable<BankInventoryDto>> GetPlayerBankInventory(Guid id)
+        [HttpGet("Inventory")]
+        public ActionResult<IEnumerable<BankInventoryDto>> GetPlayerBankInventory(Guid playerId)
         {
             try
             {
                 var items = _context.InventoryItems
-                .Where(i => i.PlayerId == id && i.IsInBank)
+                .Where(i => i.PlayerId == playerId && i.IsInBank)
                 .ProjectTo<BankInventoryDto>(_mapper.ConfigurationProvider)
                 .ToList();
 
@@ -39,8 +39,8 @@ namespace game.Server.Controllers
             
         }
 
-        [HttpPatch("{id}/Action/transfer")]
-        public async Task<ActionResult<int>> TransferMoney(Guid id, [FromBody] MovePlayerMoneyRequest request)
+        [HttpPatch("Action/Transfer")]
+        public async Task<ActionResult<int>> TransferMoney(Guid playerId, [FromBody] MovePlayerMoneyRequest request)
         {
             try 
             {
@@ -49,7 +49,7 @@ namespace game.Server.Controllers
                     return BadRequest("amount < 0");
                 }
 
-                Player? player = _context.Players.Where(i => i.PlayerId == id).FirstOrDefault();
+                Player? player = _context.Players.Where(i => i.PlayerId == playerId).FirstOrDefault();
 
                 if (player == null)
                 {
@@ -78,40 +78,38 @@ namespace game.Server.Controllers
             
         }
 
-        [HttpPatch("{id}/Action/move")] 
-        public async Task<IActionResult> MoveInventoryItem(Guid id, [FromBody] MoveInventoryItemRequest request)
+        [HttpPatch("Action/Move")]
+        public async Task<IActionResult> MoveInventoryItems(Guid playerId, [FromBody] MoveInventoryItemRequest request)
         {
-            try 
+            try
             {
-                if (request.InventoryItemId <= 0)
+                if (request.InventoryItemIds == null || !request.InventoryItemIds.Any())
                 {
-                    return BadRequest();
+                    return BadRequest("No item IDs provided.");
                 }
 
-                InventoryItem? item = await _context.InventoryItems
-                    .Where(i => i.InventoryItemId == request.InventoryItemId)
-                    .SingleOrDefaultAsync();
+                var items = await _context.InventoryItems
+                    .Where(i => i.PlayerId == playerId && request.InventoryItemIds.Contains(i.InventoryItemId))
+                    .ToListAsync();
 
-                if (item == null)
+                if (!items.Any())
                 {
-                    return NotFound();
+                    return NotFound("No matching items found for this player.");
                 }
 
-                if (item.PlayerId != id)
+                foreach (var item in items)
                 {
-                    return Forbid();
+                    item.IsInBank = !item.IsInBank;
                 }
-
-                item.IsInBank = !item.IsInBank;
 
                 await _context.SaveChangesAsync();
-                return Ok(item);
+
+                return Ok();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error: " + ex.Message);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-            
         }
     }
 }

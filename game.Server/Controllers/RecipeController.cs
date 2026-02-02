@@ -39,21 +39,21 @@ namespace game.Server.Controllers
         }
 
         [HttpGet("Random")]
-        public async Task<ActionResult> GetRandomRecipe()
+        public async Task<ActionResult<RecipeDto>> GetRandomRecipe()
         {
-            var recipes = await _context.Recipes.ToListAsync();
+            var recipes = await _context.Recipes
+                .Include(r => r.Ingrediences)
+                .ToListAsync();
 
-            if (recipes == null || recipes.Count == 0)
+            if (recipes == null || !recipes.Any())
             {
                 return NoContent();
             }
 
             var randomRecipe = recipes.OrderBy(r => Guid.NewGuid()).FirstOrDefault();
+            var recipeDto = _mapper.Map<RecipeDto>(randomRecipe);
 
-            return Ok(new[]
-            {
-                new { name = randomRecipe?.Name }
-            });
+            return Ok(recipeDto);
         }
 
         [HttpPatch("{recipeId}/Action/start")]
