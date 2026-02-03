@@ -345,7 +345,7 @@ namespace game.Server.Controllers
                             .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType == FloorItemType.Enemy)
                             .ToListAsync();
 
-                        var occupiedPositions = await _context.FloorItems
+                        var currentOccupied = await _context.FloorItems
                             .Where(fi => fi.FloorId == player.FloorId)
                             .Select(fi => new { fi.PositionX, fi.PositionY })
                             .ToListAsync();
@@ -359,19 +359,25 @@ namespace game.Server.Controllers
                             int diffX = player.SubPositionX - enemy.PositionX;
                             int diffY = player.SubPositionY - enemy.PositionY;
 
+      
                             if (Math.Abs(diffX) > Math.Abs(diffY)) nextX += Math.Sign(diffX);
                             else nextY += Math.Sign(diffY);
 
+
                             bool isStairs = stairs.Any(s => s.Item1 == nextX && s.Item2 == nextY);
                             bool isPlayer = (nextX == player.SubPositionX && nextY == player.SubPositionY);
-                            bool isOccupied = occupiedPositions.Any(p => p.PositionX == nextX && p.PositionY == nextY);
+
+                            bool isOccupied = currentOccupied.Any(p => p.PositionX == nextX && p.PositionY == nextY);
 
                             if (!isStairs && !isPlayer && !isOccupied)
                             {
-                                occupiedPositions.RemoveAll(p => p.PositionX == enemy.PositionX && p.PositionY == enemy.PositionY);
+                                currentOccupied.RemoveAll(p => p.PositionX == enemy.PositionX && p.PositionY == enemy.PositionY);
+
                                 enemy.PositionX = nextX;
                                 enemy.PositionY = nextY;
-                                occupiedPositions.Add(new { PositionX = nextX, PositionY = nextY });
+
+                                currentOccupied.Add(new { PositionX = nextX, PositionY = nextY });
+                                _context.Entry(enemy).State = EntityState.Modified;
                             }
                         }
                     }
@@ -733,7 +739,6 @@ namespace game.Server.Controllers
         {
             try
             {
-                // Fetch player with all necessary data for both combat and consumables
                 var player = await _context.Players
                     .Include(p => p.ActiveInventoryItem)
                         .ThenInclude(ai => ai.ItemInstance)
@@ -750,7 +755,6 @@ namespace game.Server.Controllers
                 var activeItem = player.ActiveInventoryItem;
                 var itemData = activeItem.ItemInstance.Item;
 
-                // --- BRANCH A: COMBAT LOGIC (Swords) ---
                 if (itemData.ItemType == ItemTypes.Sword)
                 {
                     if (player.ScreenType != ScreenTypes.Fight)
@@ -785,7 +789,6 @@ namespace game.Server.Controllers
                         });
                     }
 
-                    // Defeat Logic
                     if (targetEnemy.ItemInstanceId.HasValue)
                     {
                         floorItem.FloorItemType = FloorItemType.Item;
@@ -804,26 +807,24 @@ namespace game.Server.Controllers
                     return Ok(new { message = $"Defeated the {targetEnemy.EnemyType}!", victory = true });
                 }
 
-                // --- BRANCH B: CONSUMABLE LOGIC (IDs 40, 41, 42) ---
                 else if (itemData.ItemId == 40 || itemData.ItemId == 41 || itemData.ItemId == 42)
                 {
                     switch (itemData.ItemId)
                     {
-                        case 40: // Healing Potion
+                        case 40:
                             if (player.Health >= player.MaxHealth) return BadRequest("Already at full health!");
                             player.Health = Math.Min(player.MaxHealth, player.Health + 5);
                             break;
 
-                        case 41: // Max Health Boost
+                        case 41:
                             player.MaxHealth += 5;
                             break;
 
-                        case 42: // Capacity Boost
+                        case 42:
                             player.Capacity += 5;
                             break;
                     }
 
-                    // Remove the consumable item after use
                     var instanceToDelete = activeItem.ItemInstance;
                     player.ActiveInventoryItemId = null;
                     _context.InventoryItems.Remove(activeItem);
