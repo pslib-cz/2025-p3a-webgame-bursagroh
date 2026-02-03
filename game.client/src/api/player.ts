@@ -27,6 +27,7 @@ export const updatePlayerPositionMutation = (playerId: string, newPositionX: num
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX, newPositionY, newFloorId: null }),
         onSuccess(data) {
             queryClient.setQueryData([playerId, "player"], data)
+            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
         },
     })
 
@@ -47,13 +48,13 @@ export const updatePlayerScreenMutation = (playerId: string, newScreenType: Scre
         },
     })
 
-export const pickItemMutation = (playerId: string, mineId: number, buildingId: number, level: number) =>
+export const pickItemMutation = (playerId: string) =>
     mutationOptions({
         mutationFn: (floorItemId: number) => api.patch("/api/Player/{playerId}/Action/pick", { playerId }, {}, { floorItemId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
-            queryClient.invalidateQueries({queryKey: [playerId, "building", buildingId, level]})
+            queryClient.invalidateQueries({ queryKey: [playerId, "mine"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
         },
     })
 
@@ -62,6 +63,8 @@ export const dropItemMutation = (playerId: string) =>
         mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/drop", { playerId }, {}, { inventoryItemId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "mine"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
         },
     })
 
