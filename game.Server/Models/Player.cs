@@ -14,7 +14,8 @@ namespace game.Server.Models
         Floor,
         Fountain,
         Fight,
-        Win
+        Win,
+        Lose
     }
 
     public class Player
