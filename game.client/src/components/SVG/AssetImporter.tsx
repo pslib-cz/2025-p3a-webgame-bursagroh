@@ -1,3 +1,11 @@
+import Bacon from '../../assets/burger/Bacon'
+import BunDown from '../../assets/burger/BunDown'
+import BunUp from '../../assets/burger/BunUp'
+import Cheese from '../../assets/burger/Cheese'
+import Meat from '../../assets/burger/Meat'
+import Salad from '../../assets/burger/Salad'
+import Sauce from '../../assets/burger/Sauce'
+import Tomato from '../../assets/burger/Tomato'
 import Copper from '../../assets/items/Copper'
 import Gold from '../../assets/items/Gold'
 import Iron from '../../assets/items/Iron'
@@ -45,8 +53,9 @@ const blockAssets = [EmptyBlock, Rock, WoodenFrame, CopperOre, IronOre, GoldOre,
 const floorAssets = [Floor, FloorCorner, FloorWall, FloorDoorLeft, FloorDoorRight, FloorStairs]
 const enemyAssets = [Dragon, Skeleton, Zombie]
 const itemAssets = [WoodenPickaxe, WoodenSword, Copper, Gold, Iron, RockItem, Silver, Unobtanium, Wood]
+const burgerAssets = [Bacon, BunDown, BunUp, Meat, Salad, Sauce, Tomato, Cheese]
 
-const assets = [Player, TableLeft, TableRight, ...buildingAssets, ...blockAssets, ...floorAssets, ...enemyAssets, ...itemAssets]
+const assets = [Player, TableLeft, TableRight, ...buildingAssets, ...blockAssets, ...floorAssets, ...enemyAssets, ...itemAssets, ...burgerAssets]
 
 const AssetImporter = () => {
     return (

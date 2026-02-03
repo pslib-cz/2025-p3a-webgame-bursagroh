@@ -39,7 +39,7 @@ const PlayerUI = () => {
             <div className={styles.statContainer}>
                 <div className={styles.stat}>
                     <HeartIcon width={24} height={24} />
-                    <span>{player.health} / ?</span>
+                    <span>{player.health} / {player.maxHealth}</span>
                 </div>
                 <div className={styles.stat}>
                     <MoneyIcon width={24} height={24} />
