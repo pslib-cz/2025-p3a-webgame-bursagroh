@@ -326,7 +326,11 @@ namespace game.Server.Data
                 new Blueprint { BlueprintId = 18, ItemId = 33, Price = 40 }, // Iron Pickaxe
                 new Blueprint { BlueprintId = 19, ItemId = 34, Price = 80 }, // Silver Pickaxe
                 new Blueprint { BlueprintId = 20, ItemId = 35, Price = 150 },// Gold Pickaxe
-                new Blueprint { BlueprintId = 21, ItemId = 36, Price = 500 } // Unobtainium Pickaxe
+                new Blueprint { BlueprintId = 21, ItemId = 36, Price = 500 }, // Unobtainium Pickaxe
+
+                new Blueprint { BlueprintId = 22, ItemId = 40, Price = 500 },
+                new Blueprint { BlueprintId = 23, ItemId = 41, Price = 500 },
+                new Blueprint { BlueprintId = 24, ItemId = 42, Price = 500 } 
             );
 
             modelBuilder.Entity<Crafting>().HasData(

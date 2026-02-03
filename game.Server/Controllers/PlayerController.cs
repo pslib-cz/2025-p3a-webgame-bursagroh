@@ -341,7 +341,7 @@ namespace game.Server.Controllers
                         if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)
                         {
                             var random = new Random();
-                            int[] lootIds = { 10, 11, 12, 13, 14, 15, 16 };
+                            int[] lootIds = { 10, 11, 12, 13, 14, 15, 16, 40, 41, 42 };
                             int scatterCount = random.Next(2, 6);
 
                             var emptyTiles = new List<(int x, int y)>();
@@ -688,6 +688,23 @@ namespace game.Server.Controllers
                     var instanceToDelete = activeItem.ItemInstance;
                     player.ActiveInventoryItemId = null;
 
+                    _context.InventoryItems.Remove(activeItem);
+                    _context.ItemInstances.Remove(instanceToDelete);
+                }
+                else if (activeItem.ItemInstance.ItemId == 41)
+                {
+                    player.MaxHealth += 5;
+                    var instanceToDelete = activeItem.ItemInstance;
+                    player.ActiveInventoryItemId = null;
+
+                    _context.InventoryItems.Remove(activeItem);
+                    _context.ItemInstances.Remove(instanceToDelete);
+                }
+                else if (activeItem.ItemInstance.ItemId == 42)
+                {
+                    player.Capacity += 5;
+                    var instanceToDelete = activeItem.ItemInstance;
+                    player.ActiveInventoryItemId = null;
                     _context.InventoryItems.Remove(activeItem);
                     _context.ItemInstances.Remove(instanceToDelete);
                 }
