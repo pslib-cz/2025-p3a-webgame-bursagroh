@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace game.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class rebase : Migration
+    public partial class pico123 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -282,45 +282,6 @@ namespace game.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Enemies",
-                columns: table => new
-                {
-                    EnemyId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Health = table.Column<int>(type: "INTEGER", nullable: false),
-                    EnemyType = table.Column<int>(type: "INTEGER", nullable: false),
-                    FloorItemId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ItemInstanceId = table.Column<int>(type: "INTEGER", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Enemies", x => x.EnemyId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FloorItems",
-                columns: table => new
-                {
-                    FloorItemId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    FloorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PositionX = table.Column<int>(type: "INTEGER", nullable: false),
-                    PositionY = table.Column<int>(type: "INTEGER", nullable: false),
-                    ItemInstanceId = table.Column<int>(type: "INTEGER", nullable: true),
-                    FloorItemType = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FloorItems", x => x.FloorItemId);
-                    table.ForeignKey(
-                        name: "FK_FloorItems_Floors_FloorId",
-                        column: x => x.FloorId,
-                        principalTable: "Floors",
-                        principalColumn: "FloorId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Chests",
                 columns: table => new
                 {
@@ -331,12 +292,6 @@ namespace game.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Chests", x => x.ChestId);
-                    table.ForeignKey(
-                        name: "FK_Chests_FloorItems_FloorItemId",
-                        column: x => x.FloorItemId,
-                        principalTable: "FloorItems",
-                        principalColumn: "FloorItemId",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -366,6 +321,35 @@ namespace game.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FloorItems",
+                columns: table => new
+                {
+                    FloorItemId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FloorId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PositionX = table.Column<int>(type: "INTEGER", nullable: false),
+                    PositionY = table.Column<int>(type: "INTEGER", nullable: false),
+                    ItemInstanceId = table.Column<int>(type: "INTEGER", nullable: true),
+                    FloorItemType = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FloorItems", x => x.FloorItemId);
+                    table.ForeignKey(
+                        name: "FK_FloorItems_Floors_FloorId",
+                        column: x => x.FloorId,
+                        principalTable: "Floors",
+                        principalColumn: "FloorId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FloorItems_ItemInstances_ItemInstanceId",
+                        column: x => x.ItemInstanceId,
+                        principalTable: "ItemInstances",
+                        principalColumn: "ItemInstanceId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ItemMineBlock",
                 columns: table => new
                 {
@@ -387,6 +371,33 @@ namespace game.Server.Migrations
                         principalTable: "MineBlocks",
                         principalColumn: "MineBlockId",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Enemies",
+                columns: table => new
+                {
+                    EnemyId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Health = table.Column<int>(type: "INTEGER", nullable: false),
+                    EnemyType = table.Column<int>(type: "INTEGER", nullable: false),
+                    FloorItemId = table.Column<int>(type: "INTEGER", nullable: false),
+                    ItemInstanceId = table.Column<int>(type: "INTEGER", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Enemies", x => x.EnemyId);
+                    table.ForeignKey(
+                        name: "FK_Enemies_FloorItems_FloorItemId",
+                        column: x => x.FloorItemId,
+                        principalTable: "FloorItems",
+                        principalColumn: "FloorItemId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Enemies_ItemInstances_ItemInstanceId",
+                        column: x => x.ItemInstanceId,
+                        principalTable: "ItemInstances",
+                        principalColumn: "ItemInstanceId");
                 });
 
             migrationBuilder.CreateTable(
@@ -463,13 +474,13 @@ namespace game.Server.Migrations
                     { 5, 7, 0, "Silver Ore", 4, 0, "Silver Ore", 0 },
                     { 6, 6, 0, "Gold Ore", 4, 0, "Gold Ore", 0 },
                     { 7, 1, 0, "Unobtainium Ore", 4, 0, "Unobtainium Ore", 0 },
-                    { 10, 0, 10, "Wooden Sword", 0, 20, "Wooden Sword", 1 },
-                    { 11, 0, 20, "Rock Sword", 0, 40, "Rock Sword", 1 },
-                    { 12, 0, 30, "Copper Sword", 0, 60, "Copper Sword", 1 },
-                    { 13, 0, 40, "Iron Sword", 0, 80, "Iron Sword", 1 },
-                    { 14, 0, 50, "Silver Sword", 0, 100, "Silver Sword", 1 },
-                    { 15, 0, 60, "Gold Sword", 0, 120, "Gold Sword", 1 },
-                    { 16, 0, 70, "Unobtainium Sword", 0, 240, "Unobtainium Sword", 1 },
+                    { 10, 0, 1, "Wooden Sword", 0, 20, "Wooden Sword", 1 },
+                    { 11, 0, 2, "Rock Sword", 0, 40, "Rock Sword", 1 },
+                    { 12, 0, 3, "Copper Sword", 0, 60, "Copper Sword", 1 },
+                    { 13, 0, 4, "Iron Sword", 0, 80, "Iron Sword", 1 },
+                    { 14, 0, 5, "Silver Sword", 0, 100, "Silver Sword", 1 },
+                    { 15, 0, 6, "Gold Sword", 0, 120, "Gold Sword", 1 },
+                    { 16, 0, 7, "Unobtainium Sword", 0, 240, "Unobtainium Sword", 1 },
                     { 20, 0, 1, "Wooden Axe", 1, 20, "Wooden Axe", 1 },
                     { 21, 0, 2, "Rock Axe", 1, 40, "Rock Axe", 1 },
                     { 22, 0, 3, "Copper Axe", 1, 60, "Copper Axe", 1 },
@@ -562,7 +573,10 @@ namespace game.Server.Migrations
                     { 18, 33, 40 },
                     { 19, 34, 80 },
                     { 20, 35, 150 },
-                    { 21, 36, 500 }
+                    { 21, 36, 500 },
+                    { 22, 40, 500 },
+                    { 23, 41, 500 },
+                    { 24, 42, 500 }
                 });
 
             migrationBuilder.InsertData(
@@ -705,6 +719,12 @@ namespace game.Server.Migrations
                 column: "ItemId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Chests_FloorItemId",
+                table: "Chests",
+                column: "FloorItemId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Craftings_BlueprintId",
                 table: "Craftings",
                 column: "BlueprintId");
@@ -739,12 +759,6 @@ namespace game.Server.Migrations
                 name: "IX_Floors_BuildingId",
                 table: "Floors",
                 column: "BuildingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Chests_FloorItemId",
-                table: "Chests",
-                column: "FloorItemId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ingrediences_RecipeId",
@@ -810,27 +824,12 @@ namespace game.Server.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Enemies_FloorItems_FloorItemId",
-                table: "Enemies",
+                name: "FK_Chests_FloorItems_FloorItemId",
+                table: "Chests",
                 column: "FloorItemId",
                 principalTable: "FloorItems",
                 principalColumn: "FloorItemId",
                 onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Enemies_ItemInstances_ItemInstanceId",
-                table: "Enemies",
-                column: "ItemInstanceId",
-                principalTable: "ItemInstances",
-                principalColumn: "ItemInstanceId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_FloorItems_ItemInstances_ItemInstanceId",
-                table: "FloorItems",
-                column: "ItemInstanceId",
-                principalTable: "ItemInstances",
-                principalColumn: "ItemInstanceId",
-                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_InventoryItem_Players_PlayerId",

@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260203180343_ted")]
-    partial class ted
+    [Migration("20260203204220_pico123")]
+    partial class pico123
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -706,9 +706,6 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ItemInstanceId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MaxHealth")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("EnemyId");
