@@ -16,7 +16,7 @@ export interface APIBankItemMove extends GenericPATCH {
         playerId: string
     }
     body: {
-        inventoryItemId: number
+        inventoryItemIds: Array<number>
     }
     res: {
         200: object

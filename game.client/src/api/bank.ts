@@ -7,9 +7,9 @@ export const getBankInventoryQuery = (playerId: string) =>
         queryFn: () => api.getWith204("/api/Bank/Inventory", {}, { playerId }),
     })
 
-export const moveBankItemMutation = (playerId: string, inventoryItemId: number) =>
+export const moveBankItemMutation = (playerId: string) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Bank/Action/move", {}, { playerId }, { inventoryItemId }),
+        mutationFn: ({ inventoryItemIds }: { inventoryItemIds: Array<number> }) => api.patch("/api/Bank/Action/move", {}, { playerId }, { inventoryItemIds }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "bank"] })
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
