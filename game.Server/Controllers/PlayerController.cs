@@ -440,8 +440,19 @@ namespace game.Server.Controllers
                             if (player.Health == 0)
                             {
                                 player.ScreenType = ScreenTypes.Lose;
-                                player.PositionX = 0; player.PositionY = 0; 
+                                player.PositionX = 0; 
+                                player.PositionY = 0; 
                                 player.FloorId = null;
+
+                                var itemsToRemove = player.InventoryItems
+                                    .Where(ii => !ii.IsInBank)
+                                    .ToList();
+
+
+                                if (itemsToRemove.Any())
+                                {
+                                    _context.InventoryItems.RemoveRange(itemsToRemove);
+                                }
                             }
                             else
                             {
