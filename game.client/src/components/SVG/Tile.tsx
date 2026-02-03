@@ -8,7 +8,6 @@ import type { ScreenType } from "../../types/api/models/player"
 import { useNavigate } from "react-router"
 import { ActiveItemContext } from "../../providers/ActiveItemProvider"
 import { mineMineBlockMutation } from "../../api/mine"
-import { interactInBuildingMutation } from "../../api/building"
 
 type TileProps = {
     tileType: TileType
@@ -78,7 +77,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
         case "iron_ore":
         case "gold_ore":
         case "silver_ore":
-        case "unobtanium_ore":
+        case "unobtainium_ore":
         case "wooden_sword":
         case "wooden_pickaxe":
         case "wood":
@@ -87,7 +86,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
         case "iron":
         case "silver":
         case "gold":
-        case "unobtanium":
+        case "unobtainium":
             screenType = "Mine"
             break
         case "grass":
@@ -110,8 +109,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(playerId, x, y))
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, screenType))
     const { mutateAsync: updatePlayerFloorAsync } = useMutation(updatePlayerFloorMutation(playerId, x, y, targetFloorId!))
-    const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(playerId, mineId ?? -1, activeItem.activeItemInventoryItemId ?? -1, x, y))
-    const {mutateAsync: interactInBuildingAsync} = useMutation(interactInBuildingMutation(playerId, targetBuildingId ?? -1, targetLevel ?? -1, activeItem.activeItemInventoryItemId ?? -1, x, y))
+    const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(playerId, mineId ?? -1, x, y))
     const {mutateAsync: pickItemAsync} = useMutation(pickItemMutation(playerId, mineId ?? -1, targetBuildingId ?? -1, targetLevel ?? -1))
 
     const handleClick = async () => {
@@ -144,8 +142,8 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "abandoned-trap-corner-top-right":
             case "abandoned-trap-corner-bottom-left":
             case "abandoned-trap-corner-bottom-right":
-                await updatePlayerPositionAsync(), 
-                await updatePlayerScreenAsync()
+                await updatePlayerPositionAsync()
+                // await updatePlayerScreenAsync()
                 break
             case "stair":
                 await updatePlayerPositionAsync()
@@ -157,13 +155,13 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "iron_ore":
             case "gold_ore":
             case "silver_ore":
-            case "unobtanium_ore":
+            case "unobtainium_ore":
                 await mineMineBlockAsync()
                 break
             case "zombie":
             case "skeleton":
             case "dragon":
-                await interactInBuildingAsync()
+                // await interactInBuildingAsync()
                 break
             case "wooden_sword":
             case "wooden_pickaxe":
@@ -173,7 +171,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "iron":
             case "silver":
             case "gold":
-            case "unobtanium":
+            case "unobtainium":
                 await pickItemAsync(targetFloorItemId ?? -1)
                 break
             default:
@@ -193,6 +191,9 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
                 break
             case "mine":
                 navigate("/game/mine")
+                break
+            case "fountain":
+                navigate("/game/fountain")
                 break
             case "wall-door-left-top":
             case "wall-door-left-right":
@@ -220,10 +221,10 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "abandoned-trap-corner-top-right":
             case "abandoned-trap-corner-bottom-left":
             case "abandoned-trap-corner-bottom-right":
-                navigate("/game/floor/0")
+                navigate("/game/floor")
                 break
             case "stair":
-                navigate(`/game/floor/${targetLevel}`)
+                navigate("/game/floor")
                 break
         }
     }

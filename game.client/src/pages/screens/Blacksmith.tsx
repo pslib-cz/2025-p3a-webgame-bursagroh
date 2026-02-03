@@ -2,50 +2,16 @@ import React from "react"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { updatePlayerScreenMutation } from "../../api/player"
-import { buyBlueprintMutation, craftBlueprintMutation, getBlueprintsQuery, getPlayerBlueprintsQuery } from "../../api/blueprint"
-import type { Blueprint } from "../../types/api/models/blueprint"
+import { getBlueprintsQuery, getPlayerBlueprintsQuery } from "../../api/blueprint"
 import { useNavigate } from "react-router"
-
-const BlueprintToBuy = ({ blueprint }: {blueprint: Blueprint}) => {
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const {mutateAsync: buyBlueprintAsync} = useMutation(buyBlueprintMutation(playerId, blueprint.blueprintId))
-
-    const handleClick = () => {
-        buyBlueprintAsync()
-    }
-
-    return (
-        <>
-            <h3>{blueprint.item.name}</h3>
-            <p>{blueprint.price}</p>
-            <button onClick={handleClick}>Buy</button>
-        </>
-    )
-}
-
-const BlueprintToCraft = ({ blueprint }: {blueprint: Blueprint}) => {
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const {mutateAsync: craftBlueprintAsync} = useMutation(craftBlueprintMutation(playerId, blueprint.blueprintId))
-
-    const handleClick = () => {
-        craftBlueprintAsync()
-    }
-
-    return (
-        <>
-            <h3>{blueprint.item.name}</h3>
-            <p>{blueprint.price}</p>
-            {blueprint.craftings.map((crafting) => (
-                <div key={crafting.craftingId}>
-                    <p>{crafting.itemId}: {crafting.amount}x</p>
-                </div>
-            ))}
-            <button onClick={handleClick}>Craft</button>
-        </>
-    )
-}
+import styles from "./blacksmith.module.css"
+import BlueprintItem from "../../components/item/BlueprintItem"
+import Crafting from "../../components/Crafting"
+import useBlur from "../../hooks/useBlur"
 
 const BlacksmithScreen = () => {
+    useBlur(true)
+    
     const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
@@ -55,7 +21,7 @@ const BlacksmithScreen = () => {
 
     const handleClick = async () => {
         await updatePlayerScreenAsync()
-        
+
         navigate("/game/city")
     }
 
@@ -71,16 +37,23 @@ const BlacksmithScreen = () => {
         const blueprintsToBuy = blueprints.data.filter((blueprint) => !playerBlueprints.data.some((playerBlueprint) => playerBlueprint.blueprintId === blueprint.blueprintId))
 
         return (
-            <>
-                <p>Blacksmith</p>
-                <button onClick={handleClick}>close</button>
-                {blueprintsToBuy.map((blueprint) => (
-                    <BlueprintToBuy blueprint={blueprint} key={blueprint.blueprintId} />
-                ))}
-                {playerBlueprints.data.map((blueprint) => (
-                    <BlueprintToCraft blueprint={blueprint} key={blueprint.blueprintId} />
-                ))}
-            </>
+            <div className={styles.container}>
+                <div className={styles.blacksmithContainer}>
+                    <span className={styles.heading}>Crafting</span>
+                    <span className={styles.heading}>Blueprint</span>
+                    <div className={styles.craftingContainer} >
+                        {playerBlueprints.data.map((blueprint) => (
+                            <Crafting blueprint={blueprint} key={blueprint.blueprintId} />
+                        ))}
+                    </div>
+                    <div className={styles.blueprintContainer}>
+                        {blueprintsToBuy.map((blueprint) => (
+                            <BlueprintItem blueprint={blueprint} key={blueprint.blueprintId} />
+                        ))}
+                    </div>
+                    <button className={styles.close} onClick={handleClick}>close</button>
+                </div>
+            </div>
         )
     }
 }

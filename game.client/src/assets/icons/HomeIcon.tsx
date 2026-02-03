@@ -1,8 +1,8 @@
 import React from 'react'
 
-const HomeIcon: React.FC<React.SVGProps<SVGSVGElement>> = ({ viewBox = "0 0 24 24", fill = "black", xmlns = "http://www.w3.org/2000/svg", ...props }) => {
+const HomeIcon: React.FC<React.SVGProps<SVGSVGElement>> = ({ viewBox = "0 0 24 24", xmlns = "http://www.w3.org/2000/svg", ...props }) => {
     return (
-        <svg {...props} viewBox={viewBox} fill={fill} xmlns={xmlns}>
+        <svg {...props} viewBox={viewBox} xmlns={xmlns}>
             <g clipPath="url(#clip0_3368_60)">
                 <path d="M10 20V14H14V20H19V12H22L12 3L2 12H5V20H10Z" />
             </g>

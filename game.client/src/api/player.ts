@@ -4,7 +4,7 @@ import type { ScreenType } from "../types/api/models/player"
 
 export const generatePlayerMutation = (playerName?: string) =>
     mutationOptions({
-        mutationFn: () => api.post("/api/Player/generate", {}, {}, { name: playerName || "" }),
+        mutationFn: () => api.post("/api/Player/Generate", {}, {}, { name: playerName || "" }),
         onSuccess(data) {
             queryClient.setQueryData([data.playerId, "player"], data)
         },
@@ -43,6 +43,7 @@ export const updatePlayerScreenMutation = (playerId: string, newScreenType: Scre
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move-screen", { playerId }, {}, { newScreenType }),
         onSuccess(data) {
             queryClient.setQueryData([playerId, "player"], data)
+            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
         },
     })
 
@@ -63,5 +64,13 @@ export const dropItemMutation = (playerId: string, mineId: number, buildingId: n
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
             queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
             queryClient.invalidateQueries({queryKey: [playerId, "building", buildingId, level]})
+        },
+    })
+
+export const equipItemMutation = (playerId: string) =>
+    mutationOptions({
+        mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/set-active-item", { playerId }, {}, { inventoryItemId }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },
     })

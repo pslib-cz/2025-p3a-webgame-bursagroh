@@ -1,0 +1,31 @@
+.link {
+    color: var(--light);
+    text-decoration: none;
+    font-size: var(--h2);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.link:focus {
+    outline: none;
+}
+
+.link:hover::before, .link:focus::before {
+    content: ">";
+    margin-right: 0.5rem;
+}
+
+.link:hover::after, .link:focus::after {
+    content: "<";
+    margin-left: 0.5rem;
+}
+
+.disabledLink {
+    color: var(--disabled);
+    font-size: var(--h2);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    cursor: not-allowed;
+}

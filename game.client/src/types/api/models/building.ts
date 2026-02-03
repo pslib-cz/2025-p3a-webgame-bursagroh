@@ -29,15 +29,12 @@ export type Floor = {
 
 export type FloorItem = {
     floorItemId: number
-    floorId: number
     positionX: number
     positionY: number
-    floorItemType: FloorItemType
+    chest: Chest | null
     enemy: Enemy | null
-    itemInstanceId: number | null
     itemInstance: {
         itemInstanceId: number
-        itemId: number
         durability: number
         item: {
             itemId: number
@@ -47,15 +44,17 @@ export type FloorItem = {
             weight: number
             damage: number
             maxDurability: number
-            changeOfGenerating: number
         }
     } | null
+    floorItemType: FloorItemType
 }
 
 export type Enemy = {
     enemyId: number
     health: number
     enemyType: EnemyType
-    floorItemId: number
-    itemInstanceId: number
+}
+
+export type Chest = {
+    chestId: number
 }
