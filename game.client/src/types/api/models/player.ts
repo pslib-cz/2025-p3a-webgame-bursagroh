@@ -15,6 +15,7 @@ export type Player = {
     activeInventoryItemId: number | null
     capacity: number
     health: number
+    maxHealth: number
 }
 
 export type InventoryItem = {

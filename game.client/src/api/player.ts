@@ -74,3 +74,12 @@ export const equipItemMutation = (playerId: string) =>
             queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },
     })
+
+export const useItemMutation = (playerId: string, floorId: number) =>
+    mutationOptions({
+        mutationFn: () => api.patch("/api/Player/{playerId}/Action/use", { playerId }, {}, {}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "floor", floorId] })
+        },
+    })
