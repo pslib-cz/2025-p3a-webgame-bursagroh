@@ -7,8 +7,6 @@ export type Recipe = {
 }
 
 export type Ingredience = {
-    ingredienceId: number
-    recipeId: number
     order: number
     ingredienceType: IngredienceType
 }

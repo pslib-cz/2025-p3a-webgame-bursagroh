@@ -315,8 +315,8 @@ namespace game.Server.Controllers
                                 await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
                                 player.FloorId = mineFloor.FloorId;
-                                player.SubPositionX = 0;
-                                player.SubPositionY = 0;
+                                player.SubPositionX = 7;
+                                player.SubPositionY = -4;
                                 break;
 
                             case BuildingTypes.Restaurant: player.ScreenType = ScreenTypes.Restaurant; break;
@@ -326,6 +326,22 @@ namespace game.Server.Controllers
                 }
                 else
                 {
+                    // --- NEW: MINE EXIT LOGIC ---
+                    if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 7 && request.NewPositionY == -4)
+                    {
+                        player.ScreenType = ScreenTypes.City;
+                        player.FloorId = null;
+                        player.SubPositionX = 0;
+                        player.SubPositionY = 0;
+
+                        // Clean up the temporary mine data if applicable
+                        if (playerMine != null) _context.Mines.Remove(playerMine);
+
+                        await _context.SaveChangesAsync();
+                        return Ok(_mapper.Map<PlayerDto>(player));
+                    }
+                    // ----------------------------
+
                     if (player.ScreenType == ScreenTypes.Mine && playerMine != null)
                     {
                         var blockAtTarget = await _context.MineBlocks
@@ -359,23 +375,18 @@ namespace game.Server.Controllers
                             int diffX = player.SubPositionX - enemy.PositionX;
                             int diffY = player.SubPositionY - enemy.PositionY;
 
-      
                             if (Math.Abs(diffX) > Math.Abs(diffY)) nextX += Math.Sign(diffX);
                             else nextY += Math.Sign(diffY);
 
-
                             bool isStairs = stairs.Any(s => s.Item1 == nextX && s.Item2 == nextY);
                             bool isPlayer = (nextX == player.SubPositionX && nextY == player.SubPositionY);
-
                             bool isOccupied = currentOccupied.Any(p => p.PositionX == nextX && p.PositionY == nextY);
 
                             if (!isStairs && !isPlayer && !isOccupied)
                             {
                                 currentOccupied.RemoveAll(p => p.PositionX == enemy.PositionX && p.PositionY == enemy.PositionY);
-
                                 enemy.PositionX = nextX;
                                 enemy.PositionY = nextY;
-
                                 currentOccupied.Add(new { PositionX = nextX, PositionY = nextY });
                                 _context.Entry(enemy).State = EntityState.Modified;
                             }
@@ -446,19 +457,15 @@ namespace game.Server.Controllers
                             if (player.Health == 0)
                             {
                                 player.ScreenType = ScreenTypes.Lose;
-                                player.PositionX = 0; 
-                                player.PositionY = 0; 
+                                player.PositionX = 0;
+                                player.PositionY = 0;
                                 player.FloorId = null;
 
                                 var itemsToRemove = player.InventoryItems
                                     .Where(ii => !ii.IsInBank)
                                     .ToList();
 
-
-                                if (itemsToRemove.Any())
-                                {
-                                    _context.InventoryItems.RemoveRange(itemsToRemove);
-                                }
+                                if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
                             }
                             else
                             {
@@ -836,7 +843,7 @@ namespace game.Server.Controllers
                     return Ok(dto);
                 }
 
-                return BadRequest($"The {itemData.ItemId} is not a usable or consumable item.");
+                return BadRequest($"The {itemData.Name} is not a usable or consumable item.");
             }
             catch (Exception ex)
             {

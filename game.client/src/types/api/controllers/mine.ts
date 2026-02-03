@@ -48,10 +48,9 @@ export interface APIGetMineItems extends GenericGET {
 
 export interface APIMineMine extends GenericPATCH {
     params: {
-        playerId: string
+        mineId: number
     }
     body: {
-        inventoryItemId: number
         targetX: number
         targetY: number
     }
@@ -61,10 +60,8 @@ export interface APIMineMine extends GenericPATCH {
 }
 
 export interface APIMineRent extends GenericPATCH {
-    params: {
+    query: {
         playerId: string
-    }
-    body: {
         amount: number
     }
     res: {

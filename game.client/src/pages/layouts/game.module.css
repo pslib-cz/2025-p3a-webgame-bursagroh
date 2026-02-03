@@ -1,0 +1,7 @@
+.uiContainer {
+    margin-top: calc(1rem + var(--navbar-height));
+    margin-left: 1rem;
+    display: flex;
+    gap: 1rem;
+    width: max-content;
+}

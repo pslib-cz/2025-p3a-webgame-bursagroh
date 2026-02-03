@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query"
-import type { API, Param, Query } from "../types/api"
+import type { API, NoContentURL, Param, Query } from "../types/api"
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL as string
 
@@ -36,7 +36,7 @@ export const api = {
 
         return await response.json() as API["get"][URL]["res"][200]
     },
-    getWith204: async <URL extends keyof Pick<API["get"], "/api/Player/{playerId}/Inventory">, Params extends API["get"][URL]["params"], Query extends API["get"][URL]["query"]>(url: URL, params: Params, query: Query) => {
+    getWith204: async <URL extends keyof Pick<API["get"], NoContentURL>, Params extends API["get"][URL]["params"], Query extends API["get"][URL]["query"]>(url: URL, params: Params, query: Query) => {
         const uri = formatURL(url, params, query)
         const response = await fetch(uri)
 

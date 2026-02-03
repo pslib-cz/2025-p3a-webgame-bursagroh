@@ -1,11 +1,9 @@
 import React from "react"
-import type { AssetProps } from "../../types"
+import { assetTypeToId } from "../../utils/asset"
 
-type TableRightProps = AssetProps & Omit<React.SVGProps<SVGSVGElement>, "x" | "y" | "width" | "height" | "viewBox" | "xmlns">
-
-const TableRight: React.FC<TableRightProps> = ({ x, y, width, height, ...props }) => {
+const TableRight: React.FC = () => {
     return (
-        <svg {...props} x={x} y={y} width={width} height={height} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <svg id={assetTypeToId("table_right")} x={0} y={0} width="100%" height="100%" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
             <rect x="256" width="64" height="64" fill="#B7B7B7" />
             <rect y="128" width="64" height="64" fill="#53300E" />
             <rect x="64" y="128" width="64" height="64" fill="#53300E" />

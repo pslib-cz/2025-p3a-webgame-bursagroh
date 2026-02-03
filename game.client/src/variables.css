@@ -1,0 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+:root {
+    font-size: 16px;
+
+    --light: #E7E5DF;
+    --disabled: #8B8984;
+    --dark: #52595D;
+    --darker: #2D2F30;
+
+    --h0: 12rem;
+    --h1: 5.75rem;
+    --h2: 4rem;
+    --h3: 2rem;
+    --h4: 1.5rem;
+
+    --navbar-height: 6rem;
+}

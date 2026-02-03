@@ -17,7 +17,7 @@ export type FloorType =
     | "wall-door-right-bottom"
     | "wall-door-right-left"
     | "stair"
-export type BlockType = "empty" | "rock" | "wooden_frame" | "copper_ore" | "iron_ore" | "gold_ore" | "silver_ore" | "unobtanium_ore"
+export type BlockType = "empty" | "rock" | "wooden_frame" | "copper_ore" | "iron_ore" | "gold_ore" | "silver_ore" | "unobtainium_ore"
 export type BuildingType =
     | "grass"
     | "bank"
@@ -45,7 +45,7 @@ export type BuildingType =
     | "abandoned-trap-corner-bottom-left"
     | "abandoned-trap-corner-bottom-right"
 export type EnemyType = "zombie" | "skeleton" | "dragon"
-export type ItemType = "wooden_sword" | "wooden_pickaxe" | "wood" | "rock_item" | "copper" | "iron" | "silver" | "gold" | "unobtanium"
+export type ItemType = "wooden_sword" | "wooden_pickaxe" | "wood" | "rock_item" | "copper" | "iron" | "silver" | "gold" | "unobtainium"
 
 export type TileType = FloorType | BlockType | BuildingType | EnemyType | ItemType
 
@@ -58,4 +58,9 @@ export type AssetProps = {
 
 export type FloorPathParams = {
     level: string
+}
+
+export type ChunkCoords = {
+    x: number,
+    y: number
 }

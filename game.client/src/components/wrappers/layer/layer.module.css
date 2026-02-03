@@ -1,0 +1,23 @@
+.layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+.layerBlur {
+    position: relative;
+}
+
+.layerBlur::before {
+    content: '';
+    position: absolute;
+    top: 0rem;
+    left: 0rem;
+    right: 0rem;
+    bottom: 0rem;
+    backdrop-filter: blur(32px);
+    background: rgba(0, 0, 0, 0.50);
+    pointer-events: none;
+} 

@@ -1,0 +1,37 @@
+.container {
+    background-color: var(--darker);
+    padding: 0 0.5rem 0.5rem 0.5rem;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.heading {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
+
+.close {
+    fill: var(--light);
+}
+
+.itemContainer {
+    background-color: var(--dark);
+    padding: 1rem;
+}
+
+.text {
+    font-size: var(--h4);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}

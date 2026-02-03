@@ -1,0 +1,97 @@
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.recipesLeaderboardContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 0.5rem;
+    background-color: var(--darker);
+    margin-top: 1rem;
+}
+
+.heading {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+    text-align: center;
+}
+
+.cookingContainer {
+    background-color: var(--darker);
+    margin-top: 1rem;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    fill: var(--light);
+}
+
+.ingrediencesList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ingredienceText {
+    font-size: var(--h4);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
+
+.burgerContainer {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.recipesContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: var(--dark);
+}
+
+.leaderboardContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background-color: var(--dark);
+}
+
+.burgerName {
+    font-size: var(--h2);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+    text-align: center;
+}
+
+.cookingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.ingredienceButtons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1rem;
+}

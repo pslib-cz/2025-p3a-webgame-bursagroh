@@ -1,11 +1,9 @@
 import React from "react"
-import type { AssetProps } from "../../../types"
+import { assetTypeToId } from "../../../utils/asset"
 
-type ZombieProps = AssetProps & Omit<React.SVGProps<SVGSVGElement>, "x" | "y" | "width" | "height" | "viewBox" | "xmlns">
-
-const Zombie: React.FC<ZombieProps> = ({ x, y, width, height, ...props }) => {
+const Zombie: React.FC = () => {
     return (
-        <svg {...props} x={x} y={y} width={width} height={height} viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <svg id={assetTypeToId("zombie")} x={0} y={0} width="100%" height="100%" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
             <rect x="128" y="64" width="64" height="64" fill="#132A13" />
             <rect x="192" y="64" width="64" height="64" fill="#132A13" />
             <rect x="256" y="64" width="64" height="64" fill="#132A13" />

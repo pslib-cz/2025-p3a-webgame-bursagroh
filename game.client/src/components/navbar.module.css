@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: var(--darker);
+    height: var(--navbar-height);
+    box-sizing: border-box;
+}
+
+.home {
+    fill: var(--light);
+}
+
+.location {
+    color: var(--light);
+    font-family: 'VT323', monospace;
+    font-size: var(--h2);
+    align-self: center;
+    margin: 0;
+}
