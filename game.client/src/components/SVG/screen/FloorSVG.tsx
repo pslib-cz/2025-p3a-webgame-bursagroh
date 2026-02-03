@@ -20,6 +20,33 @@ const mapEnemyTypeToTileType = (enemyType: EnemyType): TileType => {
     }
 }
 
+const mapItemIdToTileType = (itemId: number): TileType => {
+    switch (itemId) {
+        case 1:
+            return "wood"
+        case 2:
+            return "rock_item"
+        case 3:
+            return "copper"
+        case 4:
+            return "iron"
+        case 5:
+            return "silver"
+        case 6:
+            return "gold"
+        case 7:
+            return "unobtainium"
+        case 10:
+            return "wooden_sword"
+        case 30:
+            return "wooden_pickaxe"
+        case 39:
+            return "wooden_pickaxe"
+        default:
+            return "empty"
+    }
+}
+
 const FloorSVG = () => {
     const floor = React.useContext(FloorContext)!.floor
     const player = React.useContext(PlayerContext)!.player!
@@ -44,11 +71,11 @@ const FloorSVG = () => {
                     )
                 }
 
-                // if (item.floorItemType === "Item" && item.itemInstance) {
-                //     return (
-                //         <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} tileType={mapItemIdToTileType(item.itemInstance.item.itemId)} targetFloorItemId={item.floorItemId} targetBuildingId={building.buildingId} targetLevel={level} />
-                //     )
-                // }
+                if (item.floorItemType === "Item" && item.itemInstance) {
+                    return (
+                        <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} tileType={mapItemIdToTileType(item.itemInstance.item.itemId)} targetFloorItemId={item.floorItemId} targetBuildingId={0} targetLevel={0} />
+                    )
+                }
             })}
             <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
         </SVGDisplay>

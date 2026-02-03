@@ -57,13 +57,11 @@ export const pickItemMutation = (playerId: string, mineId: number, buildingId: n
         },
     })
 
-export const dropItemMutation = (playerId: string, mineId: number, buildingId: number, level: number) =>
+export const dropItemMutation = (playerId: string) =>
     mutationOptions({
         mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/drop", { playerId }, {}, { inventoryItemId }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
-            queryClient.invalidateQueries({queryKey: [playerId, "building", buildingId, level]})
         },
     })
 
