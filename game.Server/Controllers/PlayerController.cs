@@ -440,8 +440,19 @@ namespace game.Server.Controllers
                             if (player.Health == 0)
                             {
                                 player.ScreenType = ScreenTypes.Lose;
-                                player.PositionX = 0; player.PositionY = 0; 
+                                player.PositionX = 0; 
+                                player.PositionY = 0; 
                                 player.FloorId = null;
+
+                                var itemsToRemove = player.InventoryItems
+                                    .Where(ii => !ii.IsInBank)
+                                    .ToList();
+
+
+                                if (itemsToRemove.Any())
+                                {
+                                    _context.InventoryItems.RemoveRange(itemsToRemove);
+                                }
                             }
                             else
                             {
@@ -718,64 +729,113 @@ namespace game.Server.Controllers
         }
 
         [HttpPatch("{id}/Action/use")]
-        public async Task<ActionResult<PlayerDto>> UseActiveItem(Guid id)
+        public async Task<ActionResult> UseItem(Guid id)
         {
             try
             {
+                // Fetch player with all necessary data for both combat and consumables
                 var player = await _context.Players
                     .Include(p => p.ActiveInventoryItem)
                         .ThenInclude(ai => ai.ItemInstance)
+                            .ThenInclude(ii => ii.Item)
                     .FirstOrDefaultAsync(p => p.PlayerId == id);
 
                 if (player == null) return NotFound("Player not found.");
 
-                if (player.ActiveInventoryItemId == null || player.ActiveInventoryItem == null)
+                if (player.ActiveInventoryItem?.ItemInstance?.Item == null)
                 {
                     return BadRequest("You aren't holding anything to use.");
                 }
 
                 var activeItem = player.ActiveInventoryItem;
+                var itemData = activeItem.ItemInstance.Item;
 
-                if (activeItem.ItemInstance.ItemId == 40)
+                // --- BRANCH A: COMBAT LOGIC (Swords) ---
+                if (itemData.ItemType == ItemTypes.Sword)
                 {
-                    if (player.Health >= 20)
+                    if (player.ScreenType != ScreenTypes.Fight)
                     {
-                        return BadRequest("You are already at full health!");
+                        return BadRequest("You can only use weapons during a fight.");
                     }
 
-                    player.Health = Math.Min(20, player.Health + 5);
+                    var floorItem = await _context.FloorItems
+                        .Include(fi => fi.Enemy)
+                        .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
+                                                   fi.PositionX == player.SubPositionX &&
+                                                   fi.PositionY == player.SubPositionY);
+
+                    if (floorItem?.Enemy == null)
+                    {
+                        player.ScreenType = ScreenTypes.Floor;
+                        await _context.SaveChangesAsync();
+                        return BadRequest("No enemy found here.");
+                    }
+
+                    var targetEnemy = floorItem.Enemy;
+                    int damageDealt = itemData.Damage;
+                    targetEnemy.Health -= damageDealt;
+
+                    if (targetEnemy.Health > 0)
+                    {
+                        await _context.SaveChangesAsync();
+                        return Ok(new
+                        {
+                            message = $"You hit the {targetEnemy.EnemyType} for {damageDealt} damage!",
+                            enemyHealth = targetEnemy.Health
+                        });
+                    }
+
+                    // Defeat Logic
+                    if (targetEnemy.ItemInstanceId.HasValue)
+                    {
+                        floorItem.FloorItemType = FloorItemType.Item;
+                        floorItem.ItemInstanceId = targetEnemy.ItemInstanceId;
+                        floorItem.Enemy = null;
+                    }
+                    else
+                    {
+                        _context.FloorItems.Remove(floorItem);
+                    }
+
+                    _context.Enemies.Remove(targetEnemy);
+                    player.ScreenType = ScreenTypes.Floor;
+
+                    await _context.SaveChangesAsync();
+                    return Ok(new { message = $"Defeated the {targetEnemy.EnemyType}!", victory = true });
+                }
+
+                // --- BRANCH B: CONSUMABLE LOGIC (IDs 40, 41, 42) ---
+                else if (itemData.ItemId == 40 || itemData.ItemId == 41 || itemData.ItemId == 42)
+                {
+                    switch (itemData.ItemId)
+                    {
+                        case 40: // Healing Potion
+                            if (player.Health >= player.MaxHealth) return BadRequest("Already at full health!");
+                            player.Health = Math.Min(player.MaxHealth, player.Health + 5);
+                            break;
+
+                        case 41: // Max Health Boost
+                            player.MaxHealth += 5;
+                            break;
+
+                        case 42: // Capacity Boost
+                            player.Capacity += 5;
+                            break;
+                    }
+
+                    // Remove the consumable item after use
                     var instanceToDelete = activeItem.ItemInstance;
                     player.ActiveInventoryItemId = null;
-
                     _context.InventoryItems.Remove(activeItem);
                     _context.ItemInstances.Remove(instanceToDelete);
-                }
-                else if (activeItem.ItemInstance.ItemId == 41)
-                {
-                    player.MaxHealth += 5;
-                    var instanceToDelete = activeItem.ItemInstance;
-                    player.ActiveInventoryItemId = null;
 
-                    _context.InventoryItems.Remove(activeItem);
-                    _context.ItemInstances.Remove(instanceToDelete);
-                }
-                else if (activeItem.ItemInstance.ItemId == 42)
-                {
-                    player.Capacity += 5;
-                    var instanceToDelete = activeItem.ItemInstance;
-                    player.ActiveInventoryItemId = null;
-                    _context.InventoryItems.Remove(activeItem);
-                    _context.ItemInstances.Remove(instanceToDelete);
-                }
-                else
-                {
-                    return BadRequest($"The {activeItem.ItemInstance.ItemId} is not a consumable item.");
+                    await _context.SaveChangesAsync();
+
+                    var dto = _mapper.Map<PlayerDto>(player);
+                    return Ok(dto);
                 }
 
-                await _context.SaveChangesAsync();
-
-                var dto = _mapper.Map<PlayerDto>(player);
-                return Ok(dto);
+                return BadRequest($"The {itemData.ItemId} is not a usable or consumable item.");
             }
             catch (Exception ex)
             {
