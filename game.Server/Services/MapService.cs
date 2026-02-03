@@ -81,18 +81,18 @@ public class MapGeneratorService
             occupiedPositions.Add($"{downX},{stairY}");
             occupiedPositions.Add($"{upX},{stairY}");
 
-            if (i > 0)
-            {
-                floor.FloorItems.Add(new FloorItem { PositionX = downX, PositionY = stairY, FloorItemType = FloorItemType.Stair });
-            }
-            else
+            if (i == 0)
             {
                 var exits = GetExitCoordinates(bX, bY);
                 foreach (var exit in exits)
                 {
                     occupiedPositions.Add($"{exit.x},{exit.y}");
                 }
-                    
+            }
+
+            if (i > 0)
+            {
+                floor.FloorItems.Add(new FloorItem { PositionX = downX, PositionY = stairY, FloorItemType = FloorItemType.Stair });
             }
 
             if (!isRealLastFloor)
@@ -129,6 +129,7 @@ public class MapGeneratorService
             }
 
             int enemyCount = isRealLastFloor ? rng.Next(1, 3) : rng.Next(2, 5);
+
             if (isRealLastFloor)
             {
                 var pos = GetFreePos();
@@ -137,7 +138,7 @@ public class MapGeneratorService
                     PositionX = pos.x,
                     PositionY = pos.y,
                     FloorItemType = FloorItemType.Enemy,
-                    Enemy = new Enemy { Health = 100, EnemyType = EnemyType.Dragon }
+                    Enemy = new Enemy { Health = 100, MaxHealth = 100, EnemyType = EnemyType.Dragon }
                 });
             }
 
@@ -151,7 +152,13 @@ public class MapGeneratorService
                     PositionX = pos.x,
                     PositionY = pos.y,
                     FloorItemType = FloorItemType.Enemy,
-                    Enemy = new Enemy { Health = 20, EnemyType = selectedType, ItemInstance = new ItemInstance { ItemId = 10, Durability = 20 } }
+                    Enemy = new Enemy
+                    {
+                        Health = 20,
+                        MaxHealth = 20,
+                        EnemyType = selectedType,
+                        ItemInstance = new ItemInstance { ItemId = 10, Durability = 20 }
+                    }
                 });
             }
 
