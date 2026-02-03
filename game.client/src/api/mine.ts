@@ -30,6 +30,7 @@ export const mineMineBlockMutation = (playerId: string, mineId: number, targetX:
         mutationFn: () => api.patch("/api/Mine/{mineId}/Action/mine", { mineId }, {}, { targetX, targetY }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
         },
     })
 
