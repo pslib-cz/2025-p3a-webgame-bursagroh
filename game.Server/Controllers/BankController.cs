@@ -92,14 +92,21 @@ namespace game.Server.Controllers
                     .Where(i => i.PlayerId == playerId && request.InventoryItemIds.Contains(i.InventoryItemId))
                     .ToListAsync();
 
-                if (!items.Any())
+                var player = await _context.Players
+                    .FirstOrDefaultAsync(p => p.PlayerId == playerId);
+
+                if (!items.Any() || player == null)
                 {
-                    return NotFound("No matching items found for this player.");
+                    return NotFound("No matching items or player found.");
                 }
 
                 foreach (var item in items)
                 {
                     item.IsInBank = !item.IsInBank;
+                    if (item.IsInBank && player.ActiveInventoryItemId == item.InventoryItemId)
+                    {
+                        player.ActiveInventoryItemId = null;
+                    }
                 }
 
                 await _context.SaveChangesAsync();

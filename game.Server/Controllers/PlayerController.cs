@@ -65,7 +65,7 @@ namespace game.Server.Controllers
                     BankBalance = 0,
                     Capacity = 10,
                     Seed = new Random().Next(),
-                    Health = 1,
+                    Health = 10,
 
                     PositionX = 0,
                     PositionY = 0,
@@ -187,11 +187,11 @@ namespace game.Server.Controllers
                     if (building != null && building.BuildingType == BuildingTypes.AbandonedTrap)
                         return BadRequest("This building is a trap!");
 
-                    /*
+                    
                     if (player.SubPositionX == 0) player.PositionX--;
                     else if (player.SubPositionX == 7) player.PositionX++;
                     else if (player.SubPositionY == 0) player.PositionY--;
-                    else if (player.SubPositionY == 7) player.PositionY++;*/
+                    else if (player.SubPositionY == 7) player.PositionY++;
 
                     player.FloorId = null;
                     player.SubPositionX = 0;
@@ -337,7 +337,6 @@ namespace game.Server.Controllers
                 }
                 else
                 {
-                    // --- NEW: MINE EXIT LOGIC ---
                     if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 7 && request.NewPositionY == -4)
                     {
                         player.ScreenType = ScreenTypes.City;
@@ -345,13 +344,11 @@ namespace game.Server.Controllers
                         player.SubPositionX = 0;
                         player.SubPositionY = 0;
 
-                        // Clean up the temporary mine data if applicable
                         if (playerMine != null) _context.Mines.Remove(playerMine);
 
                         await _context.SaveChangesAsync();
                         return Ok(_mapper.Map<PlayerDto>(player));
                     }
-                    // ----------------------------
 
                     if (player.ScreenType == ScreenTypes.Mine && playerMine != null)
                     {
@@ -492,13 +489,35 @@ namespace game.Server.Controllers
 
                     if (player.ScreenType == ScreenTypes.Floor && isAtExit)
                     {
-                        var currentFloor = await _context.Floors.FindAsync(player.FloorId);
+                        var currentFloor = await _context.Floors
+                            .Include(f => f.Building)
+                            .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+
                         if (currentFloor?.Level == 0)
                         {
+                            if (currentFloor.Building?.BuildingType == BuildingTypes.AbandonedTrap)
+                            {
+                                return BadRequest("The door is locked! Beat the dragon to leave.");
+                            }
+
+                            int exitCityX = currentFloor.Building.PositionX;
+                            int exitCityY = currentFloor.Building.PositionY;
+
+
+                            if (player.SubPositionX == 0) exitCityX -= 1;
+                            else if (player.SubPositionX == 7) exitCityX += 1;
+                            else if (player.SubPositionY == 0) exitCityY -= 1;
+                            else if (player.SubPositionY == 7) exitCityY += 1;
+
                             player.ScreenType = ScreenTypes.City;
                             player.FloorId = null;
+
+                            player.PositionX = exitCityX;
+                            player.PositionY = exitCityY;
+
                             player.SubPositionX = 0;
                             player.SubPositionY = 0;
+
                             await _context.SaveChangesAsync();
                             return Ok(_mapper.Map<PlayerDto>(player));
                         }
