@@ -4,6 +4,7 @@ import type { APIGetBuildings, APIGetFloor } from "./controllers/building"
 import type { APIGenerateMine, APIGetMineItems, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
 import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerItemDrop, APIPlayerItemEquip, APIPlayerItemPick, APIPlayerMove, APIPlayerMoveScreen, APIPlayerUse } from "./controllers/player"
 import type { APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
+import type { APILoad, APISave } from "./controllers/save"
 
 export type StringifyAble = string | number
 
@@ -80,6 +81,8 @@ export interface API extends GenericAPI {
     post: {
         "/api/Player/Generate": APIPlayerGenerate
         "/api/Mine/Regenerate": APIGenerateMine
+        "/api/Save": APISave
+        "/api/Load": APILoad
     }
     put: {
 

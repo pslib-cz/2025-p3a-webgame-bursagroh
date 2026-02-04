@@ -76,6 +76,12 @@ const FloorSVG = () => {
                         <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} tileType={mapItemIdToTileType(item.itemInstance.item.itemId)} targetFloorItemId={item.floorItemId} targetBuildingId={0} targetLevel={0} />
                     )
                 }
+
+                if (item.floorItemType === "Chest" && item.chest) {
+                    return (
+                        <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType={'chest'} targetFloorItemId={0} targetBuildingId={0} targetLevel={0} />
+                    )
+                }
             })}
             <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
         </SVGDisplay>

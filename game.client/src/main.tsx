@@ -15,6 +15,10 @@ import MineScreen from "./pages/screens/Mine.tsx"
 import RestaurantScreen from "./pages/screens/Restaurant.tsx"
 import FloorScreen from "./pages/screens/Floor.tsx"
 import FountainScreen from "./pages/screens/Fountain.tsx"
+import SettingsScreen from "./pages/screens/Settings.tsx"
+import SaveScreen from "./pages/screens/Save.tsx"
+import LoadScreen from "./pages/screens/Load.tsx"
+import LoadSaveScreen from "./pages/screens/LoadSave.tsx"
 
 const router = createBrowserRouter([
     {
@@ -66,6 +70,22 @@ const router = createBrowserRouter([
                         Component: FountainScreen
                     }
                 ]
+            },
+            {
+                path: "settings",
+                Component: SettingsScreen
+            },
+            {
+                path: "save",
+                Component: SaveScreen
+            },
+            {
+                path: "load",
+                Component: LoadScreen
+            },
+            {
+                path: "load/:saveString",
+                Component: LoadSaveScreen
             }
         ]
     }

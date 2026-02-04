@@ -53,4 +53,4 @@ type ItemAssetType = "wooden_sword" | "wooden_pickaxe" | "wood" | "rock_item" | 
 
 type BurgerAssetType = "bun_up" | "bun_down" | "meat" | "tomato" | "salad" | "bacon" | "sauce" | "cheese"
 
-export type AssetType = "player" | "table_left" | "table_right" | BuildingAssetType | BlockAssetType | FloorAssetType | EnemyAssetType | ItemAssetType | BurgerAssetType
+export type AssetType = "player" | "table_left" | "table_right" | "chest" | BuildingAssetType | BlockAssetType | FloorAssetType | EnemyAssetType | ItemAssetType | BurgerAssetType

@@ -36,6 +36,7 @@ import Mine from '../../assets/tiles/buildings/Mine'
 import Restaurant from '../../assets/tiles/buildings/Restaurant'
 import JunctionRoad from '../../assets/tiles/buildings/road/JunctionRoad'
 import StraightRoad from '../../assets/tiles/buildings/road/StraightRoad'
+import Chest from '../../assets/tiles/Chest'
 import Dragon from '../../assets/tiles/enemies/Dragon'
 import Skeleton from '../../assets/tiles/enemies/Skeleton'
 import Zombie from '../../assets/tiles/enemies/Zombie'
@@ -55,7 +56,7 @@ const enemyAssets = [Dragon, Skeleton, Zombie]
 const itemAssets = [WoodenPickaxe, WoodenSword, Copper, Gold, Iron, RockItem, Silver, Unobtanium, Wood]
 const burgerAssets = [Bacon, BunDown, BunUp, Meat, Salad, Sauce, Tomato, Cheese]
 
-const assets = [Player, TableLeft, TableRight, ...buildingAssets, ...blockAssets, ...floorAssets, ...enemyAssets, ...itemAssets, ...burgerAssets]
+const assets = [Player, TableLeft, TableRight, Chest, ...buildingAssets, ...blockAssets, ...floorAssets, ...enemyAssets, ...itemAssets, ...burgerAssets]
 
 const AssetImporter = () => {
     return (

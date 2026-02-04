@@ -11,8 +11,10 @@ import MapProvider from "./MapProvider"
 import FloorProvider, { FloorContext } from "./FloorProvider"
 import ProviderGroupLoadingWrapper from "../components/wrappers/ProviderGroupLoadingWrapper"
 import type { TLoadingWrapperContextState } from "../components/wrappers/LoadingWrapper"
+import AutosaveProvider from "./AutosaveProvider"
+import SaveProvider from "./SaveProvider"
 
-const providers = [PlayerIdProvider, PlayerProvider, MineIdProvider, BuildingIdProvider, LayerProvider, ActiveItemProvider, IsBluredProvider, MapProvider]
+const providers = [PlayerIdProvider, PlayerProvider, MineIdProvider, BuildingIdProvider, LayerProvider, ActiveItemProvider, IsBluredProvider, MapProvider, AutosaveProvider]
 const contextsToLoad = [PlayerContext] as Array<React.Context<TLoadingWrapperContextState>>
 
 const Providers: React.FC<React.PropsWithChildren> = ({ children }) => {
@@ -20,7 +22,7 @@ const Providers: React.FC<React.PropsWithChildren> = ({ children }) => {
         <>
             <QueryProvider>
                 <ProviderGroupLoadingWrapper providers={providers} contextsToLoad={contextsToLoad}>
-                    <ProviderGroupLoadingWrapper providers={[FloorProvider]} contextsToLoad={[FloorContext as React.Context<TLoadingWrapperContextState>]}>
+                    <ProviderGroupLoadingWrapper providers={[FloorProvider, SaveProvider]} contextsToLoad={[FloorContext as React.Context<TLoadingWrapperContextState>]}>
                         {children}
                     </ProviderGroupLoadingWrapper>
                 </ProviderGroupLoadingWrapper>

@@ -37,6 +37,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
         case "restaurant":
             screenType = "Restaurant"
             break
+        case "chest":
         case "abandoned-straight-top":
         case "abandoned-straight-right":
         case "abandoned-straight-bottom":
@@ -110,7 +111,7 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, screenType))
     const { mutateAsync: updatePlayerFloorAsync } = useMutation(updatePlayerFloorMutation(playerId, x, y, targetFloorId!))
     const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(playerId, mineId ?? -1, x, y))
-    const {mutateAsync: pickItemAsync} = useMutation(pickItemMutation(playerId, mineId ?? -1, targetBuildingId ?? -1, targetLevel ?? -1))
+    const {mutateAsync: pickItemAsync} = useMutation(pickItemMutation(playerId))
 
     const handleClick = async () => {
         switch (tileType) {
@@ -221,9 +222,6 @@ const Tile: React.FC<TileProps> = ({ width, height, x, y, tileType, targetFloorI
             case "abandoned-trap-corner-top-right":
             case "abandoned-trap-corner-bottom-left":
             case "abandoned-trap-corner-bottom-right":
-                navigate("/game/floor")
-                break
-            case "stair":
                 navigate("/game/floor")
                 break
         }

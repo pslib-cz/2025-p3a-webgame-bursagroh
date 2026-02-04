@@ -12,7 +12,7 @@ import { BankContext } from "../../providers/game/BankProvider"
 import styles from "./bank.module.css"
 import CloseIcon from "../../assets/icons/CloseIcon"
 import BankInventoryItem from "../../components/item/BankInventoryItem"
-import { countInventoryItems, removeEquippedItemFromInventory } from "../../utils/inventory"
+import { groupInventoryItems } from "../../utils/inventory"
 import BankItem from "../../components/item/BankItem"
 import useBlur from "../../hooks/useBlur"
 
@@ -78,11 +78,8 @@ const BankScreen = () => {
         setToPlayerAmount(0)
     }
 
-    const updatedInventory = removeEquippedItemFromInventory([...inventory], player.activeInventoryItemId)
-    const inventoryItems = countInventoryItems(updatedInventory)
-
-    const updatedBank = removeEquippedItemFromInventory([...bank], player.activeInventoryItemId)
-    const bankItems = countInventoryItems(updatedBank)
+    const inventoryItems = groupInventoryItems(inventory)
+    const bankItems = groupInventoryItems(bank)
 
     return (
         <div className={styles.container}>
@@ -106,13 +103,13 @@ const BankScreen = () => {
                     </div>
                 </div>
                 <div className={styles.itemContainer}>
-                    {Object.entries(inventoryItems).map(([itemId, count]) => (
-                        <BankInventoryItem key={itemId} item={updatedInventory.find(item => item.itemInstance.item.itemId === Number(itemId))!} count={count} />
+                    {Object.entries(inventoryItems).map(([itemString, inventoryItems]) => (
+                        <BankInventoryItem key={itemString} items={inventory.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
                     ))}
                 </div>
                 <div className={styles.itemContainer}>
-                    {Object.entries(bankItems).map(([itemId, count]) => (
-                        <BankItem key={itemId} item={updatedBank.find(item => item.itemInstance.item.itemId === Number(itemId))!} count={count} />
+                    {Object.entries(bankItems).map(([itemString, inventoryItems]) => (
+                        <BankItem key={itemString} items={bank.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
                     ))}
                 </div>
                 <CloseIcon width={24} height={24} className={styles.close} onClick={handleClick} />

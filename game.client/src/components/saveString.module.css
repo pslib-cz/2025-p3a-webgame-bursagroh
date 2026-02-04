@@ -1,0 +1,17 @@
+.container {
+    display: flex;
+    gap: 1rem;
+}
+
+.text {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
+
+.copy {
+    fill: var(--light);
+}

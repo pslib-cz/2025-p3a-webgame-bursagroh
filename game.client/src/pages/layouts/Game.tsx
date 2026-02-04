@@ -1,16 +1,16 @@
 import React from "react"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
-import { Outlet, useLocation } from "react-router"
+import { Outlet, useLocation, useNavigate } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { getPlayerQuery } from "../../api/player"
 import type { ScreenType } from "../../types/api/models/player"
-import WrongScreen from "../WrongScreen"
 import styles from "./game.module.css"
 import NavBar from "../../components/NavBar"
 import Inventory from "../../components/Inventory"
 import PlayerUI from "../../components/PlayerUI"
 import GameProviders from "../../providers/game"
 import Layer from "../../components/wrappers/layer/Layer"
+import WrongScreen from "../WrongScreen"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const screenTypeToURL = (screenType: ScreenType) => {
@@ -35,6 +35,7 @@ export const screenTypeToURL = (screenType: ScreenType) => {
 }
 
 const ProperScreenChecker = () => {
+    const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const { data, isError, isPending, isSuccess } = useQuery(getPlayerQuery(playerId))
     const location = useLocation()
@@ -49,6 +50,7 @@ const ProperScreenChecker = () => {
 
     if (isSuccess) {
         if (screenTypeToURL(data.screenType) != location.pathname) {
+            navigate(screenTypeToURL(data.screenType)!)
             return <WrongScreen />
         }
 
