@@ -25,26 +25,6 @@ namespace game.Server.Controllers
             _mineService = mineService;
         }
 
-        private List<(int x, int y)> GetExitCoordinates(int buildingX, int buildingY)
-        {
-            var exits = new List<(int x, int y)>();
-
-            if (IsRoad(buildingX, buildingY - 1)) exits.Add((3, 0));
-            if (IsRoad(buildingX, buildingY - 1)) exits.Add((4, 0));
-
-            if (IsRoad(buildingX, buildingY + 1)) exits.Add((3, 7));
-            if (IsRoad(buildingX, buildingY + 1)) exits.Add((4, 7));
-
-            if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 3));
-            if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 4));
-
-            if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 3));
-            if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 4));
-
-            if (!exits.Any()) exits.Add((0, 0));
-
-            return exits;
-        }
 
         private bool IsRoad(int x, int y)
         {
@@ -59,6 +39,62 @@ namespace game.Server.Controllers
                 Player player = new Player
                 {
                     PlayerId = Guid.NewGuid(),
+                    Name = request.Name,
+                    ScreenType = ScreenTypes.City,
+                    Money = 0,
+                    BankBalance = 0,
+                    Capacity = 10,
+                    Seed = new Random().Next(),
+                    Health = 10,
+
+                    PositionX = 0,
+                    PositionY = 0,
+                    SubPositionX = 0,
+                    SubPositionY = 0,
+                };
+
+                var fixedBuildings = new List<Building>
+            {
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Fountain, PositionX = 0, PositionY = 0, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Mine, PositionX = 2, PositionY = 0, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Bank, PositionX = -2, PositionY = 0, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Restaurant, PositionX = 0, PositionY = -2, IsBossDefeated = false },
+                new Building { PlayerId = player.PlayerId, BuildingType = BuildingTypes.Blacksmith, PositionX = 0, PositionY = 2, IsBossDefeated = false }
+            };
+
+                _context.Players.Add(player);
+                _context.Buildings.AddRange(fixedBuildings);
+
+
+                await _context.SaveChangesAsync();
+
+                Mine mine = new Mine
+                {
+                    MineId = new Random().Next(),
+                    PlayerId = player.PlayerId
+                };
+                _context.Mines.Add(mine);
+
+                var playerDto2 = _mapper.Map<PlayerDto>(player);
+                playerDto2.MineId = mine.MineId;
+
+                return Ok(playerDto2);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
+            }
+
+        }
+
+        [HttpPost("Generate2")]
+        public async Task<ActionResult<PlayerDto>> Generatee(Guid test, [FromBody] GeneratePlayerRequest request)
+        {
+            try
+            {
+                Player player = new Player
+                {
+                    PlayerId = test,
                     Name = request.Name,
                     ScreenType = ScreenTypes.City,
                     Money = 0,

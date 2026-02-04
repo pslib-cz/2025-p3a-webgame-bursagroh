@@ -29,14 +29,13 @@ namespace game.Server.Controllers
                 var items = _context.InventoryItems
                 .Where(i => i.PlayerId == playerId && i.IsInBank)
                 .ProjectTo<BankInventoryDto>(_mapper.ConfigurationProvider)
-                .ToList();
+                .ToListAsync();
 
-                return items.Any() ? Ok(items) : NoContent();
+                return Ok(items);
             } catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
         }
 
         [HttpPatch("Action/Transfer")]
