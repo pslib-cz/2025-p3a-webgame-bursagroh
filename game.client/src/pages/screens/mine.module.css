@@ -1,0 +1,25 @@
+.container {
+    float: right;
+}
+
+.groundContainer {
+    background-color: var(--darker);
+    margin-top: 1rem;
+    margin-right: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.heading {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
+
+.itemContainer {
+    background-color: var(--dark);
+    padding: 1rem;
+}
