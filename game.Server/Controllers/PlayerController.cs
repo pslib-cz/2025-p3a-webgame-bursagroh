@@ -142,6 +142,14 @@ namespace game.Server.Controllers
 
                 if (player == null) return NotFound();
 
+                if (player.ScreenType == ScreenTypes.Lose && request.NewScreenType == ScreenTypes.City)
+                {
+                    player.ScreenType = ScreenTypes.City;
+                    player.PositionX = 0;
+                    player.PositionY = 0;
+                    player.FloorId = null;
+                }
+
                 if (player.ScreenType == ScreenTypes.Mine && request.NewScreenType != ScreenTypes.Mine)
                 {
                     var rentedItems = await _context.InventoryItems
@@ -457,9 +465,6 @@ namespace game.Server.Controllers
                             if (player.Health == 0)
                             {
                                 player.ScreenType = ScreenTypes.Lose;
-                                player.PositionX = 0;
-                                player.PositionY = 0;
-                                player.FloorId = null;
 
                                 var itemsToRemove = player.InventoryItems
                                     .Where(ii => !ii.IsInBank)
