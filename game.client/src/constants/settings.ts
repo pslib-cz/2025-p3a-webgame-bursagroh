@@ -1,0 +1,2 @@
+export const DEFAULT_AUTOSAVE_INTERVAL = 5
+export const DEFAULT_MAX_AUTOSAVE = 3
