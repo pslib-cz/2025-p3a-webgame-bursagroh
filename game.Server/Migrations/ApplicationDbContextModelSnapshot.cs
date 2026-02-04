@@ -310,6 +310,12 @@ namespace game.Server.Migrations
                             BlueprintId = 24,
                             ItemId = 42,
                             Price = 500
+                        },
+                        new
+                        {
+                            BlueprintId = 25,
+                            ItemId = 100,
+                            Price = 10000
                         });
                 });
 
@@ -1605,6 +1611,17 @@ namespace game.Server.Migrations
                             ItemType = 3,
                             MaxDurability = 1,
                             Name = "Muscle Potion",
+                            Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 100,
+                            ChangeOfGenerating = 0,
+                            Damage = 100,
+                            Description = "Drop this into fountain to win",
+                            ItemType = 0,
+                            MaxDurability = 1000000,
+                            Name = "Mythical Sword",
                             Weight = 1
                         });
                 });

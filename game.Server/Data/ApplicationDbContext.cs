@@ -283,7 +283,9 @@ namespace game.Server.Data
 
                 new Item { ItemId = 40, Name = "Healing Potion", Description = "This thing heals", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
                 new Item { ItemId = 41, Name = "God Potion", Description = "+5 hp", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
-                new Item { ItemId = 42, Name = "Muscle Potion", Description = "+5 inventory space", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 }
+                new Item { ItemId = 42, Name = "Muscle Potion", Description = "+5 inventory space", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
+
+                new Item { ItemId = 100, Name = "Mythical Sword", Description = "Drop this into fountain to win", ItemType = ItemTypes.Sword, Weight = 1, Damage = 100, MaxDurability = 1000000 }
 
             );
             modelBuilder.Entity<Block>().HasData(
@@ -310,6 +312,8 @@ namespace game.Server.Data
                 new Blueprint { BlueprintId = 7, ItemId = 15, Price = 150 }, // Gold Sword
                 new Blueprint { BlueprintId = 8, ItemId = 16, Price = 500 }, // Unobtainium Sword
 
+               
+
                 // Axes
                 new Blueprint { BlueprintId = 9, ItemId = 20, Price = 5 },   // Wooden Axe
                 new Blueprint { BlueprintId = 10, ItemId = 21, Price = 10 }, // Rock Axe
@@ -330,7 +334,9 @@ namespace game.Server.Data
 
                 new Blueprint { BlueprintId = 22, ItemId = 40, Price = 500 },
                 new Blueprint { BlueprintId = 23, ItemId = 41, Price = 500 },
-                new Blueprint { BlueprintId = 24, ItemId = 42, Price = 500 } 
+                new Blueprint { BlueprintId = 24, ItemId = 42, Price = 500 },
+
+                new Blueprint { BlueprintId = 25, ItemId = 100, Price = 10000 } // Unobtainium Sword
             );
 
             modelBuilder.Entity<Crafting>().HasData(

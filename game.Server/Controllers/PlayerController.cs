@@ -64,6 +64,7 @@ namespace game.Server.Controllers
                     BankBalance = 0,
                     Capacity = 10,
                     Seed = new Random().Next(),
+                    Health = 1,
 
                     PositionX = 0,
                     PositionY = 0,
@@ -652,24 +653,25 @@ namespace game.Server.Controllers
             try
             {
                 var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
-                if (player == null)
-                {
-                    return NotFound("Player not found.");
-                }
-                if (player.FloorId == null)
-                {
-                    return BadRequest("You can only drop items while in floor/mine.");
-                }
-
-
+                if (player == null) return NotFound("Player not found.");
 
                 var inventoryItem = await _context.InventoryItems
                     .Include(ii => ii.ItemInstance)
                     .FirstOrDefaultAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == id);
 
-                if (inventoryItem == null)
+                if (inventoryItem == null) return BadRequest("Item not found in the inventory.");
+
+                bool isWinCondition = inventoryItem.ItemInstance.ItemId == 100 &&
+                                      player.SubPositionX == 0 &&
+                                      player.SubPositionY == 0;
+
+                if (isWinCondition)
                 {
-                    return BadRequest("Item not found in the inventory.");
+                    player.ScreenType = ScreenTypes.Win;
+                }
+                else if (player.FloorId == null)
+                {
+                    return BadRequest("You can only drop items while in floor/mine.");
                 }
 
                 if (player.ActiveInventoryItemId == inventoryItem.InventoryItemId)
@@ -677,32 +679,33 @@ namespace game.Server.Controllers
                     player.ActiveInventoryItemId = null;
                 }
 
-                var floorItem = new FloorItem
+                if (player.FloorId != null)
                 {
-                    FloorId = player.FloorId.Value,
-                    PositionX = player.SubPositionX,
-                    PositionY = player.SubPositionY,
-                    FloorItemType = FloorItemType.Item,
-                    ItemInstanceId = inventoryItem.ItemInstanceId
-                };
+                    var floorItem = new FloorItem
+                    {
+                        FloorId = player.FloorId.Value,
+                        PositionX = player.SubPositionX,
+                        PositionY = player.SubPositionY,
+                        FloorItemType = FloorItemType.Item,
+                        ItemInstanceId = inventoryItem.ItemInstanceId
+                    };
+                    _context.FloorItems.Add(floorItem);
+                }
 
                 _context.InventoryItems.Remove(inventoryItem);
-                _context.FloorItems.Add(floorItem);
 
                 await _context.SaveChangesAsync();
 
                 return Ok(new
                 {
-                    message = "Item dropped.",
-                    itemInstanceId = inventoryItem.ItemInstanceId,
-                    x = player.SubPositionX,
-                    y = player.SubPositionY
+                    message = player.ScreenType == ScreenTypes.Win ? "You won the game!" : "Item dropped.",
+                    currentScreen = player.ScreenType.ToString(),
                 });
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
         }
 
         [HttpPatch("{id}/Action/set-active-item")]
