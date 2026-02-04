@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260203204220_pico123")]
-    partial class pico123
+    [Migration("20260204150839_kundicka12")]
+    partial class kundicka12
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -313,6 +313,12 @@ namespace game.Server.Migrations
                             BlueprintId = 24,
                             ItemId = 42,
                             Price = 500
+                        },
+                        new
+                        {
+                            BlueprintId = 25,
+                            ItemId = 100,
+                            Price = 10000
                         });
                 });
 
@@ -1608,6 +1614,17 @@ namespace game.Server.Migrations
                             ItemType = 3,
                             MaxDurability = 1,
                             Name = "Muscle Potion",
+                            Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 100,
+                            ChangeOfGenerating = 0,
+                            Damage = 100,
+                            Description = "Drop this into fountain to win",
+                            ItemType = 0,
+                            MaxDurability = 1000000,
+                            Name = "Mythical Sword",
                             Weight = 1
                         });
                 });

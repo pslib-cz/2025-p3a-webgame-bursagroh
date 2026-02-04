@@ -1,4 +1,4 @@
-﻿using game.Server.Data;
+using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
