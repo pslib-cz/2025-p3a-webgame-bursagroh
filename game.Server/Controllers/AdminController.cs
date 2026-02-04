@@ -1,4 +1,4 @@
-﻿using game.Server.Data;
+using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +12,10 @@ namespace game.Server.Controllers
 
         private readonly ApplicationDbContext context;
 
-        
+
         public AdminController(ApplicationDbContext context)
         {
-           this.context = context;
+            this.context = context;
         }
 
         [HttpPost("{id}/SpawnFrames")]
@@ -232,10 +232,9 @@ namespace game.Server.Controllers
             });
         }
 
-        [HttpPost("{id}/SpawnItem100")]
+        [HttpPost("{id}/SpawnMythicalSword")]
         public async Task<ActionResult> GiveSpecialItem(Guid id)
         {
-            // 1. Fetch player and check inventory capacity
             var player = await context.Players
                 .Include(p => p.InventoryItems)
                 .FirstOrDefaultAsync(p => p.PlayerId == id);
@@ -247,7 +246,6 @@ namespace game.Server.Controllers
                 return BadRequest("Inventory is full.");
             }
 
-            // 2. Fetch the template for Item 100
             var itemTemplate = await context.Items
                 .FirstOrDefaultAsync(i => i.ItemId == 100);
 
@@ -256,7 +254,6 @@ namespace game.Server.Controllers
                 return BadRequest("Item template ID 100 not found in database.");
             }
 
-            // 3. Create the instance and link it to the player's inventory
             var newInstance = new ItemInstance
             {
                 ItemId = itemTemplate.ItemId,
@@ -272,7 +269,6 @@ namespace game.Server.Controllers
             };
             context.InventoryItems.Add(inventoryEntry);
 
-            // 4. Persist changes
             await context.SaveChangesAsync();
 
             return Ok(new
