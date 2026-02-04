@@ -25,6 +25,7 @@ public class MapGeneratorService
     public List<Building> GenerateMapArea(Guid playerId, int minX, int maxX, int minY, int maxY, int globalSeed)
     {
         var buildings = new List<Building>();
+        var random = new Random();
 
         for (int x = minX; x <= maxX; x++)
         {
@@ -46,7 +47,7 @@ public class MapGeneratorService
                     BuildingType = type,
                     PositionX = x,
                     PositionY = y,
-                    Height = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? 5 : null,
+                    Height = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? random.Next(5, 10) : null,
                     ReachedHeight = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? 0 : null,
                     IsBossDefeated = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? false : null
 
