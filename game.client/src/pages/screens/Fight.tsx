@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/react-query"
 import { useItemMutation } from "../../api/player"
 import styles from "./fight.module.css"
 
-const mapEnemyTypeToAssetType = (enemyType: EnemyType): AssetType => {
+const mapEnemyTypeToAssetType = (enemyType: EnemyType | undefined): AssetType => {
     switch (enemyType) {
         case 'Zombie':
             return 'zombie'
@@ -17,6 +17,8 @@ const mapEnemyTypeToAssetType = (enemyType: EnemyType): AssetType => {
             return 'skeleton'
         case 'Dragon':
             return 'dragon'
+        default:
+            return "empty"
     }
 }
 
@@ -45,7 +47,7 @@ const FightScreen = () => {
             </div>
             <div className={styles.entityContainer} onClick={handleClick}>
                 <svg width={512} height={512} viewBox="0 0 512 512">
-                    <Asset assetType={mapEnemyTypeToAssetType(enemy.enemy!.enemyType)} x={0} y={0} width={512} height={512} />
+                    <Asset assetType={mapEnemyTypeToAssetType(enemy.enemy?.enemyType)} x={0} y={0} width={512} height={512} />
                 </svg>
                 <span className={styles.entityText}>{enemy.enemy?.health} / ?</span>
             </div>

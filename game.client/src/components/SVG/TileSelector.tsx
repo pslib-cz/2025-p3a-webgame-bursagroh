@@ -260,6 +260,10 @@ const TileSelector: React.FC<TileSelectorProps> = ({width, height, x, y, tileTyp
             return (
                 <Asset assetType='unobtainium' x={x} y={y} width={width} height={height} {...props} />
             )
+        case 'chest':
+            return (
+                <Asset assetType='chest' x={x} y={y} width={width} height={height} {...props} />
+            )
     }
 }
 

@@ -6,19 +6,19 @@ export const calcInventoryWeight = (inventoryItems: Array<InventoryItem>) => {
     }, 0)
 }
 
-export const countInventoryItems = (inventoryItems: Array<InventoryItem>) => {
-    const itemCountMap: Record<number, number> = {}
+export const groupInventoryItems = (inventoryItems: Array<InventoryItem>) => {
+    const itemGroupMap: Record<string, number[]> = {}
 
     inventoryItems.forEach((item) => {
-        const itemId = item.itemInstance.item.itemId
-        if (itemCountMap[itemId]) {
-            itemCountMap[itemId] += 1
+        const key = `${item.itemInstance.item.itemId}-${item.itemInstance.durability}`
+        if (itemGroupMap[key]) {
+            itemGroupMap[key].push(item.inventoryItemId)
         } else {
-            itemCountMap[itemId] = 1
+            itemGroupMap[key] = [item.inventoryItemId]
         }
     })
     
-    return itemCountMap
+    return itemGroupMap
 }
 
 export const removeEquippedItemFromInventory = (inventoryItems: Array<InventoryItem>, equippedInventoryItemId: number | null) => {

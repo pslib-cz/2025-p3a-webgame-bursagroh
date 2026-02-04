@@ -96,7 +96,13 @@ export const api = {
             throw new Error(`Error patching to ${uri}: ${response.statusText}`)
         }
 
-        return await response.json() as API["patch"][URL]["res"][200]
+        const text = await response.text()
+
+        if (!text) {
+            return {} as API["patch"][URL]["res"][200]
+        }
+
+        return await JSON.parse(text) as API["patch"][URL]["res"][200]
     },
     patchWith204: async <URL extends keyof Pick<API["patch"], "/api/Recipe/{recipeId}/Action/start">, Params extends API["patch"][URL]["params"], Query extends API["patch"][URL]["query"], Body extends API["patch"][URL]["body"]>(url: URL, params: Params, query: Query, body: Body) => {
         const uri = formatURL(url, params, query)
