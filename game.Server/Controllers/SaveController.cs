@@ -36,11 +36,13 @@ namespace game.Server.Controllers
 
                 var clonedPlayer = new Player();
                 _context.Entry(clonedPlayer).CurrentValues.SetValues(originalPlayer);
+
                 clonedPlayer.PlayerId = Guid.NewGuid();
                 clonedPlayer.Name = originalPlayer.Name;
                 clonedPlayer.InventoryItems = new List<InventoryItem>();
                 clonedPlayer.FloorId = null;
                 clonedPlayer.Floor = null;
+                clonedPlayer.ActiveInventoryItemId = null;
 
                 _context.Players.Add(clonedPlayer);
                 await _context.SaveChangesAsync();
@@ -218,7 +220,6 @@ namespace game.Server.Controllers
                 if (saveEntry == null) return NotFound("Save string not found.");
                 var sourceId = saveEntry.PlayerId;
 
-
                 var sourcePlayer = await _context.Players
                     .Include(p => p.InventoryItems).ThenInclude(ii => ii.ItemInstance)
                     .AsNoTracking()
@@ -239,11 +240,23 @@ namespace game.Server.Controllers
                 _context.InventoryItems.RemoveRange(oldInv);
 
                 await _context.SaveChangesAsync();
-                _context.Entry(targetPlayer).CurrentValues.SetValues(sourcePlayer);
-                targetPlayer.PlayerId = targetPlayerId;
-                targetPlayer.Name = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 1));
+
+                targetPlayer.Money = sourcePlayer.Money;
+                targetPlayer.BankBalance = sourcePlayer.BankBalance;
+                targetPlayer.ScreenType = sourcePlayer.ScreenType;
+                targetPlayer.PositionX = sourcePlayer.PositionX;
+                targetPlayer.PositionY = sourcePlayer.PositionY;
+                targetPlayer.SubPositionX = sourcePlayer.SubPositionX;
+                targetPlayer.SubPositionY = sourcePlayer.SubPositionY;
+                targetPlayer.Capacity = sourcePlayer.Capacity;
+                targetPlayer.Seed = sourcePlayer.Seed;
+                targetPlayer.Health = sourcePlayer.Health;
+                targetPlayer.MaxHealth = sourcePlayer.MaxHealth;
+                targetPlayer.MineId = sourcePlayer.MineId;
+                targetPlayer.Name = sourcePlayer.Name;
                 targetPlayer.InventoryItems = new List<InventoryItem>();
                 targetPlayer.FloorId = null;
+                targetPlayer.ActiveInventoryItemId = null;
 
                 await _context.SaveChangesAsync();
 
@@ -279,7 +292,10 @@ namespace game.Server.Controllers
                             _context.Floors.Add(newFloor);
                             await _context.SaveChangesAsync();
 
-                            if (sourcePlayer.FloorId == oldFloor.FloorId) targetPlayer.FloorId = newFloor.FloorId;
+                            if (sourcePlayer.FloorId == oldFloor.FloorId)
+                            {
+                                targetPlayer.FloorId = newFloor.FloorId;
+                            }
 
                             foreach (var oldFI in oldFloor.FloorItems)
                             {
@@ -318,6 +334,7 @@ namespace game.Server.Controllers
                     var newMine = new Mine { MineId = new Random().Next(), PlayerId = targetPlayer.PlayerId };
                     _context.Mines.Add(newMine);
                     await _context.SaveChangesAsync();
+
 
                     foreach (var oldLayer in sourceMine.MineLayers)
                     {
