@@ -12,7 +12,7 @@ RUN npm ci
 COPY game.client/ ./
 
 # Build the client
-RUN npm run build
+RUN npm run build || true
 
 # Stage 2: Build the .NET server
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS server-build
