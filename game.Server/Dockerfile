@@ -26,7 +26,7 @@ RUN dotnet restore
 COPY game.Server/ ./
 
 # Copy built client files to wwwroot
-COPY --from=client-build /app/client/dist ./wwwroot
+COPY --from=client-build /app/client/build ./wwwroot
 
 # Build the server
 RUN dotnet publish -c Release -o /app/publish
