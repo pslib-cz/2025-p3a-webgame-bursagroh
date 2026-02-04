@@ -17,7 +17,6 @@ namespace game.Server.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int EnemyId { get; set; }
         public int Health { get; set; }
-        public int MaxHealth { get; set; }
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public EnemyType EnemyType { get; set; }
