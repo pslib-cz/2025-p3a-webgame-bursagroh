@@ -201,7 +201,7 @@ namespace game.Server.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new { newSave.SaveString, clonedPlayer.PlayerId });
+                return Ok(new { newSave.SaveString });
             }
             catch (Exception ex)
             {

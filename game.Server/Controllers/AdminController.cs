@@ -1,4 +1,4 @@
-﻿using game.Server.Data;
+using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,10 +12,10 @@ namespace game.Server.Controllers
 
         private readonly ApplicationDbContext context;
 
-        
+
         public AdminController(ApplicationDbContext context)
         {
-           this.context = context;
+            this.context = context;
         }
 
         [HttpPost("{id}/SpawnFrames")]
@@ -229,6 +229,53 @@ namespace game.Server.Controllers
                 message = "Healing Potion added to inventory!",
                 inventoryItemId = inventoryEntry.InventoryItemId,
                 itemName = potionTemplate.Name
+            });
+        }
+
+        [HttpPost("{id}/SpawnMythicalSword")]
+        public async Task<ActionResult> GiveSpecialItem(Guid id)
+        {
+            var player = await context.Players
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found.");
+
+            if (player.InventoryItems.Count >= player.Capacity)
+            {
+                return BadRequest("Inventory is full.");
+            }
+
+            var itemTemplate = await context.Items
+                .FirstOrDefaultAsync(i => i.ItemId == 100);
+
+            if (itemTemplate == null)
+            {
+                return BadRequest("Item template ID 100 not found in database.");
+            }
+
+            var newInstance = new ItemInstance
+            {
+                ItemId = itemTemplate.ItemId,
+                Durability = itemTemplate.MaxDurability
+            };
+            context.ItemInstances.Add(newInstance);
+
+            var inventoryEntry = new InventoryItem
+            {
+                PlayerId = id,
+                ItemInstance = newInstance,
+                IsInBank = false
+            };
+            context.InventoryItems.Add(inventoryEntry);
+
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = $"{itemTemplate.Name} added to inventory!",
+                inventoryItemId = inventoryEntry.InventoryItemId,
+                itemId = itemTemplate.ItemId
             });
         }
     }

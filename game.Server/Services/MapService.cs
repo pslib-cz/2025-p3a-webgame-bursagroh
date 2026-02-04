@@ -25,6 +25,7 @@ public class MapGeneratorService
     public List<Building> GenerateMapArea(Guid playerId, int minX, int maxX, int minY, int maxY, int globalSeed)
     {
         var buildings = new List<Building>();
+        var random = new Random();
 
         for (int x = minX; x <= maxX; x++)
         {
@@ -46,9 +47,10 @@ public class MapGeneratorService
                     BuildingType = type,
                     PositionX = x,
                     PositionY = y,
-                    Height = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? 5 : null,
+                    Height = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? random.Next(5, 10) : null,
                     ReachedHeight = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? 0 : null,
                     IsBossDefeated = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? false : null
+
                 });
             }
         }
@@ -138,7 +140,7 @@ public class MapGeneratorService
                     PositionX = pos.x,
                     PositionY = pos.y,
                     FloorItemType = FloorItemType.Enemy,
-                    Enemy = new Enemy { Health = 100, MaxHealth = 100, EnemyType = EnemyType.Dragon }
+                    Enemy = new Enemy { Health = 100, EnemyType = EnemyType.Dragon }
                 });
             }
 
@@ -155,7 +157,7 @@ public class MapGeneratorService
                     Enemy = new Enemy
                     {
                         Health = 20,
-                        MaxHealth = 20,
+
                         EnemyType = selectedType,
                         ItemInstance = new ItemInstance { ItemId = 10, Durability = 20 }
                     }
