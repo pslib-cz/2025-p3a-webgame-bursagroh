@@ -12,10 +12,10 @@ namespace game.Server.Controllers
 
         private readonly ApplicationDbContext context;
 
-        
+
         public AdminController(ApplicationDbContext context)
         {
-           this.context = context;
+            this.context = context;
         }
 
         [HttpPost("{id}/SpawnFrames")]
@@ -229,6 +229,57 @@ namespace game.Server.Controllers
                 message = "Healing Potion added to inventory!",
                 inventoryItemId = inventoryEntry.InventoryItemId,
                 itemName = potionTemplate.Name
+            });
+        }
+
+        [HttpPost("{id}/SpawnItem100")]
+        public async Task<ActionResult> GiveSpecialItem(Guid id)
+        {
+            // 1. Fetch player and check inventory capacity
+            var player = await context.Players
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
+            if (player == null) return NotFound("Player not found.");
+
+            if (player.InventoryItems.Count >= player.Capacity)
+            {
+                return BadRequest("Inventory is full.");
+            }
+
+            // 2. Fetch the template for Item 100
+            var itemTemplate = await context.Items
+                .FirstOrDefaultAsync(i => i.ItemId == 100);
+
+            if (itemTemplate == null)
+            {
+                return BadRequest("Item template ID 100 not found in database.");
+            }
+
+            // 3. Create the instance and link it to the player's inventory
+            var newInstance = new ItemInstance
+            {
+                ItemId = itemTemplate.ItemId,
+                Durability = itemTemplate.MaxDurability
+            };
+            context.ItemInstances.Add(newInstance);
+
+            var inventoryEntry = new InventoryItem
+            {
+                PlayerId = id,
+                ItemInstance = newInstance,
+                IsInBank = false
+            };
+            context.InventoryItems.Add(inventoryEntry);
+
+            // 4. Persist changes
+            await context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = $"{itemTemplate.Name} added to inventory!",
+                inventoryItemId = inventoryEntry.InventoryItemId,
+                itemId = itemTemplate.ItemId
             });
         }
     }

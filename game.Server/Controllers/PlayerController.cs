@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿
+using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Models;
@@ -28,7 +29,7 @@ namespace game.Server.Controllers
         {
             var exits = new List<(int x, int y)>();
 
-            if (IsRoad(buildingX, buildingY - 1)) exits.Add((3, 0)); 
+            if (IsRoad(buildingX, buildingY - 1)) exits.Add((3, 0));
             if (IsRoad(buildingX, buildingY - 1)) exits.Add((4, 0));
 
             if (IsRoad(buildingX, buildingY + 1)) exits.Add((3, 7));
@@ -37,7 +38,7 @@ namespace game.Server.Controllers
             if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 3));
             if (IsRoad(buildingX - 1, buildingY)) exits.Add((0, 4));
 
-            if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 3)); 
+            if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 3));
             if (IsRoad(buildingX + 1, buildingY)) exits.Add((7, 4));
 
             if (!exits.Any()) exits.Add((0, 0));
@@ -53,7 +54,7 @@ namespace game.Server.Controllers
         [HttpPost("Generate")]
         public async Task<ActionResult<PlayerDto>> Generate([FromBody] GeneratePlayerRequest request)
         {
-            try 
+            try
             {
                 Player player = new Player
                 {
@@ -64,6 +65,7 @@ namespace game.Server.Controllers
                     BankBalance = 0,
                     Capacity = 10,
                     Seed = new Random().Next(),
+                    Health = 1,
 
                     PositionX = 0,
                     PositionY = 0,
@@ -102,7 +104,7 @@ namespace game.Server.Controllers
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
+
         }
 
         [HttpGet("{id}")]
@@ -119,11 +121,12 @@ namespace game.Server.Controllers
                 dto.MineId = mine?.MineId;
 
                 return Ok(dto);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
+
         }
 
         /// <remarks>
@@ -141,6 +144,14 @@ namespace game.Server.Controllers
                     .FirstOrDefaultAsync(p => p.PlayerId == id);
 
                 if (player == null) return NotFound();
+
+                if (player.ScreenType == ScreenTypes.Lose && request.NewScreenType == ScreenTypes.City)
+                {
+                    player.ScreenType = ScreenTypes.City;
+                    player.PositionX = 0;
+                    player.PositionY = 0;
+                    player.FloorId = null;
+                }
 
                 if (player.ScreenType == ScreenTypes.Mine && request.NewScreenType != ScreenTypes.Mine)
                 {
@@ -457,9 +468,6 @@ namespace game.Server.Controllers
                             if (player.Health == 0)
                             {
                                 player.ScreenType = ScreenTypes.Lose;
-                                player.PositionX = 0;
-                                player.PositionY = 0;
-                                player.FloorId = null;
 
                                 var itemsToRemove = player.InventoryItems
                                     .Where(ii => !ii.IsInBank)
@@ -550,19 +558,20 @@ namespace game.Server.Controllers
                     .ThenInclude(ins => ins!.Item)
                 .ToListAsync();
 
-            if (items == null || !items.Any())
-            {
-                return NoContent();
+                if (items == null || !items.Any())
+                {
+                    return NoContent();
+                }
+
+                var inventoryDtos = _mapper.Map<List<InventoryItemDto>>(items);
+
+                return Ok(inventoryDtos);
             }
-
-            var inventoryDtos = _mapper.Map<List<InventoryItemDto>>(items);
-
-            return Ok(inventoryDtos);
-            } catch (Exception ex)
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
+
         }
 
         public class PickRequest //proc to tu je?
@@ -572,7 +581,7 @@ namespace game.Server.Controllers
         }
 
         [HttpPatch("{id}/Action/pick")]
-        public async Task<ActionResult> Pick(Guid id, [FromBody] PickRequest request) 
+        public async Task<ActionResult> Pick(Guid id, [FromBody] PickRequest request)
         {
             try
             {
@@ -634,11 +643,12 @@ namespace game.Server.Controllers
                 }
 
                 return Ok(new { message = "Items picked up.", newCount = currentInventoryCount });
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
+
         }
 
         [HttpPatch("{id}/Action/drop")]
@@ -647,24 +657,25 @@ namespace game.Server.Controllers
             try
             {
                 var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
-                if (player == null)
-                {
-                    return NotFound("Player not found.");
-                }
-                if (player.FloorId == null)
-                {
-                    return BadRequest("You can only drop items while in floor/mine.");
-                }
-
-
+                if (player == null) return NotFound("Player not found.");
 
                 var inventoryItem = await _context.InventoryItems
                     .Include(ii => ii.ItemInstance)
                     .FirstOrDefaultAsync(ii => ii.InventoryItemId == request.InventoryItemId && ii.PlayerId == id);
 
-                if (inventoryItem == null)
+                if (inventoryItem == null) return BadRequest("Item not found in the inventory.");
+
+                bool isWinCondition = inventoryItem.ItemInstance.ItemId == 100 &&
+                                      player.SubPositionX == 0 &&
+                                      player.SubPositionY == 0;
+
+                if (isWinCondition)
                 {
-                    return BadRequest("Item not found in the inventory.");
+                    player.ScreenType = ScreenTypes.Win;
+                }
+                else if (player.FloorId == null)
+                {
+                    return BadRequest("You can only drop items while in floor/mine.");
                 }
 
                 if (player.ActiveInventoryItemId == inventoryItem.InventoryItemId)
@@ -672,32 +683,33 @@ namespace game.Server.Controllers
                     player.ActiveInventoryItemId = null;
                 }
 
-                var floorItem = new FloorItem
+                if (player.FloorId != null)
                 {
-                    FloorId = player.FloorId.Value,
-                    PositionX = player.SubPositionX,
-                    PositionY = player.SubPositionY,
-                    FloorItemType = FloorItemType.Item,
-                    ItemInstanceId = inventoryItem.ItemInstanceId
-                };
+                    var floorItem = new FloorItem
+                    {
+                        FloorId = player.FloorId.Value,
+                        PositionX = player.SubPositionX,
+                        PositionY = player.SubPositionY,
+                        FloorItemType = FloorItemType.Item,
+                        ItemInstanceId = inventoryItem.ItemInstanceId
+                    };
+                    _context.FloorItems.Add(floorItem);
+                }
 
                 _context.InventoryItems.Remove(inventoryItem);
-                _context.FloorItems.Add(floorItem);
 
                 await _context.SaveChangesAsync();
 
                 return Ok(new
                 {
-                    message = "Item dropped.",
-                    itemInstanceId = inventoryItem.ItemInstanceId,
-                    x = player.SubPositionX,
-                    y = player.SubPositionY
+                    message = player.ScreenType == ScreenTypes.Win ? "You won the game!" : "Item dropped.",
+                    currentScreen = player.ScreenType.ToString(),
                 });
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
-            
         }
 
         [HttpPatch("{id}/Action/set-active-item")]
@@ -734,7 +746,8 @@ namespace game.Server.Controllers
                 dto.MineId = mine?.MineId;
 
                 return Ok(dto);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }

@@ -76,9 +76,9 @@ namespace game.Server.Data
                     PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
                     Name = "Seeded Player",
                     Money = 100,
-                    BankBalance = 0, 
-                    ScreenType = ScreenTypes.City, 
-                    Capacity = 10, 
+                    BankBalance = 0,
+                    ScreenType = ScreenTypes.City,
+                    Capacity = 10,
                     Seed = 252
                 });
             });
@@ -167,7 +167,7 @@ namespace game.Server.Data
                     // --- Recipe 2: Cheeseburger (FIXED: Sauce -> Cheese) ---
                     new Ingredience { RecipeId = 2, IngredienceId = 4, Order = 1, IngredienceType = IngredienceTypes.BunUp },
                     new Ingredience { RecipeId = 2, IngredienceId = 5, Order = 2, IngredienceType = IngredienceTypes.Meat },
-                    new Ingredience { RecipeId = 2, IngredienceId = 6, Order = 3, IngredienceType = IngredienceTypes.Cheese }, 
+                    new Ingredience { RecipeId = 2, IngredienceId = 6, Order = 3, IngredienceType = IngredienceTypes.Cheese },
                     new Ingredience { RecipeId = 2, IngredienceId = 7, Order = 4, IngredienceType = IngredienceTypes.BunDown },
 
                     // --- Recipe 3: Bacon Burger ---
@@ -232,7 +232,7 @@ namespace game.Server.Data
                     new Ingredience { RecipeId = 11, IngredienceId = 50, Order = 1, IngredienceType = IngredienceTypes.BunUp },
                     new Ingredience { RecipeId = 11, IngredienceId = 51, Order = 2, IngredienceType = IngredienceTypes.Salad },
                     new Ingredience { RecipeId = 11, IngredienceId = 52, Order = 3, IngredienceType = IngredienceTypes.Tomato },
-                    new Ingredience { RecipeId = 11, IngredienceId = 53, Order = 4, IngredienceType = IngredienceTypes.Cheese }, 
+                    new Ingredience { RecipeId = 11, IngredienceId = 53, Order = 4, IngredienceType = IngredienceTypes.Cheese },
                     new Ingredience { RecipeId = 11, IngredienceId = 54, Order = 5, IngredienceType = IngredienceTypes.Meat },
                     new Ingredience { RecipeId = 11, IngredienceId = 55, Order = 6, IngredienceType = IngredienceTypes.Bacon },
                     new Ingredience { RecipeId = 11, IngredienceId = 56, Order = 7, IngredienceType = IngredienceTypes.BunDown }
@@ -247,52 +247,54 @@ namespace game.Server.Data
             });
 
             modelBuilder.Entity<Item>().HasData(
-                new Item { ItemId = 1, Name = "Wooden Frame",         Description = "Wooden Frame",        ItemType = ItemTypes.Block,   ChangeOfGenerating = 6 },
-                new Item { ItemId = 2, Name = "Rock",                 Description = "Rock",                ItemType = ItemTypes.Block,   ChangeOfGenerating = 95 },
-                new Item { ItemId = 3, Name = "Copper Ore",           Description = "Copper Ore",          ItemType = ItemTypes.Block,   ChangeOfGenerating = 7 },
-                new Item { ItemId = 4, Name = "Iron Ore",             Description = "Iron Ore",            ItemType = ItemTypes.Block,   ChangeOfGenerating = 6 },
-                new Item { ItemId = 5, Name = "Silver Ore",           Description = "Silver Ore",          ItemType = ItemTypes.Block,   ChangeOfGenerating = 7 },
-                new Item { ItemId = 6, Name = "Gold Ore",             Description = "Gold Ore",            ItemType = ItemTypes.Block,   ChangeOfGenerating = 6 },
-                new Item { ItemId = 7, Name = "Unobtainium Ore",      Description = "Unobtainium Ore",     ItemType = ItemTypes.Block,   ChangeOfGenerating = 1 },
-                
-                new Item { ItemId = 10, Name = "Wooden Sword",        Description = "Wooden Sword",        ItemType = ItemTypes.Sword,   Weight = 1, Damage = 1, MaxDurability = 20 },
-                new Item { ItemId = 11, Name = "Rock Sword",          Description = "Rock Sword",          ItemType = ItemTypes.Sword,   Weight = 1, Damage = 2, MaxDurability = 40 },
-                new Item { ItemId = 12, Name = "Copper Sword",        Description = "Copper Sword",        ItemType = ItemTypes.Sword,   Weight = 1, Damage = 3, MaxDurability = 60 },
-                new Item { ItemId = 13, Name = "Iron Sword",          Description = "Iron Sword",          ItemType = ItemTypes.Sword,   Weight = 1, Damage = 4, MaxDurability = 80 },
-                new Item { ItemId = 14, Name = "Silver Sword",        Description = "Silver Sword",        ItemType = ItemTypes.Sword,   Weight = 1, Damage = 5, MaxDurability = 100 },
-                new Item { ItemId = 15, Name = "Gold Sword",          Description = "Gold Sword",          ItemType = ItemTypes.Sword,   Weight = 1, Damage = 6, MaxDurability = 120 },
-                new Item { ItemId = 16, Name = "Unobtainium Sword",   Description = "Unobtainium Sword",   ItemType = ItemTypes.Sword,   Weight = 1, Damage = 7, MaxDurability = 240 },
+                new Item { ItemId = 1, Name = "Wooden Frame", Description = "Wooden Frame", ItemType = ItemTypes.Block, ChangeOfGenerating = 6 },
+                new Item { ItemId = 2, Name = "Rock", Description = "Rock", ItemType = ItemTypes.Block, ChangeOfGenerating = 95 },
+                new Item { ItemId = 3, Name = "Copper Ore", Description = "Copper Ore", ItemType = ItemTypes.Block, ChangeOfGenerating = 7 },
+                new Item { ItemId = 4, Name = "Iron Ore", Description = "Iron Ore", ItemType = ItemTypes.Block, ChangeOfGenerating = 6 },
+                new Item { ItemId = 5, Name = "Silver Ore", Description = "Silver Ore", ItemType = ItemTypes.Block, ChangeOfGenerating = 7 },
+                new Item { ItemId = 6, Name = "Gold Ore", Description = "Gold Ore", ItemType = ItemTypes.Block, ChangeOfGenerating = 6 },
+                new Item { ItemId = 7, Name = "Unobtainium Ore", Description = "Unobtainium Ore", ItemType = ItemTypes.Block, ChangeOfGenerating = 1 },
 
-                new Item { ItemId = 20, Name = "Wooden Axe",          Description = "Wooden Axe",          ItemType = ItemTypes.Axe,     Weight = 1, Damage = 1, MaxDurability = 20 },
-                new Item { ItemId = 21, Name = "Rock Axe",            Description = "Rock Axe",            ItemType = ItemTypes.Axe,     Weight = 1, Damage = 2, MaxDurability = 40 },
-                new Item { ItemId = 22, Name = "Copper Axe",          Description = "Copper Axe",          ItemType = ItemTypes.Axe,     Weight = 1, Damage = 3, MaxDurability = 60 },
-                new Item { ItemId = 23, Name = "Iron Axe",            Description = "Iron Axe",            ItemType = ItemTypes.Axe,     Weight = 1, Damage = 4, MaxDurability = 80 },
-                new Item { ItemId = 24, Name = "Silver Axe",          Description = "Silver Axe",          ItemType = ItemTypes.Axe,     Weight = 1, Damage = 5, MaxDurability = 100 },
-                new Item { ItemId = 25, Name = "Gold Axe",            Description = "Gold Axe",            ItemType = ItemTypes.Axe,     Weight = 1, Damage = 6, MaxDurability = 120 },
-                new Item { ItemId = 26, Name = "Unobtainium Axe",     Description = "Unobtainium Axe",     ItemType = ItemTypes.Axe,     Weight = 1, Damage = 7, MaxDurability = 240 },
+                new Item { ItemId = 10, Name = "Wooden Sword", Description = "Wooden Sword", ItemType = ItemTypes.Sword, Weight = 1, Damage = 1, MaxDurability = 20 },
+                new Item { ItemId = 11, Name = "Rock Sword", Description = "Rock Sword", ItemType = ItemTypes.Sword, Weight = 1, Damage = 2, MaxDurability = 40 },
+                new Item { ItemId = 12, Name = "Copper Sword", Description = "Copper Sword", ItemType = ItemTypes.Sword, Weight = 1, Damage = 3, MaxDurability = 60 },
+                new Item { ItemId = 13, Name = "Iron Sword", Description = "Iron Sword", ItemType = ItemTypes.Sword, Weight = 1, Damage = 4, MaxDurability = 80 },
+                new Item { ItemId = 14, Name = "Silver Sword", Description = "Silver Sword", ItemType = ItemTypes.Sword, Weight = 1, Damage = 5, MaxDurability = 100 },
+                new Item { ItemId = 15, Name = "Gold Sword", Description = "Gold Sword", ItemType = ItemTypes.Sword, Weight = 1, Damage = 6, MaxDurability = 120 },
+                new Item { ItemId = 16, Name = "Unobtainium Sword", Description = "Unobtainium Sword", ItemType = ItemTypes.Sword, Weight = 1, Damage = 7, MaxDurability = 240 },
 
-                new Item { ItemId = 30, Name = "Wooden Pickaxe",      Description = "Wooden Pickaxe",      ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 20 },
-                new Item { ItemId = 31, Name = "Rock Pickaxe",        Description = "Rock Pickaxe",        ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 2, MaxDurability = 40 },
-                new Item { ItemId = 32, Name = "Copper Pickaxe",      Description = "Copper Pickaxe",      ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 3, MaxDurability = 60 },
-                new Item { ItemId = 33, Name = "Iron Pickaxe",        Description = "Iron Pickaxe",        ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 4, MaxDurability = 80 },
-                new Item { ItemId = 34, Name = "Silver Pickaxe",      Description = "Silver Pickaxe",      ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 5, MaxDurability = 100 },
-                new Item { ItemId = 35, Name = "Gold Pickaxe",        Description = "Gold Pickaxe",        ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 6, MaxDurability = 120 },
+                new Item { ItemId = 20, Name = "Wooden Axe", Description = "Wooden Axe", ItemType = ItemTypes.Axe, Weight = 1, Damage = 1, MaxDurability = 20 },
+                new Item { ItemId = 21, Name = "Rock Axe", Description = "Rock Axe", ItemType = ItemTypes.Axe, Weight = 1, Damage = 2, MaxDurability = 40 },
+                new Item { ItemId = 22, Name = "Copper Axe", Description = "Copper Axe", ItemType = ItemTypes.Axe, Weight = 1, Damage = 3, MaxDurability = 60 },
+                new Item { ItemId = 23, Name = "Iron Axe", Description = "Iron Axe", ItemType = ItemTypes.Axe, Weight = 1, Damage = 4, MaxDurability = 80 },
+                new Item { ItemId = 24, Name = "Silver Axe", Description = "Silver Axe", ItemType = ItemTypes.Axe, Weight = 1, Damage = 5, MaxDurability = 100 },
+                new Item { ItemId = 25, Name = "Gold Axe", Description = "Gold Axe", ItemType = ItemTypes.Axe, Weight = 1, Damage = 6, MaxDurability = 120 },
+                new Item { ItemId = 26, Name = "Unobtainium Axe", Description = "Unobtainium Axe", ItemType = ItemTypes.Axe, Weight = 1, Damage = 7, MaxDurability = 240 },
+
+                new Item { ItemId = 30, Name = "Wooden Pickaxe", Description = "Wooden Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 20 },
+                new Item { ItemId = 31, Name = "Rock Pickaxe", Description = "Rock Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 2, MaxDurability = 40 },
+                new Item { ItemId = 32, Name = "Copper Pickaxe", Description = "Copper Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 3, MaxDurability = 60 },
+                new Item { ItemId = 33, Name = "Iron Pickaxe", Description = "Iron Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 4, MaxDurability = 80 },
+                new Item { ItemId = 34, Name = "Silver Pickaxe", Description = "Silver Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 5, MaxDurability = 100 },
+                new Item { ItemId = 35, Name = "Gold Pickaxe", Description = "Gold Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 6, MaxDurability = 120 },
                 new Item { ItemId = 36, Name = "Unobtainium Pickaxe", Description = "Unobtainium Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 7, MaxDurability = 240 },
 
                 new Item { ItemId = 39, Name = "Rented Pickaxe", Description = "Rented Pickaxe", ItemType = ItemTypes.Pickaxe, Weight = 1, Damage = 1, MaxDurability = 15 },
 
                 new Item { ItemId = 40, Name = "Healing Potion", Description = "This thing heals", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
                 new Item { ItemId = 41, Name = "God Potion", Description = "+5 hp", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
-                new Item { ItemId = 42, Name = "Muscle Potion", Description = "+5 inventory space", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 }
+                new Item { ItemId = 42, Name = "Muscle Potion", Description = "+5 inventory space", ItemType = ItemTypes.Potion, Weight = 1, Damage = 1, MaxDurability = 1 },
+
+                new Item { ItemId = 100, Name = "Mythical Sword", Description = "Drop this into fountain to win", ItemType = ItemTypes.Sword, Weight = 1, Damage = 100, MaxDurability = 1000000 }
 
             );
             modelBuilder.Entity<Block>().HasData(
-                new Block { BlockId = 1, BlockType = BlockType.Wooden_Frame,   ItemId = 1, MinAmount = 1, MaxAmount = 1},
-                new Block { BlockId = 2, BlockType = BlockType.Rock,           ItemId = 2, MinAmount = 1, MaxAmount = 1 },
-                new Block { BlockId = 3, BlockType = BlockType.Copper_Ore,     ItemId = 3, MinAmount = 1, MaxAmount = 1 },
-                new Block { BlockId = 4, BlockType = BlockType.Iron_Ore,       ItemId = 4, MinAmount = 1, MaxAmount = 1 },
-                new Block { BlockId = 5, BlockType = BlockType.Silver_Ore,     ItemId = 5, MinAmount = 1, MaxAmount = 1 },
-                new Block { BlockId = 6, BlockType = BlockType.Gold_Ore,       ItemId = 6, MinAmount = 1, MaxAmount = 1 },
+                new Block { BlockId = 1, BlockType = BlockType.Wooden_Frame, ItemId = 1, MinAmount = 1, MaxAmount = 1 },
+                new Block { BlockId = 2, BlockType = BlockType.Rock, ItemId = 2, MinAmount = 1, MaxAmount = 1 },
+                new Block { BlockId = 3, BlockType = BlockType.Copper_Ore, ItemId = 3, MinAmount = 1, MaxAmount = 1 },
+                new Block { BlockId = 4, BlockType = BlockType.Iron_Ore, ItemId = 4, MinAmount = 1, MaxAmount = 1 },
+                new Block { BlockId = 5, BlockType = BlockType.Silver_Ore, ItemId = 5, MinAmount = 1, MaxAmount = 1 },
+                new Block { BlockId = 6, BlockType = BlockType.Gold_Ore, ItemId = 6, MinAmount = 1, MaxAmount = 1 },
                 new Block { BlockId = 7, BlockType = BlockType.Unobtanium_Ore, ItemId = 7, MinAmount = 1, MaxAmount = 1 }
             );
 
@@ -309,6 +311,8 @@ namespace game.Server.Data
                 new Blueprint { BlueprintId = 6, ItemId = 14, Price = 80 },  // Silver Sword
                 new Blueprint { BlueprintId = 7, ItemId = 15, Price = 150 }, // Gold Sword
                 new Blueprint { BlueprintId = 8, ItemId = 16, Price = 500 }, // Unobtainium Sword
+
+
 
                 // Axes
                 new Blueprint { BlueprintId = 9, ItemId = 20, Price = 5 },   // Wooden Axe
@@ -330,7 +334,9 @@ namespace game.Server.Data
 
                 new Blueprint { BlueprintId = 22, ItemId = 40, Price = 500 },
                 new Blueprint { BlueprintId = 23, ItemId = 41, Price = 500 },
-                new Blueprint { BlueprintId = 24, ItemId = 42, Price = 500 } 
+                new Blueprint { BlueprintId = 24, ItemId = 42, Price = 500 },
+
+                new Blueprint { BlueprintId = 25, ItemId = 100, Price = 10000 } // Unobtainium Sword
             );
 
             modelBuilder.Entity<Crafting>().HasData(
@@ -416,7 +422,7 @@ namespace game.Server.Data
             modelBuilder.Entity<ItemMineBlock>()
                 .HasKey(imb => new { imb.ItemInstanceId, imb.MineBlockId });
 
-            
+
             modelBuilder.Entity<ItemMineBlock>()
                 .HasOne(imb => imb.ItemInstance)
                 .WithMany()
@@ -451,6 +457,6 @@ namespace game.Server.Data
                 .Navigation(ii => ii.Item)
                 .AutoInclude();
 
-        }   
+        }
     }
 }
