@@ -19,6 +19,8 @@ import SettingsScreen from "./pages/screens/Settings.tsx"
 import SaveScreen from "./pages/screens/Save.tsx"
 import LoadScreen from "./pages/screens/Load.tsx"
 import LoadSaveScreen from "./pages/screens/LoadSave.tsx"
+import LoseScreen from "./pages/screens/Lose.tsx"
+import WinScreen from "./pages/screens/Win.tsx"
 
 const router = createBrowserRouter([
     {
@@ -68,6 +70,14 @@ const router = createBrowserRouter([
                     {
                         path: "fountain",
                         Component: FountainScreen
+                    },
+                    {
+                        path: "lose",
+                        Component: LoseScreen
+                    },
+                    {
+                        path: "win",
+                        Component: WinScreen
                     }
                 ]
             },
