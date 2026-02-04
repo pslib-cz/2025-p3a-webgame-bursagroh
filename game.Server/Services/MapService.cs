@@ -49,6 +49,7 @@ public class MapGeneratorService
                     Height = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? 5 : null,
                     ReachedHeight = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? 0 : null,
                     IsBossDefeated = (type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap) ? false : null
+
                 });
             }
         }
