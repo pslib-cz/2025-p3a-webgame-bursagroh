@@ -20,7 +20,7 @@ const NavBar = () => {
         <div className={styles.container}>
             <HomeIcon className={styles.home} width={64} height={64} onClick={handleClick} />
             <span className={styles.location}>{player.screenType}</span>
-            {saveState === "idle" && <button onClick={save}>Save</button>}
+            {saveState === "idle" && <button onClick={() => save()}>Save</button>}
             {saveState === "saving" && <span>Saving...</span>}
             {saveState === "saved" && <SaveString saveString={saveString!} />}
         </div>

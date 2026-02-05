@@ -31,6 +31,10 @@ export const screenTypeToURL = (screenType: ScreenType) => {
             return "/game/fight"
         case "Fountain":
             return "/game/fountain"
+        case "Win":
+            return "/game/win"
+        case "Lose":
+            return "/game/lose"
     }
 }
 

@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using game.Server.Data;
 
@@ -11,11 +10,9 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260203194430_idk")]
-    partial class idk
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.11");
@@ -313,6 +310,12 @@ namespace game.Server.Migrations
                             BlueprintId = 24,
                             ItemId = 42,
                             Price = 500
+                        },
+                        new
+                        {
+                            BlueprintId = 25,
+                            ItemId = 100,
+                            Price = 10000
                         });
                 });
 
@@ -706,9 +709,6 @@ namespace game.Server.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<int?>("ItemInstanceId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MaxHealth")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("EnemyId");
@@ -1611,6 +1611,17 @@ namespace game.Server.Migrations
                             ItemType = 3,
                             MaxDurability = 1,
                             Name = "Muscle Potion",
+                            Weight = 1
+                        },
+                        new
+                        {
+                            ItemId = 100,
+                            ChangeOfGenerating = 0,
+                            Damage = 100,
+                            Description = "Drop this into fountain to win",
+                            ItemType = 0,
+                            MaxDurability = 1000000,
+                            Name = "Mythical Sword",
                             Weight = 1
                         });
                 });

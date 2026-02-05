@@ -1,4 +1,4 @@
-export type ScreenType = "City" | "Bank" | "Mine" | "Restaurant" | "Blacksmith" | "Floor" | "Fight" | "Fountain" | "Win"
+export type ScreenType = "City" | "Bank" | "Mine" | "Restaurant" | "Blacksmith" | "Floor" | "Fight" | "Fountain" | "Win" | "Lose"
 
 export type Player = {
     playerId: string

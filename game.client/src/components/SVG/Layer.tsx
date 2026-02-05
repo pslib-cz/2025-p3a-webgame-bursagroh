@@ -1,16 +1,11 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getMineLayersQuery } from "../../api/mine"
-import Tile from "./Tile"
 import type { BlockType, MineLayer } from "../../types/api/models/mine"
-import type { TileType } from "../../types"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import Block from "./tiles/mine/Block"
 
-const mapBlockTypeToTileType = (buildingType: BlockType | undefined): TileType => {
-    if (!buildingType) {
-        return "empty"
-    }
-
+const mapBlockTypeToTileType = (buildingType: BlockType) => {
     switch (buildingType) {
         case "Wooden_Frame":
             return "wooden_frame"
@@ -26,8 +21,6 @@ const mapBlockTypeToTileType = (buildingType: BlockType | undefined): TileType =
             return "silver_ore"
         case "Unobtanium_Ore":
             return "unobtainium_ore"
-        default:
-            return "rock"
     }
 }
 
@@ -59,7 +52,9 @@ const Layer: React.FC<LayerProps> = ({ depth, size, mineId }) => {
                         layerMap[block.index] = block
                     })
 
-                    return layerMap.map((block, index) => <Tile key={`${layer.depth}-${index}`} width={1} height={1} x={index} y={layer.depth} tileType={mapBlockTypeToTileType(block?.block.blockType)} mineId={mineId} />)
+                    return layerMap.map((block, index) => (
+                        <Block key={`${layer.depth}-${index}`} width={1} height={1} x={index} y={layer.depth} blockType={mapBlockTypeToTileType(block!.block.blockType)} />
+                    ))
                 })}
             </>
         )
