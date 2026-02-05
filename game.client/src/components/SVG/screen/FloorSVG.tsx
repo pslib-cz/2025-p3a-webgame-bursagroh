@@ -1,15 +1,16 @@
 import React from 'react'
 import SVGDisplay from '../../SVGDisplay'
-import Tile from '../Tile'
 import Asset from '../Asset'
 import { PlayerContext } from '../../../providers/game/PlayerProvider'
 import { FloorContext } from '../../../providers/FloorProvider'
-import type { TileType } from '../../../types'
 import type { EnemyType } from '../../../types/api/models/building'
 import styles from './floorSVG.module.css'
 import Floor from '../Floor'
+import Enemy from '../tiles/floor/Enemy'
+import FloorTile from '../tiles/floor/FloorTile'
+import { itemIdToAssetType } from '../../../utils/item'
 
-const mapEnemyTypeToTileType = (enemyType: EnemyType): TileType => {
+const mapEnemyType = (enemyType: EnemyType) => {
     switch (enemyType) {
         case 'Zombie':
             return 'zombie'
@@ -17,33 +18,6 @@ const mapEnemyTypeToTileType = (enemyType: EnemyType): TileType => {
             return 'skeleton'
         case 'Dragon':
             return 'dragon'
-    }
-}
-
-const mapItemIdToTileType = (itemId: number): TileType => {
-    switch (itemId) {
-        case 1:
-            return "wood"
-        case 2:
-            return "rock_item"
-        case 3:
-            return "copper"
-        case 4:
-            return "iron"
-        case 5:
-            return "silver"
-        case 6:
-            return "gold"
-        case 7:
-            return "unobtainium"
-        case 10:
-            return "wooden_sword"
-        case 30:
-            return "wooden_pickaxe"
-        case 39:
-            return "wooden_pickaxe"
-        default:
-            return "empty"
     }
 }
 
@@ -61,25 +35,25 @@ const FloorSVG = () => {
             {floor.floorItems.map((item) => {
                 if (item.floorItemType === "Stair") {
                     return (
-                        <Tile z-index={100} key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType='stair' targetLevel={0} targetFloorId={0} />
+                        <FloorTile z-index={100} key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} floorTileType='stair' />
                     )
                 }
 
                 if (item.floorItemType === "Enemy" && item.enemy) {
                     return (
-                        <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType={mapEnemyTypeToTileType(item.enemy.enemyType)} targetBuildingId={0} targetLevel={0} />
+                        <Enemy key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} enemyType={mapEnemyType(item.enemy.enemyType)} />
                     )
                 }
 
                 if (item.floorItemType === "Item" && item.itemInstance) {
                     return (
-                        <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} tileType={mapItemIdToTileType(item.itemInstance.item.itemId)} targetFloorItemId={item.floorItemId} targetBuildingId={0} targetLevel={0} />
+                        <Asset key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} />
                     )
                 }
 
                 if (item.floorItemType === "Chest" && item.chest) {
                     return (
-                        <Tile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} tileType={'chest'} targetFloorItemId={0} targetBuildingId={0} targetLevel={0} />
+                        <FloorTile z-index={100} key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} floorTileType='chest' />
                     )
                 }
             })}

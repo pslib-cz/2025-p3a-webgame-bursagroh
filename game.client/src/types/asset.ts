@@ -49,8 +49,15 @@ type BuildingAssetType =
 
 type EnemyAssetType = "zombie" | "skeleton" | "dragon"
 
-type ItemAssetType = "wooden_sword" | "wooden_pickaxe" | "wood" | "rock_item" | "copper" | "iron" | "silver" | "gold" | "unobtainium"
+type ItemAssetType = 
+    | "wood" | "rock_item" | "copper" | "iron" | "silver" | "gold" | "unobtainium" 
+    | "wooden_sword" | "rock_sword" | "copper_sword" | "iron_sword" | "silver_sword" | "gold_sword" | "unobtainium_sword" 
+    | "wooden_axe" | "rock_axe" | "copper_axe" | "iron_axe" | "silver_axe" | "gold_axe" | "unobtainium_axe"
+    | "wooden_pickaxe" | "rock_pickaxe" | "copper_pickaxe" | "iron_pickaxe" | "silver_pickaxe" | "gold_pickaxe" | "unobtainium_pickaxe"
+    | "rented_pickaxe"
+    | "health_potion" | "strength_potion" | "endurance_potion"
+    | "mythical_sword"
 
 type BurgerAssetType = "bun_up" | "bun_down" | "meat" | "tomato" | "salad" | "bacon" | "sauce" | "cheese"
 
-export type AssetType = "player" | "table_left" | "table_right" | "chest" | BuildingAssetType | BlockAssetType | FloorAssetType | EnemyAssetType | ItemAssetType | BurgerAssetType
+export type AssetType = "player" | "table_left" | "table_right" | "chest" | "minecard" | "rail_straight" | "rail_corner" | BuildingAssetType | BlockAssetType | FloorAssetType | EnemyAssetType | ItemAssetType | BurgerAssetType

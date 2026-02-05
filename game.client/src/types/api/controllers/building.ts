@@ -1,4 +1,4 @@
-import type { GenericGET, GenericPATCH } from ".."
+import type { GenericGET } from ".."
 import type { Building, Floor } from "../models/building"
 
 export interface APIGetBuildings extends GenericGET {

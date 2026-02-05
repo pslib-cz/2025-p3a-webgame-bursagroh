@@ -4,6 +4,226 @@ export const assetTypeToId = (assetType: AssetType): string => {
     return `asset_${assetType}`
 }
 
-export const assetTypeToHref = (assetType: AssetType): string => {
-    return `#${assetTypeToId(assetType)}`
+export const assetTypeToHref = (assetType: AssetType | undefined): string => {
+    if (!assetType) {
+        return ""
+    }
+
+    switch (assetType) {
+        case "player":
+            return "/player.svg#player"
+
+        case "grass":
+            return "/building/grass.svg#grass"
+        case "bank":
+            return "/building/bank.svg#bank"
+        case "blacksmith":
+            return "/building/blacksmith.svg#blacksmith"
+        case "fountain":
+            return "/building/fountain.svg#fountain"
+        case "mine":
+            return "/building/mine.svg#mine"
+        case "restaurant":
+            return "/building/restaurant.svg#restaurant"
+        case "road":
+            return "/building/road_junction.svg#road-junction"
+        case "road-vertical":
+            return "/building/road_straight.svg#road-vertical"
+        case "road-horizontal":
+            return "/building/road_straight.svg#road-horizontal"
+        case "abandoned-straight-top":
+            return "/building/building_straight.svg#abandoned-straight-top"
+        case "abandoned-straight-right":
+            return "/building/building_straight.svg#abandoned-straight-right"
+        case "abandoned-straight-bottom":
+            return "/building/building_straight.svg#abandoned-straight-bottom"
+        case "abandoned-straight-left":
+            return "/building/building_straight.svg#abandoned-straight-left"
+        case "abandoned-trap-straight-top":
+            return "/building/building_straight_trap.svg#abandoned-trap-straight-top"
+        case "abandoned-trap-straight-right":
+            return "/building/building_straight_trap.svg#abandoned-trap-straight-right"
+        case "abandoned-trap-straight-bottom":
+            return "/building/building_straight_trap.svg#abandoned-trap-straight-bottom"
+        case "abandoned-trap-straight-left":
+            return "/building/building_straight_trap.svg#abandoned-trap-straight-left"
+        case "abandoned-corner-top-left":
+            return "/building/building_corner.svg#abandoned-corner-top-left"
+        case "abandoned-corner-top-right":
+            return "/building/building_corner.svg#abandoned-corner-top-right"
+        case "abandoned-corner-bottom-left":
+            return "/building/building_corner.svg#abandoned-corner-bottom-left"
+        case "abandoned-corner-bottom-right":
+            return "/building/building_corner.svg#abandoned-corner-bottom-right"
+        case "abandoned-trap-corner-top-left":
+            return "/building/building_corner_trap.svg#abandoned-trap-corner-top-left"
+        case "abandoned-trap-corner-top-right":
+            return "/building/building_corner_trap.svg#abandoned-trap-corner-top-right"
+        case "abandoned-trap-corner-bottom-left":
+            return "/building/building_corner_trap.svg#abandoned-trap-corner-bottom-left"
+        case "abandoned-trap-corner-bottom-right":
+            return "/building/building_corner_trap.svg#abandoned-trap-corner-bottom-right"
+
+        case "bun_up":
+            return "/burger/bun_up.svg#bun_up"
+        case "bun_down":
+            return "/burger/bun_down.svg#bun_down"
+        case "meat":
+            return "/burger/meat.svg#meat"
+        case "tomato":
+            return "/burger/tomato.svg#tomato"
+        case "salad":
+            return "/burger/salad.svg#salad"
+        case "bacon":
+            return "/burger/bacon.svg#bacon"
+        case "sauce":
+            return "/burger/sauce.svg#sauce"
+        case "cheese":
+            return "/burger/cheese.svg#cheese"
+
+        case "zombie":
+            return "/enemy/zombie.svg#zombie"
+        case "skeleton":
+            return "/enemy/skeleton.svg#skeleton"
+        case "dragon":
+            return "/enemy/dragon.svg#dragon"
+
+        case "floor":
+            return "/floor/floor.svg#floor"
+        case "wall-top":
+            return "/floor/wall_straight.svg#wall-top"
+        case "wall-right":
+            return "/floor/wall_straight.svg#wall-right"
+        case "wall-bottom":
+            return "/floor/wall_straight.svg#wall-bottom"
+        case "wall-left":
+            return "/floor/wall_straight.svg#wall-left"
+        case "wall-top-left":
+            return "/floor/wall_corner.svg#wall-top-left"
+        case "wall-top-right":
+            return "/floor/wall_corner.svg#wall-top-right"
+        case "wall-bottom-left":
+            return "/floor/wall_corner.svg#wall-bottom-left"
+        case "wall-bottom-right":
+            return "/floor/wall_corner.svg#wall-bottom-right"
+        case "wall-door-left-top":
+            return "/floor/door_left.svg#wall-door-left-top"
+        case "wall-door-left-right":
+            return "/floor/door_left.svg#wall-door-left-right"
+        case "wall-door-left-bottom":
+            return "/floor/door_left.svg#wall-door-left-bottom"
+        case "wall-door-left-left":
+            return "/floor/door_left.svg#wall-door-left-left"
+        case "wall-door-right-top":
+            return "/floor/door_right.svg#wall-door-right-top"
+        case "wall-door-right-right":
+            return "/floor/door_right.svg#wall-door-right-right"
+        case "wall-door-right-bottom":
+            return "/floor/door_right.svg#wall-door-right-bottom"
+        case "wall-door-right-left":
+            return "/floor/door_right.svg#wall-door-right-left"
+        case "stairs":
+            return "/floor/stairs.svg#stairs"
+        case "chest":
+            return "/floor/chest.svg#chest"
+
+        case "wooden_axe":
+            return "/items/axe/wooden_axe.svg#wooden_axe"
+        case "rock_axe":
+            return "/items/axe/rock_axe.svg#rock_axe"
+        case "copper_axe":
+            return "/items/axe/copper_axe.svg#copper_axe"
+        case "iron_axe":
+            return "/items/axe/iron_axe.svg#iron_axe"
+        case "silver_axe":
+            return "/items/axe/silver_axe.svg#silver_axe"
+        case "gold_axe":
+            return "/items/axe/gold_axe.svg#gold_axe"
+        case "unobtainium_axe":
+            return "/items/axe/unobtainium_axe.svg#unobtainium_axe"
+
+        case "wood":
+            return "/items/ore/wood.svg#wood"
+        case "rock_item":
+            return "/items/ore/rock.svg#rock"
+        case "copper":
+            return "/items/ore/copper_ore.svg#copper_ore"
+        case "iron":
+            return "/items/ore/iron_ore.svg#iron_ore"
+        case "silver":
+            return "/items/ore/silver_ore.svg#silver_ore"
+        case "gold":
+            return "/items/ore/gold_ore.svg#gold_ore"
+        case "unobtainium":
+            return "/items/ore/unobtainium_ore.svg#unobtainium_ore"
+
+        case "wooden_pickaxe":
+            return "/items/pickaxe/wooden_pickaxe.svg#wooden_pickaxe"
+        case "rock_pickaxe":
+            return "/items/pickaxe/rock_pickaxe.svg#rock_pickaxe"
+        case "copper_pickaxe":
+            return "/items/pickaxe/copper_pickaxe.svg#copper_pickaxe"
+        case "iron_pickaxe":
+            return "/items/pickaxe/iron_pickaxe.svg#iron_pickaxe"
+        case "silver_pickaxe":
+            return "/items/pickaxe/silver_pickaxe.svg#silver_pickaxe"
+        case "gold_pickaxe":
+            return "/items/pickaxe/gold_pickaxe.svg#gold_pickaxe"
+        case "unobtainium_pickaxe":
+            return "/items/pickaxe/unobtainium_pickaxe.svg#unobtainium_pickaxe"
+        case "rented_pickaxe":
+            return "/items/pickaxe/wooden_pickaxe.svg#wooden_pickaxe"
+
+        case "health_potion":
+            return "/items/potion/health_potion.svg#health_potion"
+        case "strength_potion":
+            return "/items/potion/strength_potion.svg#strength_potion"
+        case "endurance_potion":
+            return "/items/potion/endurance_potion.svg#endurance_potion"
+
+        case "wooden_sword":
+            return "/items/sword/wooden_sword.svg#wooden_sword"
+        case "rock_sword":
+            return "/items/sword/rock_sword.svg#rock_sword"
+        case "copper_sword":
+            return "/items/sword/copper_sword.svg#copper_sword"
+        case "iron_sword":
+            return "/items/sword/iron_sword.svg#iron_sword"
+        case "silver_sword":
+            return "/items/sword/silver_sword.svg#silver_sword"
+        case "gold_sword":
+            return "/items/sword/gold_sword.svg#gold_sword"
+        case "unobtainium_sword":
+            return "/items/sword/unobtainium_sword.svg#unobtainium_sword"
+
+        case "mythical_sword":
+            return "/items/sword/mythical_sword.svg#mythical_sword"
+
+        case "table_left":
+            return "/mine/table_left.svg#table_left"
+        case "table_right":
+            return "/mine/table_right.svg#table_right"
+        case "empty":
+            return "/mine/empty.svg#empty"
+        case "rock":
+            return "/mine/rock.svg#rock"
+        case "wooden_frame":
+            return "/mine/wooden_frame.svg#wooden_frame"
+        case "copper_ore":
+            return "/mine/copper_ore.svg#copper_ore"
+        case "iron_ore":
+            return "/mine/iron_ore.svg#iron_ore"
+        case "gold_ore":
+            return "/mine/gold_ore.svg#gold_ore"
+        case "silver_ore":
+            return "/mine/silver_ore.svg#silver_ore"
+        case "unobtainium_ore":
+            return "/mine/unobtainium_ore.svg#unobtainium_ore"
+        case "minecard":
+            return "/mine/minecard.svg#minecard"
+        case "rail_straight":
+            return "/mine/rail_straight.svg#rail_straight"
+        case "rail_corner":
+            return "/mine/rail_corner.svg#rail_corner"
+    }
 }

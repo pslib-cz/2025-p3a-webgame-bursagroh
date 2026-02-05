@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { getBuildingsQuery } from "../../api/building"
-import Tile from "./Tile"
-import type { Building, BuildingType } from "../../types/api/models/building"
-import type { TileType } from "../../types"
+import type { BuildingType, Building } from "../../types/api/models/building"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import Asset from "./Asset"
+import Road from "./tiles/city/Road"
+import BuildingTile from "./tiles/city/Building"
 
-const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null): TileType => {
+const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null) => {
     switch (buildingType) {
         case "Fountain":
             return "fountain"
@@ -43,8 +44,6 @@ const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: 
             if (buildingTypeTop === "Road" && buildingTypeRight === "Road" && buildingTypeBottom === "Road" && buildingTypeLeft === "Road") return "road"
             if (buildingTypeTop === "Road" && buildingTypeBottom === "Road") return "road-vertical"
             return "road-horizontal"
-        default:
-            return "rock"
     }
 }
 
@@ -143,7 +142,9 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
                             const positionX = x + x_index
                             const positionY = y + y_index
 
-                            return <Tile key={`x:${positionX};y:${positionY}`} width={1} height={1} x={positionX} y={positionY} tileType={"grass"} />
+                            return (
+                                <Asset key={`x:${positionX};y:${positionY}`} width={1} height={1} x={positionX} y={positionY} assetType="grass" />
+                            )
                         }
 
                         const tileType = mapBuildingTypeToTileType(
@@ -154,7 +155,15 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
                             buildingsMap[y_index + 1][x_index]
                         )
 
-                        return <Tile key={`x:${building.positionX};y:${building.positionY}`} width={1} height={1} x={building.positionX} y={building.positionY} tileType={tileType} />
+                        if (tileType === "road" || tileType === "road-horizontal" || tileType === "road-vertical") {
+                            return (
+                                <Road key={`x:${building.positionX};y:${building.positionY}`} width={1} height={1} x={building.positionX} y={building.positionY} roadType={tileType} />
+                            )
+                        }
+
+                        return (
+                            <BuildingTile key={`x:${building.positionX};y:${building.positionY}`} width={1} height={1} x={building.positionX} y={building.positionY} buildingType={tileType} />
+                        )
                     })
                 })}
             </>

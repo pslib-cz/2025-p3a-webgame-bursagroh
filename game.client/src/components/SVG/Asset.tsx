@@ -3,7 +3,7 @@ import type { AssetType } from '../../types/asset'
 import { assetTypeToHref } from '../../utils/asset'
 
 type AssetProps = {
-    assetType: AssetType
+    assetType: AssetType | undefined
 } & Omit<React.SVGProps<SVGUseElement>, 'href'>
 
 const Asset: React.FC<AssetProps> = ({assetType, ...props}) => {
