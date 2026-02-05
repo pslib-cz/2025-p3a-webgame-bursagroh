@@ -15,7 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-builder.Services.AddScoped<MineService>();
+builder.Services.AddScoped<MineGenerationService>();
 builder.Services.AddScoped<ICityService, CityService>();
 builder.Services.AddScoped<IDungeonService, DungeonService>();
 builder.Services.AddSingleton<MapGeneratorService>();
@@ -24,6 +24,10 @@ builder.Services.AddScoped<ISaveService, SaveService>();
 builder.Services.AddScoped<IBankService, BankService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<IBuildingService, BuildingService>();
+builder.Services.AddScoped<INavigationService, NavigationService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<ICombatService, CombatService>();
+builder.Services.AddScoped<IMineInteractionService, MineInteractionService>();
 builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
 
 

@@ -1,5 +1,5 @@
 ﻿using game.Server.DTOs;
-using game.Server.Models;
+using game.Server.Requests;
 using game.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 

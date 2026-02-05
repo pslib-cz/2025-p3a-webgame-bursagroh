@@ -1,5 +1,6 @@
 ﻿using game.Server.Data;
 using game.Server.Models;
+using game.Server.Requests;
 using game.Server.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,9 +12,9 @@ public interface ICityService
 public class CityService : ICityService
 {
     private readonly ApplicationDbContext _context;
-    private readonly MineService _mineService;
+    private readonly MineGenerationService _mineService;
 
-    public CityService(ApplicationDbContext context, MineService mineService)
+    public CityService(ApplicationDbContext context, MineGenerationService mineService)
     {
         _context = context;
         _mineService = mineService;

@@ -2,7 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using game.Server.Data;
 using game.Server.DTOs;
-using game.Server.Models;
+using game.Server.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

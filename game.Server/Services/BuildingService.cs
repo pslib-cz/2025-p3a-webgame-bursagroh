@@ -9,9 +9,12 @@ namespace game.Server.Services
 {
     public interface IBuildingService
     {
+        List<Building> GetCoreBuildings(Guid playerId);
+
         Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildingsAsync(Guid playerId, int top, int left, int width, int height);
         Task<ActionResult<IEnumerable<BuildingDto>>> GetAllMaterializedBuildingsAsync(int page, int pageSize);
         Task<ActionResult<FloorDto>> GetFloorByIdAsync(int floorId);
+
     }
 
     public class BuildingService : IBuildingService
@@ -25,7 +28,7 @@ namespace game.Server.Services
             _mapper = mapper;
         }
 
-        private List<Building> GetCoreBuildings(Guid playerId) => new List<Building>
+        public List<Building> GetCoreBuildings(Guid playerId) => new List<Building>
         {
             new Building { PlayerId = playerId, BuildingType = BuildingTypes.Fountain, PositionX = 0, PositionY = 0, IsBossDefeated = false },
             new Building { PlayerId = playerId, BuildingType = BuildingTypes.Mine, PositionX = 2, PositionY = 0, IsBossDefeated = false },

@@ -5,12 +5,12 @@ using System.Linq;
 
 namespace game.Server.Services
 {
-    public class MineService
+    public class MineGenerationService
     {
         private readonly ApplicationDbContext _context;
         private const int LayerSize = 8;
 
-        public MineService(ApplicationDbContext context)
+        public MineGenerationService(ApplicationDbContext context)
         {
             _context = context;
         }
