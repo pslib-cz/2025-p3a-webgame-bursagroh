@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 [Route("api/[controller]")]
 [ApiController]
+[EnableRateLimiting("per_user_limit_10")]
 public class SaveController : ControllerBase
 {
     private readonly ISaveService _saveService;

@@ -2,9 +2,11 @@
 using game.Server.Requests;
 using game.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("per_user_limit")]
 public class BankController : ControllerBase
 {
     private readonly IBankService _bankService;

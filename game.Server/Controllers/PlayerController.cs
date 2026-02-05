@@ -2,9 +2,11 @@
 using game.Server.Requests;
 using game.Server.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("per_user_limit")]
 public class PlayerController : ControllerBase
 {
     private readonly INavigationService _nav;

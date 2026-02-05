@@ -1,9 +1,11 @@
 ﻿using game.Server.DTOs;
 using game.Server.Requests;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 [ApiController]
 [Route("api/[controller]")]
+[EnableRateLimiting("per_user_limit")]
 public class RecipeController : ControllerBase
 {
     private readonly IRecipeService _recipeService;

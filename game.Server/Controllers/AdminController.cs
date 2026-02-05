@@ -1,12 +1,14 @@
 using game.Server.Data;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [EnableRateLimiting("per_user_limit")]
     public class AdminController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

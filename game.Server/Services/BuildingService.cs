@@ -30,6 +30,11 @@ namespace game.Server.Services
 
         public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildingsAsync(Guid playerId, int top, int left, int width, int height)
         {
+            if (width > 20 || height > 20 || width <= 0 || height <= 0)
+            {
+                return new BadRequestObjectResult("Requested area is too large or invalid. Maximum size is 20x20.");
+            }
+
             var player = await _context.Players.AsNoTracking().FirstOrDefaultAsync(p => p.PlayerId == playerId);
             if (player == null) return new NotFoundResult();
 
