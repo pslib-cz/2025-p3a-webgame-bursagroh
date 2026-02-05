@@ -1,22 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using game.Server.Types;
 
 namespace game.Server.Models
 {
-    public enum BlockType
-    {
-        Empty,
-        Rock,
-        Wooden_Frame,
-        Iron_Ore,
-        Copper_Ore,
-        Silver_Ore,
-        Gold_Ore,
-        Unobtanium_Ore
-
-    }
-
     public class Block
     {
         [Key]

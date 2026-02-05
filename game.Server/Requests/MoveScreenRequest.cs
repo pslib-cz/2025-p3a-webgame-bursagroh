@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
+using game.Server.Types;
 
-namespace game.Server.Models
+namespace game.Server.Requests
 {
     public class MoveScreenRequest
     {

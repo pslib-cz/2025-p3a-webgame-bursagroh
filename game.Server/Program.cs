@@ -1,25 +1,75 @@
 using game.Server.Data;
 using game.Server.Services;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.HttpOverrides; 
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
-
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-builder.Services.AddScoped<MineService>();
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    static string GetUserIdentifier(HttpContext context)
+    {
+        return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+    }
+
+    options.AddPolicy("per_user_limit", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: GetUserIdentifier(httpContext),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 500,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+
+    options.AddPolicy("per_user_limit_10", httpContext =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: GetUserIdentifier(httpContext),
+            factory: partition => new FixedWindowRateLimiterOptions
+            {
+                AutoReplenishment = true,
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            }));
+});
+
+builder.Services.AddScoped<MineGenerationService>();
+builder.Services.AddScoped<ISaveService, SaveService>();
+builder.Services.AddScoped<IBankService, BankService>();
+builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddScoped<ICombatService, CombatService>();
+builder.Services.AddScoped<IRecipeService, RecipeService>();
+builder.Services.AddScoped<IDungeonService, DungeonService>();
+builder.Services.AddScoped<IBuildingService, BuildingService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
+builder.Services.AddScoped<IBlueprintService, BlueprintService>();
+builder.Services.AddScoped<INavigationService, NavigationService>();
+builder.Services.AddScoped<IMineInteractionService, MineInteractionService>();
 builder.Services.AddSingleton<MapGeneratorService>();
 builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
-
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend",
@@ -32,9 +82,10 @@ builder.Services.AddCors(options => {
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
+
 app.UseDefaultFiles();
 app.MapStaticAssets();
-app.UseRouting();
 
 if (app.Environment.IsDevelopment())
 {
@@ -42,13 +93,15 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+app.UseRouting(); 
+
+app.UseCors("AllowFrontend");
+
+app.UseRateLimiter();
+
 app.UseHttpsRedirection();
-
-app.UseCors("AllowFrontend"); // If some controller or some URL becomes admin only, move this to every non admin only controller instead!
-
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();

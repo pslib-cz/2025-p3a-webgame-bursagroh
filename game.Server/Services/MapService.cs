@@ -1,4 +1,5 @@
-﻿using game.Server.Models;
+﻿using game.Server.Types;
+using game.Server.Models;
 
 public class MapGeneratorService
 {
@@ -145,7 +146,7 @@ public class MapGeneratorService
                 PositionX = bossPos.x,
                 PositionY = bossPos.y,
                 FloorItemType = FloorItemType.Enemy,
-                Enemy = new Enemy { Health = 100, EnemyType = EnemyType.Dragon }
+                Enemy = new Enemy { Health = 100, MaxHealth = 100, EnemyType = EnemyType.Dragon }
             });
         }
 
@@ -165,6 +166,7 @@ public class MapGeneratorService
                     Enemy = new Enemy
                     {
                         Health = 20,
+                        MaxHealth = 20,
                         EnemyType = type,
                         ItemInstance = new ItemInstance { ItemId = 10, Durability = 20 }
                     }
@@ -191,11 +193,11 @@ public class MapGeneratorService
         return false;
     }
 
-    private BuildingTypes DetermineBuildingType(int x, int y, Random coordRng)
+    private game.Server.Types.BuildingTypes DetermineBuildingType(int x, int y, Random coordRng)
     {
-        if (IsRoad(x, y)) return BuildingTypes.Road;
-        return coordRng.NextDouble() < 0.10 ? BuildingTypes.AbandonedTrap : BuildingTypes.Abandoned;
+        if (IsRoad(x, y)) return game.Server.Types.BuildingTypes.Road;
+        return coordRng.NextDouble() < 0.10 ? game.Server.Types.BuildingTypes.AbandonedTrap : game.Server.Types.BuildingTypes.Abandoned;
     }
 
-    private bool IsHostileBuilding(BuildingTypes type) => type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap;
+    private bool IsHostileBuilding(game.Server.Types.BuildingTypes type) => type == game.Server.Types.BuildingTypes.Abandoned || type == game.Server.Types.BuildingTypes.AbandonedTrap;
 }

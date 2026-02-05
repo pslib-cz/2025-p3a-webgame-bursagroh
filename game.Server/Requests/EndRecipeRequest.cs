@@ -1,5 +1,6 @@
 ﻿using game.Server.Models;
 using System.Text.Json.Serialization;
+using game.Server.Types;
 
 public class AssembledIngredience
 {
