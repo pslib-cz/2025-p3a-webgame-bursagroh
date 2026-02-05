@@ -5,7 +5,6 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
 
@@ -20,6 +19,11 @@ builder.Services.AddScoped<MineService>();
 builder.Services.AddScoped<ICityService, CityService>();
 builder.Services.AddScoped<IDungeonService, DungeonService>();
 builder.Services.AddSingleton<MapGeneratorService>();
+builder.Services.AddScoped<IBlueprintService, BlueprintService>();
+builder.Services.AddScoped<ISaveService, SaveService>();
+builder.Services.AddScoped<IBankService, BankService>();
+builder.Services.AddScoped<IRecipeService, RecipeService>();
+builder.Services.AddScoped<IBuildingService, BuildingService>();
 builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
 
 

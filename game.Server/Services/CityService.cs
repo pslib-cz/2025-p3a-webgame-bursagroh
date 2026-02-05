@@ -24,6 +24,7 @@ public class CityService : ICityService
         int previousX = player.PositionX;
         int previousY = player.PositionY;
 
+        //tady
         player.PositionX = request.NewPositionX;
         player.PositionY = request.NewPositionY;
 
@@ -87,7 +88,7 @@ public class CityService : ICityService
             await _context.SaveChangesAsync();
         }
 
-        int spawnX = 3, spawnY = 3;
+        int spawnX = 0, spawnY = 0;
         if (previousX < building.PositionX) { spawnX = 0; spawnY = 3; }
         else if (previousX > building.PositionX) { spawnX = 7; spawnY = 3; }
         else if (previousY < building.PositionY) { spawnX = 3; spawnY = 0; }

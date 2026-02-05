@@ -17,7 +17,6 @@ namespace game.Server.Data
         public DbSet<Mine> Mines { get; set; }
         public DbSet<MineLayer> MineLayers { get; set; }
         public DbSet<MineBlock> MineBlocks { get; set; }
-
         public DbSet<InventoryItem> ItemMineBlocks { get; set; }
         public DbSet<Block> Blocks { get; set; }
         public DbSet<Floor> Floors { get; set; }
@@ -27,18 +26,13 @@ namespace game.Server.Data
         public DbSet<RecipeTime> RecipeTimes { get; set; }
         public DbSet<Blueprint> Blueprints { get; set; }
         public DbSet<Crafting> Craftings { get; set; }
-
         public DbSet<Enemy> Enemies { get; set; }
         public DbSet<Chest> Chests { get; set; }
-
         public DbSet<Save> Saves { get; set; }
-
         public DbSet<BlueprintPlayer> BlueprintPlayers { get; set; }
 
 
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
-        {
-        }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,6 +56,57 @@ namespace game.Server.Data
 
             modelBuilder.Entity<InventoryItem>()
                 .Navigation(i => i.ItemInstance)
+                .AutoInclude();
+
+            modelBuilder.Entity<ItemInstance>()
+                .Navigation(ii => ii.Item)
+                .AutoInclude();
+
+
+            modelBuilder.Entity<BlueprintPlayer>()
+                .HasKey(bp => new { bp.PlayerId, bp.BlueprintId });
+
+            modelBuilder.Entity<BlueprintPlayer>()
+                .HasOne(bp => bp.Player)
+                .WithMany()
+                .HasForeignKey(bp => bp.PlayerId);
+
+            modelBuilder.Entity<BlueprintPlayer>()
+                .HasOne(bp => bp.Blueprint)
+                .WithMany()
+                .HasForeignKey(bp => bp.BlueprintId);
+
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasKey(imb => new { imb.ItemInstanceId, imb.MineBlockId });
+
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasOne(imb => imb.ItemInstance)
+                .WithMany()
+                .HasForeignKey(imb => imb.ItemInstanceId);
+
+            modelBuilder.Entity<ItemMineBlock>()
+                .HasOne(imb => imb.MineBlock)
+                .WithMany()
+                .HasForeignKey(imb => imb.MineBlockId);
+
+            modelBuilder.Entity<Blueprint>()
+                .Navigation(b => b.Item)
+                .AutoInclude();
+
+            modelBuilder.Entity<Crafting>()
+                .Navigation(c => c.Item)
+                .AutoInclude();
+
+            modelBuilder.Entity<Floor>()
+                .Navigation(f => f.FloorItems)
+                .AutoInclude();
+
+            modelBuilder.Entity<FloorItem>()
+                .Navigation(fi => fi.Enemy)
+                .AutoInclude();
+
+            modelBuilder.Entity<Enemy>()
+                .Navigation(e => e.ItemInstance)
                 .AutoInclude();
 
             modelBuilder.Entity<ItemInstance>()
@@ -406,56 +451,6 @@ namespace game.Server.Data
                 new Crafting { CraftingId = 27, BlueprintId = 21, ItemId = 7, Amount = 10 }
             );
 
-            modelBuilder.Entity<BlueprintPlayer>()
-                .HasKey(bp => new { bp.PlayerId, bp.BlueprintId });
-
-            modelBuilder.Entity<BlueprintPlayer>()
-                .HasOne(bp => bp.Player)
-                .WithMany()
-                .HasForeignKey(bp => bp.PlayerId);
-
-            modelBuilder.Entity<BlueprintPlayer>()
-                .HasOne(bp => bp.Blueprint)
-                .WithMany()
-                .HasForeignKey(bp => bp.BlueprintId);
-
-            modelBuilder.Entity<ItemMineBlock>()
-                .HasKey(imb => new { imb.ItemInstanceId, imb.MineBlockId });
-
-
-            modelBuilder.Entity<ItemMineBlock>()
-                .HasOne(imb => imb.ItemInstance)
-                .WithMany()
-                .HasForeignKey(imb => imb.ItemInstanceId);
-
-            modelBuilder.Entity<ItemMineBlock>()
-                .HasOne(imb => imb.MineBlock)
-                .WithMany()
-                .HasForeignKey(imb => imb.MineBlockId);
-
-            modelBuilder.Entity<Blueprint>()
-                .Navigation(b => b.Item)
-                .AutoInclude();
-
-            modelBuilder.Entity<Crafting>()
-                .Navigation(c => c.Item)
-                .AutoInclude();
-
-            modelBuilder.Entity<Floor>()
-                .Navigation(f => f.FloorItems)
-                .AutoInclude();
-
-            modelBuilder.Entity<FloorItem>()
-                .Navigation(fi => fi.Enemy)
-                .AutoInclude();
-
-            modelBuilder.Entity<Enemy>()
-                .Navigation(e => e.ItemInstance)
-                .AutoInclude();
-
-            modelBuilder.Entity<ItemInstance>()
-                .Navigation(ii => ii.Item)
-                .AutoInclude();
 
         }
     }

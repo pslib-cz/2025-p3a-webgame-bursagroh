@@ -5,8 +5,6 @@ using game.Server.Models;
 using game.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Runtime.Intrinsics.Arm;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace game.Server.Controllers
 {
