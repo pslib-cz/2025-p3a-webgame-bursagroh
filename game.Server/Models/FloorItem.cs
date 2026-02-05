@@ -1,16 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using game.Server.Types;
 
 namespace game.Server.Models
 {
-    public enum FloorItemType
-    {
-       Stair,
-       Chest,
-       Item,
-       Enemy
-    }
+    
 
     public class FloorItem
     {

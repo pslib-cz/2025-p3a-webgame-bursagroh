@@ -1,14 +1,9 @@
 ﻿using CrypticWizard.RandomWordGenerator;
 using game.Server.Data;
 using game.Server.Models;
+using game.Server.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-public interface ISaveService
-{
-    Task<ActionResult> LoadSnapshotAsync(string saveString, Guid targetPlayerId);
-    Task<ActionResult> ClonePlayerRecordAsync(Guid playerId);
-}
 
 public class SaveService : ISaveService
 {

@@ -1,19 +1,13 @@
 ﻿using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
+using game.Server.Types;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
 {
-    public interface IInventoryService
-    {
-        Task<ActionResult<IEnumerable<InventoryItemDto>>> GetInventoryAsync(Guid id);
-        Task<ActionResult> PickItemAsync(Guid id, int floorItemId);
-        Task<ActionResult> DropItemAsync(Guid id, int inventoryItemId);
-        Task<ActionResult<PlayerDto>> SetActiveItemAsync(Guid id, int? inventoryItemId);
-    }
     public class InventoryService : IInventoryService
     {
         private readonly ApplicationDbContext _context;

@@ -3,20 +3,12 @@ using AutoMapper.QueryableExtensions;
 using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Models;
+using game.Server.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
 {
-
-    public interface IBlueprintService
-    {
-        Task<ActionResult<IEnumerable<BlueprintDto>>> GetBlueprintsWithCraftingsAsync();
-        Task<ActionResult<IEnumerable<BlueprintDto>>> GetPlayerBlueprintsAsync(Guid playerId);
-        Task<ActionResult> BuyBlueprintAsync(Guid playerId, int blueprintId);
-        Task<ActionResult> CraftItemAsync(Guid playerId, int blueprintId);
-    }
-
     public class BlueprintService : IBlueprintService
     {
         private readonly ApplicationDbContext _context;

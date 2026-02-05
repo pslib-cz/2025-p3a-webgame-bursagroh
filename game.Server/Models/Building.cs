@@ -1,24 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using game.Server.Types;
 
 namespace game.Server.Models
 {
-    public enum BuildingTypes
-    {
-        Fountain,
-        City,
-        Bank,
-        Restaurant,
-        Mine,
-        Blacksmith,
-        Abandoned,
-        AbandonedTrap,
-        Road,
-        RoadVertical,
-        RoadHorizontal
-    }
-
     public class Building
     {
         [Key]

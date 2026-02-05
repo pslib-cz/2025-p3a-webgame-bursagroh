@@ -1,4 +1,6 @@
-﻿public enum ScreenTypes
+﻿namespace game.Server.Types;
+
+public enum ScreenTypes
 {
     City,
     Bank,

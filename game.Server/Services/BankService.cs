@@ -8,13 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
 {
-    public interface IBankService
-    {
-        Task<ActionResult<IEnumerable<BankInventoryDto>>> GetPlayerBankInventoryAsync(Guid playerId);
-        Task<ActionResult<int>> TransferMoneyAsync(Guid playerId, MovePlayerMoneyRequest request);
-        Task<ActionResult> MoveInventoryItemsAsync(Guid playerId, MoveInventoryItemRequest request);
-    }
-
     public class BankService : IBankService
     {
         private readonly ApplicationDbContext _context;

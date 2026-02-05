@@ -1,22 +1,13 @@
 ﻿using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
+using game.Server.Types;
 using game.Server.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
 {
-    public interface IBuildingService
-    {
-        List<Building> GetCoreBuildings(Guid playerId);
-
-        Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildingsAsync(Guid playerId, int top, int left, int width, int height);
-        Task<ActionResult<IEnumerable<BuildingDto>>> GetAllMaterializedBuildingsAsync(int page, int pageSize);
-        Task<ActionResult<FloorDto>> GetFloorByIdAsync(int floorId);
-
-    }
-
     public class BuildingService : IBuildingService
     {
         private readonly ApplicationDbContext _context;

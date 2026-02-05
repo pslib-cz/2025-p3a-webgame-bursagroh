@@ -1,4 +1,5 @@
 ﻿using game.Server.Models;
+using game.Server.Types;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

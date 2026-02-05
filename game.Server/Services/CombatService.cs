@@ -1,16 +1,14 @@
 ﻿using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
+using game.Server.Types;
 using game.Server.Models;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
 {
-    public interface ICombatService
-    {
-        Task<ActionResult> UseItemAsync(Guid id);
-    }
     public class CombatService : ICombatService
     {
         private readonly ApplicationDbContext _context;

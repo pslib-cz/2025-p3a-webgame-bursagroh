@@ -1,5 +1,5 @@
-﻿using game.Server.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using game.Server.Types;
 
 namespace game.Server.Requests
 {

@@ -2,18 +2,10 @@
 using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Models;
+using game.Server.Types;
 using game.Server.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-public interface IRecipeService
-{
-    Task<ActionResult<List<RecipeDto>>> GetAllRecipesAsync();
-    Task<ActionResult<RecipeDto>> GetRandomRecipeAsync();
-    Task<ActionResult> StartRecipeAsync(int recipeId, StartRecipeRequest request);
-    Task<ActionResult> EndRecipeAsync(int recipeId, EndRecipeRequest request);
-    Task<ActionResult<List<RecipeTime>>> GetRecipeLeaderboardAsync();
-}
 
 public class RecipeService : IRecipeService
 {

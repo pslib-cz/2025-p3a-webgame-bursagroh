@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
+using game.Server.Types;
 using game.Server.Models;
 using game.Server.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-public interface IDungeonService
-{
-    Task<ActionResult?> HandleInternalLogic(Player player, Mine? playerMine, MovePlayerRequest request);
-}
 
 public class DungeonService : IDungeonService
 {

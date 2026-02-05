@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
+using game.Server.Types;
 using game.Server.Models;
 using game.Server.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -8,14 +9,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
 {
-    public interface INavigationService
-    {
-        Task<ActionResult<PlayerDto>> GeneratePlayer(GeneratePlayerRequest request);
-        Task<ActionResult<PlayerDto>> GetPlayerAsync(Guid id);
-        Task<ActionResult<PlayerDto>> MoveScreenAsync(Guid id, MoveScreenRequest request);
-        Task<ActionResult<PlayerDto>> MovePlayerAsync(Guid id, MovePlayerRequest request);
-    }
-
     public class NavigationService : INavigationService
     {
         private readonly ApplicationDbContext _context;
