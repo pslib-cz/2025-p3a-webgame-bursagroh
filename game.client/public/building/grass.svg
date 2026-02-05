@@ -1,5 +1,4 @@
-<svg id="grass" viewBox="0 0 512 512"
-    xmlns="http://www.w3.org/2000/svg">
+<svg id="grass" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <rect width="64" height="64" fill="#4F772D"/>
     <rect x="64" width="64" height="64" fill="#4F772D"/>
     <rect x="128" width="64" height="64" fill="#4F772D"/>

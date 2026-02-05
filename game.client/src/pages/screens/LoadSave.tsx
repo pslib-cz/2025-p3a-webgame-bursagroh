@@ -8,12 +8,13 @@ import Button from '../../components/Button';
 import { useMutation } from '@tanstack/react-query';
 import { loadMutation } from '../../api/save';
 import { PlayerIdContext } from '../../providers/PlayerIdProvider';
+import styles from './loadSave.module.css'
 
 const LoadSaveScreen = () => {
     const navigate = useNavigate()
     const saveString = useParams().saveString!
-    
-    const {saves, save} = React.useContext(SaveContext)!
+
+    const { saves, save } = React.useContext(SaveContext)!
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
     const { mutateAsync: loadAsync } = useMutation(loadMutation(playerId, saveString))
@@ -30,7 +31,7 @@ const LoadSaveScreen = () => {
         displaySaveString = `${saveString} (Not found in saves)`
     }
 
-    const handleSaveAndLoad = async() => {
+    const handleSaveAndLoad = async () => {
         await save()
         await loadAsync()
         navigate("/game/city")
@@ -40,17 +41,23 @@ const LoadSaveScreen = () => {
         await loadAsync()
         navigate("/game/city")
     }
-    
+
     return (
         <Layer layer={1}>
-            <div>
-                <span>Load</span>
-                <div>
-                    <span>Loading save:</span>
-                    <span>{displaySaveString}</span>
+            <div className={styles.container}>
+                <div className={styles.subContainer}>
+                    <span className={styles.heading}>Load</span>
+                    <div className={styles.saveContainer}>
+                        <div className={styles.saveTextContainer}>
+                            <span className={styles.saveText}>Loading save:</span>
+                            <span className={styles.saveText}>{displaySaveString}</span>
+                        </div>
+                        <div className={styles.buttonContainer}>
+                            <Button onClick={handleSaveAndLoad}>Save and Load</Button>
+                            <Button onClick={handleJustLoad}>Just Load</Button>
+                        </div>
+                    </div>
                 </div>
-                <Button onClick={handleSaveAndLoad}>Save and Load</Button>
-                <Button onClick={handleJustLoad}>Just Load</Button>
                 <Link to="/load">Back</Link>
             </div>
         </Layer>
