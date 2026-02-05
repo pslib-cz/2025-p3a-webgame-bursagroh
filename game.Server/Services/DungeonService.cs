@@ -144,12 +144,28 @@ public class DungeonService : IDungeonService
         int[] lootIds = { 10, 20, 30, 11, 21, 31, 12, 22, 32, 40, 41, 42 };
         int scatterCount = random.Next(2, 6);
 
+        var floor = await _context.Floors.AsNoTracking()
+            .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+        if (floor == null) return;
+
+        bool isEven = floor.Level % 2 == 0;
+        var stairsUp = (x: isEven ? 5 : 2, y: 2);
+        var stairsDown = (x: isEven ? 2 : 5, y: 2);
+
+        var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
+
         var emptyTiles = new List<(int x, int y)>();
         for (int x = floorItem.PositionX - 1; x <= floorItem.PositionX + 1; x++)
         {
             for (int y = floorItem.PositionY - 1; y <= floorItem.PositionY + 1; y++)
             {
-                bool isOccupied = await _context.FloorItems.AnyAsync(f => f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
+                if (x < 0 || x > 7 || y < 0 || y > 7) continue;
+                if (exits.Any(e => e.x == x && e.y == y)) continue;
+                if ((x == stairsUp.x && y == stairsUp.y) || (x == stairsDown.x && y == stairsDown.y)) continue;
+
+                bool isOccupied = await _context.FloorItems.AnyAsync(f =>
+                    f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
+
                 if (!isOccupied) emptyTiles.Add((x, y));
             }
         }
