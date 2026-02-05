@@ -17,6 +17,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 );
 
 builder.Services.AddScoped<MineService>();
+builder.Services.AddScoped<ICityService, CityService>();
+builder.Services.AddScoped<IDungeonService, DungeonService>();
 builder.Services.AddSingleton<MapGeneratorService>();
 builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
 

@@ -17,19 +17,19 @@ namespace game.Server.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
         private readonly MineService _mineService;
+        private readonly ICityService _cityService;
+        private readonly IDungeonService _dungeonService;
 
-        public PlayerController(ApplicationDbContext context, IMapper mapper, MineService mineService)
+        public PlayerController(ApplicationDbContext context, IMapper mapper, MineService mineService, ICityService cityService, IDungeonService dungeonService)
         {
             _context = context;
             _mapper = mapper;
             _mineService = mineService;
+            _cityService = cityService;
+            _dungeonService = dungeonService;
+
         }
 
-
-        private bool IsRoad(int x, int y)
-        {
-            return Math.Abs(x) % 4 == 1 || Math.Abs(y) % 4 == 1;
-        }
 
         [HttpPost("Generate")]
         public async Task<ActionResult<PlayerDto>> Generate([FromBody] GeneratePlayerRequest request)
@@ -276,11 +276,6 @@ namespace game.Server.Controllers
             }
         }
 
-        /// <remarks>
-        /// - pohyb 
-        /// - pokud je floorId na null, tak se meni PositionX a PositionY 
-        /// - jinak se meni patro a pozice jsou ignorovany 
-        /// </remarks>
         [HttpPatch("{id}/Action/move")]
         public async Task<ActionResult<PlayerDto>> MovePlayer(Guid id, [FromBody] MovePlayerRequest request)
         {
@@ -303,252 +298,18 @@ namespace game.Server.Controllers
 
                 if (player.ScreenType == ScreenTypes.City)
                 {
-                    player.PositionX = request.NewPositionX;
-                    player.PositionY = request.NewPositionY;
-
-                    if (player.PositionX == 0 && player.PositionY == 0) player.ScreenType = ScreenTypes.Fountain;
-
-                    var building = await _context.Buildings.FirstOrDefaultAsync(b =>
-                        b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.PlayerId == id);
-
-                    if (building == null)
-                    {
-                        var mapGen = new MapGeneratorService();
-                        var proceduralArea = mapGen.GenerateMapArea(id, player.PositionX, player.PositionX, player.PositionY, player.PositionY, player.Seed);
-                        var generatedBuilding = proceduralArea.FirstOrDefault();
-
-                        if (generatedBuilding != null)
-                        {
-                            _context.Buildings.Add(generatedBuilding);
-                            await _context.SaveChangesAsync();
-                            building = generatedBuilding;
-                        }
-                    }
-
-                    if (building != null)
-                    {
-                        switch (building.BuildingType)
-                        {
-                            case BuildingTypes.Abandoned:
-                            case BuildingTypes.AbandonedTrap:
-                                var floor0 = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == building.BuildingId && f.Level == 0);
-                                if (floor0 == null)
-                                {
-                                    var mapGen = new MapGeneratorService();
-                                    var generated = mapGen.GenerateInterior(building.BuildingId, player.Seed, 1, building.Height ?? 5, building.PositionX, building.PositionY);
-                                    floor0 = generated.First(f => f.Level == 0);
-                                    _context.Floors.Add(floor0);
-                                    await _context.SaveChangesAsync();
-                                }
-
-                                int spawnX = 0; int spawnY = 0;
-                                if (currentX < building.PositionX) { spawnX = 0; spawnY = 3; }
-                                else if (currentX > building.PositionX) { spawnX = 7; spawnY = 3; }
-                                else if (currentY < building.PositionY) { spawnX = 3; spawnY = 0; }
-                                else if (currentY > building.PositionY) { spawnX = 3; spawnY = 7; }
-                                else
-                                {
-                                    var defaultExit = MapGeneratorService.GetExitCoordinates(building.PositionX, building.PositionY).First();
-                                    spawnX = defaultExit.x; spawnY = defaultExit.y;
-                                }
-
-                                player.FloorId = floor0.FloorId;
-                                player.ScreenType = ScreenTypes.Floor;
-                                player.SubPositionX = spawnX;
-                                player.SubPositionY = spawnY;
-                                break;
-
-                            case BuildingTypes.Bank: player.ScreenType = ScreenTypes.Bank; break;
-                            case BuildingTypes.Mine:
-                                player.ScreenType = ScreenTypes.Mine;
-                                if (playerMine != null) _context.Mines.Remove(playerMine);
-                                playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
-                                _context.Mines.Add(playerMine);
-
-                                Floor mineFloor = new Floor { BuildingId = building.BuildingId, Level = 0, FloorItems = new List<FloorItem>() };
-                                _context.Floors.Add(mineFloor);
-                                await _context.SaveChangesAsync();
-                                await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
-
-                                player.FloorId = mineFloor.FloorId;
-                                player.SubPositionX = 7;
-                                player.SubPositionY = -4;
-                                break;
-
-                            case BuildingTypes.Restaurant: player.ScreenType = ScreenTypes.Restaurant; break;
-                            case BuildingTypes.Blacksmith: player.ScreenType = ScreenTypes.Blacksmith; break;
-                        }
-                    }
+                    await _cityService.HandleCityMovement(player, request, id);
                 }
                 else
                 {
-                    if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 7 && request.NewPositionY == -4)
-                    {
-                        player.ScreenType = ScreenTypes.City;
-                        player.FloorId = null;
-                        player.SubPositionX = 0;
-                        player.SubPositionY = 0;
-                        if (playerMine != null) _context.Mines.Remove(playerMine);
-                        await _context.SaveChangesAsync();
-                        return Ok(_mapper.Map<PlayerDto>(player));
-                    }
-
-                    if (player.ScreenType == ScreenTypes.Mine && playerMine != null)
-                    {
-                        var blockAtTarget = await _context.MineBlocks
-                            .AnyAsync(mb => mb.MineLayer.MineId == playerMine.MineId &&
-                                            mb.MineLayer.Depth == request.NewPositionY &&
-                                            mb.Index == request.NewPositionX);
-
-                        if (blockAtTarget) return BadRequest("Movement blocked by a mine block.");
-                    }
-
-                    player.SubPositionX = request.NewPositionX;
-                    player.SubPositionY = request.NewPositionY;
-
-                    if (player.FloorId != null)
-                    {
-                        var enemiesOnFloor = await _context.FloorItems
-                            .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType == FloorItemType.Enemy)
-                            .ToListAsync();
-
-                        var currentOccupied = await _context.FloorItems
-                            .Where(fi => fi.FloorId == player.FloorId)
-                            .Select(fi => new { fi.PositionX, fi.PositionY })
-                            .ToListAsync();
-
-                        var stairs = new[] { (2, 2), (5, 2) };
-
-                        foreach (var enemy in enemiesOnFloor)
-                        {
-                            int nextX = enemy.PositionX;
-                            int nextY = enemy.PositionY;
-                            int diffX = player.SubPositionX - enemy.PositionX;
-                            int diffY = player.SubPositionY - enemy.PositionY;
-
-                            if (Math.Abs(diffX) > Math.Abs(diffY)) nextX += Math.Sign(diffX);
-                            else nextY += Math.Sign(diffY);
-
-                            if (!stairs.Any(s => s.Item1 == nextX && s.Item2 == nextY) &&
-                                !(nextX == player.SubPositionX && nextY == player.SubPositionY) &&
-                                !currentOccupied.Any(p => p.PositionX == nextX && p.PositionY == nextY))
-                            {
-                                currentOccupied.RemoveAll(p => p.PositionX == enemy.PositionX && p.PositionY == enemy.PositionY);
-                                enemy.PositionX = nextX;
-                                enemy.PositionY = nextY;
-                                currentOccupied.Add(new { PositionX = nextX, PositionY = nextY });
-                                _context.Entry(enemy).State = EntityState.Modified;
-                            }
-                        }
-
-                        var floorItem = await _context.FloorItems
-                            .Include(fi => fi.Chest)
-                            .Include(fi => fi.Enemy)
-                            .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
-                                                       fi.PositionX == player.SubPositionX &&
-                                                       fi.PositionY == player.SubPositionY);
-
-                        if (floorItem != null)
-                        {
-                            if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)
-                            {
-                                var random = new Random();
-                                int[] lootIds = { 10, 20, 30, 11, 21, 31, 12, 22, 32, 40, 41, 42 };
-                                int scatterCount = random.Next(2, 6);
-                                var emptyTiles = new List<(int x, int y)>();
-                                for (int x = floorItem.PositionX - 1; x <= floorItem.PositionX + 1; x++)
-                                {
-                                    for (int y = floorItem.PositionY - 1; y <= floorItem.PositionY + 1; y++)
-                                    {
-                                        bool isOccupied = await _context.FloorItems.AnyAsync(f => f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
-                                        if (!isOccupied) emptyTiles.Add((x, y));
-                                    }
-                                }
-                                for (int i = 0; i < scatterCount; i++)
-                                {
-                                    int randomLootId = lootIds[random.Next(lootIds.Length)];
-                                    var itemTemplate = await _context.Items.AsNoTracking().FirstOrDefaultAsync(it => it.ItemId == randomLootId);
-                                    if (itemTemplate == null) continue;
-                                    var newItemInstance = new ItemInstance { ItemId = randomLootId, Durability = itemTemplate.MaxDurability };
-                                    _context.ItemInstances.Add(newItemInstance);
-                                    (int x, int y) dropPos = (floorItem.PositionX, floorItem.PositionY);
-                                    if (emptyTiles.Any()) { int index = random.Next(emptyTiles.Count); dropPos = emptyTiles[index]; emptyTiles.RemoveAt(index); }
-                                    _context.FloorItems.Add(new FloorItem { FloorId = (int)player.FloorId!, PositionX = dropPos.x, PositionY = dropPos.y, FloorItemType = FloorItemType.Item, ItemInstance = newItemInstance });
-                                }
-                                _context.Chests.Remove(floorItem.Chest);
-                                _context.FloorItems.Remove(floorItem);
-                            }
-                            else if (floorItem.FloorItemType == FloorItemType.Enemy && floorItem.Enemy != null)
-                            {
-                                var random = new Random();
-                                player.Health -= random.Next(1, 4);
-                                if (player.Health <= 0)
-                                {
-                                    player.Health = 0;
-                                    player.ScreenType = ScreenTypes.Lose;
-                                    var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
-                                    if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
-                                }
-                                else player.ScreenType = ScreenTypes.Fight;
-
-                                await _context.SaveChangesAsync();
-                                var fightDto = _mapper.Map<PlayerDto>(player);
-                                fightDto.MineId = playerMine?.MineId;
-                                return Ok(fightDto);
-                            }
-                        }
-
-                        var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
-                        if (player.ScreenType == ScreenTypes.Floor && exits.Any(e => e.x == player.SubPositionX && e.y == player.SubPositionY))
-                        {
-                            var currentFloor = await _context.Floors.Include(f => f.Building).FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
-                            if (currentFloor?.Level == 0)
-                            {
-                                if (currentFloor.Building?.BuildingType == BuildingTypes.AbandonedTrap) return BadRequest("The door is locked!");
-                                player.ScreenType = ScreenTypes.City;
-                                player.FloorId = null;
-                                if (player.SubPositionX == 0) player.PositionX -= 1;
-                                else if (player.SubPositionX == 7) player.PositionX += 1;
-                                else if (player.SubPositionY == 0) player.PositionY -= 1;
-                                else if (player.SubPositionY == 7) player.PositionY += 1;
-                                player.SubPositionX = 0; player.SubPositionY = 0;
-                                await _context.SaveChangesAsync();
-                                return Ok(_mapper.Map<PlayerDto>(player));
-                            }
-                        }
-
-                        var currentFloorData = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
-                        if (currentFloorData != null)
-                        {
-                            bool isEven = currentFloorData.Level % 2 == 0;
-                            if (player.SubPositionX == (isEven ? 5 : 2) && player.SubPositionY == 2)
-                            {
-                                int nextLvl = currentFloorData.Level + 1;
-                                var nextF = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == nextLvl);
-                                if (nextF == null)
-                                {
-                                    var b = await _context.Buildings.FindAsync(currentFloorData.BuildingId);
-                                    if (b != null && (!b.Height.HasValue || nextLvl < b.Height.Value))
-                                    {
-                                        var gen = new MapGeneratorService().GenerateInterior(b.BuildingId, player.Seed, nextLvl + 1, b.Height ?? 5, b.PositionX, b.PositionY);
-                                        nextF = gen.FirstOrDefault(f => f.Level == nextLvl);
-                                        if (nextF != null) { _context.Floors.Add(nextF); await _context.SaveChangesAsync(); }
-                                    }
-                                }
-                                if (nextF != null) player.FloorId = nextF.FloorId;
-                            }
-                            else if (player.SubPositionX == (isEven ? 2 : 5) && player.SubPositionY == 2 && currentFloorData.Level > 0)
-                            {
-                                var prevF = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == currentFloorData.BuildingId && f.Level == currentFloorData.Level - 1);
-                                if (prevF != null) player.FloorId = prevF.FloorId;
-                            }
-                        }
-                    }
+                    var result = await _dungeonService.HandleInternalLogic(player, playerMine, request);
+                    if (result != null) return result;
                 }
 
                 await _context.SaveChangesAsync();
+
                 var dto = _mapper.Map<PlayerDto>(player);
-                dto.MineId = playerMine?.MineId;
+                dto.MineId = (await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id))?.MineId;
                 return Ok(dto);
             }
             catch (Exception ex)
