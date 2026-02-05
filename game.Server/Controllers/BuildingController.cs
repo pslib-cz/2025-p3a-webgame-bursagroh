@@ -13,7 +13,6 @@ namespace game.Server.Controllers
     public class BuildingController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private static readonly SemaphoreSlim _bulkSemaphore = new SemaphoreSlim(1, 1);
         private readonly IMapper _mapper;
 
         public BuildingController(ApplicationDbContext context, IMapper mapper)
@@ -22,62 +21,90 @@ namespace game.Server.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
+        /// <summary>
+        /// Retrieves all materialized buildings across all players.
+        /// </summary>
+        /// <param name="page">The page number (starting at 1).</param>
+        /// <param name="pageSize">Number of buildings per page.</param>
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<BuildingDto>>> GetAllMaterializedBuildings([FromQuery] int page = 1, [FromQuery] int pageSize = 50)
         {
             try
             {
-                var player = await _context.Players.FindAsync(playerId);
-                if (player == null) return NotFound();
+                // Basic validation for pagination
+                if (page < 1) page = 1;
+                if (pageSize > 200) pageSize = 200; // Cap page size for safety
 
-                int minX = left;
-                int maxX = left + width - 1;
-                int minY = top;
-                int maxY = top + height - 1;
-
-                var existingBuildings = await _context.Buildings
+                var buildings = await _context.Buildings
                     .AsNoTracking()
-                    .Where(b => b.PlayerId == playerId &&
-                                b.PositionX >= minX && b.PositionX <= maxX &&
-                                b.PositionY >= minY && b.PositionY <= maxY)
+                    .OrderBy(b => b.PlayerId) // Group by player for readability
+                    .ThenBy(b => b.PositionX)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
                     .ToListAsync();
 
-                var mapGenerator = new MapGeneratorService();
-                var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY, player.Seed);
-
-                var existingCoords = new HashSet<(int, int)>(
-                    existingBuildings.Select(b => (b.PositionX, b.PositionY))
-                );
-
-                var newBuildings = proceduralBuildings
-                    .Where(pb => !existingCoords.Contains((pb.PositionX, pb.PositionY)))
-                    .ToList();
-
-                if (newBuildings.Any())
-                {
-                    await _bulkSemaphore.WaitAsync();
-                    try
-                    {
-                        await _context.BulkInsertAsync(newBuildings, config =>
-                        {
-                            config.SetOutputIdentity = true;
-                        });
-                    }
-                    finally
-                    {
-                        _bulkSemaphore.Release();
-                    }
-
-                    existingBuildings.AddRange(newBuildings);
-                }
-
-                var buildingDtos = _mapper.Map<IEnumerable<BuildingDto>>(existingBuildings);
-                return Ok(buildingDtos);
-            } catch
+                return Ok(_mapper.Map<IEnumerable<BuildingDto>>(buildings));
+            }
+            catch (Exception ex)
             {
-                return StatusCode(500, "Internal server error.");
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildings(Guid playerId, [FromQuery] int top, [FromQuery] int left, [FromQuery] int width, [FromQuery] int height)
+        {
+            var player = await _context.Players.AsNoTracking().FirstOrDefaultAsync(p => p.PlayerId == playerId);
+            if (player == null) return NotFound();
+
+            int minX = left;
+            int maxX = left + width - 1;
+            int minY = top;
+            int maxY = top + height - 1;
+
+            var coreBuildings = GetCoreBuildings(playerId)
+                .Where(b => b.PositionX >= minX && b.PositionX <= maxX && b.PositionY >= minY && b.PositionY <= maxY)
+                .ToList();
+
+            var materializedBuildings = await _context.Buildings
+                .AsNoTracking()
+                .Where(b => b.PlayerId == playerId &&
+                            b.PositionX >= minX && b.PositionX <= maxX &&
+                            b.PositionY >= minY && b.PositionY <= maxY)
+                .ToListAsync();
+
+            var mapGenerator = new MapGeneratorService();
+            var proceduralBuildings = mapGenerator.GenerateMapArea(playerId, minX, maxX, minY, maxY, player.Seed);
+            var finalMap = new Dictionary<(int, int), Building>();
+
+            foreach (var b in coreBuildings)
+            {
+                finalMap[(b.PositionX, b.PositionY)] = b;
+            }
+
+            foreach (var b in materializedBuildings)
+            {
+                finalMap[(b.PositionX, b.PositionY)] = b;
+            }
+
+            foreach (var b in proceduralBuildings)
+            {
+                if (!finalMap.ContainsKey((b.PositionX, b.PositionY)))
+                {
+                    finalMap[(b.PositionX, b.PositionY)] = b;
+                }
+            }
+
+            var buildingDtos = _mapper.Map<IEnumerable<BuildingDto>>(finalMap.Values);
+            return Ok(buildingDtos);
+        }
+        private List<Building> GetCoreBuildings(Guid playerId) => new List<Building> {
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Fountain, PositionX = 0, PositionY = 0, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Mine, PositionX = 2, PositionY = 0, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Bank, PositionX = -2, PositionY = 0, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Restaurant, PositionX = 0, PositionY = -2, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Blacksmith, PositionX = 0, PositionY = 2, IsBossDefeated = false }
+        };
 
         [HttpGet("Floor/{floorId}")]
         public async Task<ActionResult<FloorDto>> GetFloorById(int floorId)

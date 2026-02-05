@@ -145,7 +145,7 @@ public class MapGeneratorService
                 PositionX = bossPos.x,
                 PositionY = bossPos.y,
                 FloorItemType = FloorItemType.Enemy,
-                Enemy = new Enemy { Health = 100, EnemyType = EnemyType.Dragon }
+                Enemy = new Enemy { Health = 100, MaxHealth = 100, EnemyType = EnemyType.Dragon }
             });
         }
 
@@ -165,6 +165,7 @@ public class MapGeneratorService
                     Enemy = new Enemy
                     {
                         Health = 20,
+                        MaxHealth = 20,
                         EnemyType = type,
                         ItemInstance = new ItemInstance { ItemId = 10, Durability = 20 }
                     }

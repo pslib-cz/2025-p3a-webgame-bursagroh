@@ -161,6 +161,34 @@ namespace game.Server.Controllers
                 JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
                 JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
                 WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                INSERT INTO Enemies (FloorItemId, Health, MaxHealth, EnemyType)
+                SELECT nfi.FloorItemId, e.Health, e.MaxHealth, e.EnemyType
+                FROM Enemies e
+                JOIN FloorItems ofi ON e.FloorItemId = ofi.FloorItemId
+                JOIN Floors [of] ON ofi.FloorId = [of].FloorId
+                JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
+                JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
+                JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
+                JOIN FloorItems nfi ON nf.FloorId = nfi.FloorId 
+                     AND ofi.PositionX = nfi.PositionX 
+                     AND ofi.PositionY = nfi.PositionY
+                WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
+
+            await _context.Database.ExecuteSqlRawAsync(@"
+                INSERT INTO Chests (FloorItemId)
+                SELECT nfi.FloorItemId
+                FROM Chests c
+                JOIN FloorItems ofi ON c.FloorItemId = ofi.FloorItemId
+                JOIN Floors [of] ON ofi.FloorId = [of].FloorId
+                JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
+                JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
+                JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
+                JOIN FloorItems nfi ON nf.FloorId = nfi.FloorId 
+                     AND ofi.PositionX = nfi.PositionX 
+                     AND ofi.PositionY = nfi.PositionY
+                WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
         }
 
         private async Task SyncPlayerStatsAsync(Guid sourcePlayerId, Guid targetPlayerId)
