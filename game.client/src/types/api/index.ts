@@ -3,7 +3,7 @@ import type { APIBuyBlueprint, APICraftBlueprint, APIGetBlueprints, APIGetPlayer
 import type { APIGetBuildings, APIGetFloor } from "./controllers/building"
 import type { APIGenerateMine, APIGetMineItems, APIGetMineLayer, APIGetMineLayers, APIMineMine, APIMineRent } from "./controllers/mine"
 import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayerItemDrop, APIPlayerItemEquip, APIPlayerItemPick, APIPlayerMove, APIPlayerMoveScreen, APIPlayerUse } from "./controllers/player"
-import type { APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
+import type { APIGetLeaderboard, APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
 import type { APILoad, APISave } from "./controllers/save"
 
 export type StringifyAble = string | number
@@ -75,6 +75,7 @@ export interface API extends GenericAPI {
         "/api/Mine/{mineId}/Items": APIGetMineItems
         "/api/Recipe": APIGetRecipes
         "/api/Recipe/Random": APIGetRandomRecipe
+        "/api/Recipe/Leaderboard": APIGetLeaderboard
         "/api/Blueprint": APIGetBlueprints
         "/api/Blueprint/Player/{playerId}": APIGetPlayerBlueprints
     }

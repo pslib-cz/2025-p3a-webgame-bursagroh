@@ -5,6 +5,9 @@ import type { FloorItemInstance } from '../../types/api/models/building'
 import { useMutation } from '@tanstack/react-query'
 import { pickItemMutation } from '../../api/player'
 import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import ConditionalDisplay from '../wrappers/ConditionalDisplay'
+import WeightIcon from '../../assets/icons/WeightIcon'
+import styles from './groundItem.module.css'
 
 type GroundItemProps = {
     items: {floorItemId: number, item: FloorItemInstance}[]
@@ -20,15 +23,18 @@ const GroundItem: React.FC<GroundItemProps> = ({ items }) => {
     }
 
     return (
-        <div onClick={handleClick}>
+        <div className={styles.container} onClick={handleClick}>
             <svg width="128" height="128" viewBox="0 0 128 128">
-                <Asset assetType={itemIdToAssetType(items[0].item.item.itemId)} />
+                <Asset assetType={itemIdToAssetType(items[0].item.item.itemId)} width={128} height={128} />
             </svg>
-            <span>{items[0].item.durability}</span>
-            {","}
-            <span>{items[0].item.item.weight}</span>
-            {","}
-            <span>{items.length}x</span>
+            <ConditionalDisplay condition={items[0].item.durability !== 0}>
+                <span className={styles.durability}>{items[0].item.durability}</span>
+            </ConditionalDisplay>
+            <div className={styles.weight}>
+                <WeightIcon className={styles.weightIcon} width={24} height={24} />
+                <span className={styles.weightText}>{items[0].item.item.weight}</span>
+            </div>
+            <span className={styles.amount}>{items.length}x</span>
         </div>
     )
 }

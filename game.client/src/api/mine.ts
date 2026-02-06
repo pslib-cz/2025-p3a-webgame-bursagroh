@@ -1,7 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query"
 import { api, queryClient } from "."
 
-export const generateMineQuery = (playerId: string) =>
+export const regenerateMineQuery = (playerId: string) =>
     queryOptions({
         queryKey: [playerId, "mine"],
         queryFn: () => api.post("/api/Mine/Regenerate", {}, {}, { playerId }),

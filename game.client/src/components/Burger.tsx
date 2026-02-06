@@ -50,7 +50,7 @@ const Burger: React.FC<BurgerProps> = ({ burger }) => {
                     <Asset key={index} x={0} y={height - ingrediencePixelHeight * 8 - (ingrediencePixelHeight + offset) * index} width={ingrediencePixelHeight * 8} height={ingrediencePixelHeight * 8} assetType={mapIngredienceToAssetType(ingredience.ingredienceType)} />
                 ))}
             </svg>
-            <span className={styles.burgerName}>{burger.name}</span>
+            <span onMouseEnter={handleEnter} onMouseLeave={handleLeave} className={styles.burgerName}>{burger.name}</span>
         </div>
     )
 }

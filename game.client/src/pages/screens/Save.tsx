@@ -4,6 +4,7 @@ import { SaveContext } from '../../providers/SaveProvider'
 import Link from '../../components/Link'
 import SaveString from '../../components/SaveString'
 import useBlur from '../../hooks/useBlur'
+import styles from './save.module.css'
 
 const SaveScreen = () => {
     useBlur(true)
@@ -12,9 +13,11 @@ const SaveScreen = () => {
 
     return (
         <Layer layer={1}>
-            <div>
-                <span>Save</span>
-                <SaveString saveString={saveString} />
+            <div className={styles.container}>
+                <div className={styles.subContainer}>
+                    <span className={styles.heading}>Save</span>
+                    <SaveString saveString={saveString} />
+                </div>
                 <Link to='/'>Back</Link>
             </div>
         </Layer>

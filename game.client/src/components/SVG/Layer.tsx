@@ -4,6 +4,7 @@ import { getMineLayersQuery } from "../../api/mine"
 import type { BlockType, MineLayer } from "../../types/api/models/mine"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
 import Block from "./tiles/mine/Block"
+import MineTile from "./tiles/mine/MineTile"
 
 const mapBlockTypeToTileType = (buildingType: BlockType) => {
     switch (buildingType) {
@@ -52,9 +53,15 @@ const Layer: React.FC<LayerProps> = ({ depth, size, mineId }) => {
                         layerMap[block.index] = block
                     })
 
-                    return layerMap.map((block, index) => (
-                        <Block key={`${layer.depth}-${index}`} width={1} height={1} x={index} y={layer.depth} blockType={mapBlockTypeToTileType(block!.block.blockType)} />
-                    ))
+                    return layerMap.map((block, index) => {
+                        if (!block) {
+                            return <MineTile key={`${layer.depth}-${index}`} width={1} height={1} x={index} y={layer.depth} mineTileType="empty" />
+                        }
+
+                        return (
+                            <Block key={`${layer.depth}-${index}`} width={1} height={1} x={index} y={layer.depth} blockType={mapBlockTypeToTileType(block.block.blockType)} />
+                        )
+                    })
                 })}
             </>
         )

@@ -19,3 +19,16 @@
     align-self: center;
     margin: 0;
 }
+
+.save {
+    fill: var(--light);
+}
+
+.saveText {
+    font-size: var(--h3);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}
