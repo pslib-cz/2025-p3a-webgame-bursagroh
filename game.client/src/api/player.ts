@@ -65,6 +65,7 @@ export const dropItemMutation = (playerId: string) =>
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
             queryClient.invalidateQueries({ queryKey: [playerId, "mine"] })
             queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },
     })
 
@@ -76,11 +77,12 @@ export const equipItemMutation = (playerId: string) =>
         },
     })
 
-export const useItemMutation = (playerId: string, floorId: number) =>
+export const useItemMutation = (playerId: string) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/use", { playerId }, {}, {}),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "floor", floorId] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
         },
     })
