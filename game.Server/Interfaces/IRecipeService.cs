@@ -8,5 +8,5 @@ public interface IRecipeService
     Task<ActionResult<RecipeDto>> GetRandomRecipeAsync();
     Task<ActionResult> StartRecipeAsync(int recipeId, StartRecipeRequest request);
     Task<ActionResult> EndRecipeAsync(int recipeId, EndRecipeRequest request);
-    Task<ActionResult<List<RecipeTime>>> GetRecipeLeaderboardAsync();
+    Task<ActionResult<List<LeaderboardDto>>> GetRecipeLeaderboardAsync();
 }
