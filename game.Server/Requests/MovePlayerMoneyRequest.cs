@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace game.Server.Models
+namespace game.Server.Requests
 {
     public enum Direction
     {

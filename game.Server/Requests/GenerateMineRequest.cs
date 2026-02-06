@@ -1,4 +1,4 @@
-namespace game.Server.Models
+namespace game.Server.Requests
 {
     public class GenerateMineRequest
     {

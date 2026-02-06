@@ -4,6 +4,7 @@
     {
         public int EnemyId { get; set; }
         public int Health { get; set; }
+        public int MaxHealth { get; set; }
         public string EnemyType { get; set; } = string.Empty;
     }
 }

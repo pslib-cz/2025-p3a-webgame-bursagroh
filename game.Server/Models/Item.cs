@@ -1,18 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
+using game.Server.Types;
 
 namespace game.Server.Models
 {
-    public enum ItemTypes
-    {
-        Sword,
-        Axe,
-        Pickaxe,
-        Potion,
-        Block
-    }
-
     public class Item
     {
         [Key]
