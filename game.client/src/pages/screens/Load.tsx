@@ -18,12 +18,14 @@ const LoadScreen = () => {
                 <div className={styles.subContainer}>
                     <span className={styles.heading}>Load</span>
                     <div className={styles.savesContainer}>
-                        {saves.autosaves.map((save, index) => (
-                            <Link key={`autosave_${index}`} to={`/load/${encodeURIComponent(save.saveString)}`}>{parseSave(save, true)}</Link>
-                        ))}
-                        {saves.saves.map((save, index) => (
-                            <Link key={`save_${index}`} to={`/load/${encodeURIComponent(save.saveString)}`}>{parseSave(save)}</Link>
-                        ))}
+                        <div className={styles.savesLinkContainer}>
+                            {saves.autosaves.map((save, index) => (
+                                <Link key={`autosave_${index}`} to={`/load/${encodeURIComponent(save.saveString)}`}>{parseSave(save, true)}</Link>
+                            ))}
+                            {saves.saves.map((save, index) => (
+                                <Link key={`save_${index}`} to={`/load/${encodeURIComponent(save.saveString)}`}>{parseSave(save)}</Link>
+                            ))}
+                        </div>
                         <div className={styles.inputContainer}>
                             <Input placeholder="SaveString" value={userSaveString} onChange={e => setUserSaveString(e.target.value)} />
                             <Link to={`/load/${encodeURIComponent(userSaveString)}`}>

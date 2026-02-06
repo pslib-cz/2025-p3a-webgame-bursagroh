@@ -28,7 +28,7 @@ const FightScreen = () => {
     const player = React.useContext(PlayerContext)!.player!
     const floor = React.useContext(FloorContext)!.floor!
 
-    const { mutateAsync: useItemAsync } = useMutation(useItemMutation(player.playerId, floor.floorId))
+    const { mutateAsync: useItemAsync } = useMutation(useItemMutation(player.playerId))
 
     const enemy = floor.floorItems.filter(item => item.floorItemType === "Enemy").filter(enemy => enemy.positionX === player.subPositionX && enemy.positionY === player.subPositionY)[0]
 
@@ -49,7 +49,7 @@ const FightScreen = () => {
                 <svg width={512} height={512} viewBox="0 0 512 512">
                     <Asset assetType={mapEnemyTypeToAssetType(enemy.enemy?.enemyType)} x={0} y={0} width={512} height={512} />
                 </svg>
-                <span className={styles.entityText}>{enemy.enemy?.health} / ?</span>
+                <span className={styles.entityText}>{enemy.enemy?.health} / {enemy.enemy?.maxHealth}</span>
             </div>
         </div>
     )
