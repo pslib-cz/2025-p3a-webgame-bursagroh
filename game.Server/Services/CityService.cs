@@ -133,8 +133,8 @@ namespace game.Server.Services
             await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
             player.FloorId = mineFloor.FloorId;
-            player.SubPositionX = 0;
-            player.SubPositionY = 0;
+            player.SubPositionX = 4;
+            player.SubPositionY = -3;
         }
 
     }

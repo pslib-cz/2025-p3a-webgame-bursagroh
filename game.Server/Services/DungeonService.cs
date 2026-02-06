@@ -147,12 +147,12 @@ public class DungeonService : IDungeonService
 
     private async Task<ActionResult?> ProcessMineLogic(Player player, Mine? playerMine, MovePlayerRequest request)
     {
-        if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 0 && request.NewPositionY == 0)
+        if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 4 && request.NewPositionY == -3)
         {
             player.ScreenType = ScreenTypes.City;
             player.FloorId = null;
-            player.SubPositionX = 0;
-            player.SubPositionY = 0;
+            player.SubPositionX = 4;
+            player.SubPositionY = -3;
             if (playerMine != null) _context.Mines.Remove(playerMine);
             await _context.SaveChangesAsync();
             return new OkObjectResult(_mapper.Map<PlayerDto>(player));
