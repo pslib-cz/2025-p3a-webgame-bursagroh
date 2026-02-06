@@ -22,11 +22,7 @@ namespace game.Server.Services
             int previousX = player.PositionX;
             int previousY = player.PositionY;
 
-            if (request.NewPositionX == 2 && request.NewPositionY == 0)
-            {
-                player.ScreenType = ScreenTypes.Mine;
-            }
-            else if (request.NewPositionX == 0 && request.NewPositionY == -2) 
+            if (request.NewPositionX == 0 && request.NewPositionY == -2) 
             {
                 player.ScreenType = ScreenTypes.Restaurant;
             }
