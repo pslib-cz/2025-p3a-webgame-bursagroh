@@ -21,7 +21,11 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options.UseSqlite(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqliteOptions => {
+        }
+    )
 );
 
 

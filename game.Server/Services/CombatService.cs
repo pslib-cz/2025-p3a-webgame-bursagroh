@@ -3,7 +3,6 @@ using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Types;
 using game.Server.Models;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,9 +22,9 @@ namespace game.Server.Services
         public async Task<ActionResult> UseItemAsync(Guid id)
         {
             var player = await _context.Players
-        .Include(p => p.ActiveInventoryItem).ThenInclude(ai => ai.ItemInstance).ThenInclude(ii => ii.Item)
-        .Include(p => p.InventoryItems)
-        .FirstOrDefaultAsync(p => p.PlayerId == id);
+                .Include(p => p.ActiveInventoryItem).ThenInclude(ai => ai.ItemInstance).ThenInclude(ii => ii.Item)
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
 
             if (player == null) return new NotFoundObjectResult("Player not found.");
 
@@ -62,11 +61,12 @@ namespace game.Server.Services
                 var rng = new Random();
 
                 enemy.Health -= playerDamage;
+
                 if (enemy.Health > 0)
                 {
                     if (rng.NextDouble() < 0.07)
                     {
-                        int enemyDamage = rng.Next(1, 3); 
+                        int enemyDamage = rng.Next(1, 3);
                         player.Health -= enemyDamage;
 
                         if (player.Health <= 0)
@@ -77,10 +77,9 @@ namespace game.Server.Services
                             if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
 
                             await _context.SaveChangesAsync();
-                            return new OkObjectResult(new { message = "You died."});
+                            return new OkObjectResult(new { message = "You died." });
                         }
                     }
-                    
 
                     await _context.SaveChangesAsync();
                     return new OkObjectResult(new
@@ -88,6 +87,20 @@ namespace game.Server.Services
                         enemyHealth = enemy.Health,
                         playerHealth = player.Health
                     });
+                }
+
+                if (enemy.EnemyType == EnemyType.Dragon)
+                {
+                    player.Money += 750;
+
+                    var floor = await _context.Floors
+                        .Include(f => f.Building)
+                        .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+
+                    if (floor?.Building != null)
+                    {
+                        floor.Building.IsBossDefeated = true;
+                    }
                 }
 
                 if (enemy.ItemInstanceId.HasValue)
@@ -104,7 +117,7 @@ namespace game.Server.Services
                 _context.Enemies.Remove(enemy);
                 player.ScreenType = ScreenTypes.Floor;
                 await _context.SaveChangesAsync();
-                return new OkObjectResult(new { victory = true, message = $"{enemy.EnemyType} defeated!" });
+                return new OkObjectResult(new { victory = true, message = "Enemy defeated." });
             }
 
             if (player.ActiveInventoryItem != null)

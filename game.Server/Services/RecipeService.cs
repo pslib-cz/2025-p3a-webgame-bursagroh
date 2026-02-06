@@ -120,7 +120,7 @@ public class RecipeService : IRecipeService
         });
     }
 
-    public async Task<ActionResult<List<RecipeTime>>> GetRecipeLeaderboardAsync()
+    public async Task<ActionResult<List<LeaderboardDto>>> GetRecipeLeaderboardAsync()
     {
         List<RecipeTime> completedTimes = await _context.RecipeTimes
             .Where(rt => rt.EndTime > rt.StartTime)
@@ -143,6 +143,21 @@ public class RecipeService : IRecipeService
             .OrderBy(rt => rt.Duration)
             .ToList();
 
-        return new OkObjectResult(finalLeaderboard);
+        var leaderboardDtos = _mapper.Map<List<LeaderboardDto>>(finalLeaderboard);
+        var playerIds = leaderboardDtos.Select(d => d.PlayerId).Distinct().ToList();
+
+        var playerNames = await _context.Players
+            .Where(p => playerIds.Contains(p.PlayerId))
+            .ToDictionaryAsync(p => p.PlayerId, p => p.Name);
+
+        foreach (var dto in leaderboardDtos)
+        {
+            dto.Player = new PlayerNameDto
+            {
+                Name = playerNames.TryGetValue(dto.PlayerId, out var name) ? name : "Unknown Player"
+            };
+        }
+
+        return new OkObjectResult(leaderboardDtos);
     }
 }
