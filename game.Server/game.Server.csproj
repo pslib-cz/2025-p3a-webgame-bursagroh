@@ -53,8 +53,4 @@
     <None Include="Models\PickRequest.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
 </Project>

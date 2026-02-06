@@ -11,11 +11,13 @@ public class DungeonService : IDungeonService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly ILogger<DungeonService> _logger;
 
-    public DungeonService(ApplicationDbContext context, IMapper mapper)
+    public DungeonService(ApplicationDbContext context, IMapper mapper, ILogger<DungeonService> logger)
     {
         _context = context;
         _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<ActionResult?> HandleInternalLogic(Player player, Mine? playerMine, MovePlayerRequest request)
@@ -23,11 +25,11 @@ public class DungeonService : IDungeonService
         var mineResult = await ProcessMineLogic(player, playerMine, request);
         if (mineResult != null) return mineResult;
 
-        player.SubPositionX = request.NewPositionX;
-        player.SubPositionY = request.NewPositionY;
-
         if (player.FloorId != null)
         {
+            player.SubPositionX = request.NewPositionX;
+            player.SubPositionY = request.NewPositionY;
+
             await MoveEnemiesAsync(player);
 
             var interactionResult = await ProcessFloorInteractions(player, playerMine);
@@ -37,6 +39,110 @@ public class DungeonService : IDungeonService
             if (exitResult != null) return exitResult;
 
             await ProcessStairNavigation(player);
+        }
+        else
+        {
+            player.SubPositionX = request.NewPositionX;
+            player.SubPositionY = request.NewPositionY;
+        }
+
+        return null;
+    }
+
+    private async Task MoveEnemiesAsync(Player player)
+    {
+        var enemiesOnFloor = await _context.FloorItems
+            .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType == FloorItemType.Enemy)
+            .ToListAsync();
+
+        var obstacles = await _context.FloorItems
+            .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType != FloorItemType.Enemy)
+            .Select(fi => new { fi.PositionX, fi.PositionY })
+            .ToListAsync();
+
+        var stairs = new[] { (2, 2), (5, 2) };
+
+        foreach (var enemy in enemiesOnFloor)
+        {
+            int diffX = player.SubPositionX - enemy.PositionX;
+            int diffY = player.SubPositionY - enemy.PositionY;
+
+            if (diffX == 0 && diffY == 0) continue;
+
+            var movesToTry = new List<(int x, int y)>();
+            if (Math.Abs(diffX) >= Math.Abs(diffY))
+            {
+                movesToTry.Add((enemy.PositionX + Math.Sign(diffX), enemy.PositionY));
+                movesToTry.Add((enemy.PositionX, enemy.PositionY + Math.Sign(diffY)));
+            }
+            else
+            {
+                movesToTry.Add((enemy.PositionX, enemy.PositionY + Math.Sign(diffY)));
+                movesToTry.Add((enemy.PositionX + Math.Sign(diffX), enemy.PositionY));
+            }
+
+            foreach (var move in movesToTry)
+            {
+                if (move.x == enemy.PositionX && move.y == enemy.PositionY) continue;
+                if (move.x < 0 || move.x > 7 || move.y < 0 || move.y > 7) continue;
+
+                bool isStairs = stairs.Any(s => s.Item1 == move.x && s.Item2 == move.y);
+                bool isObstacle = obstacles.Any(o => o.PositionX == move.x && o.PositionY == move.y);
+                bool isOtherEnemy = enemiesOnFloor.Any(e => e.FloorItemId != enemy.FloorItemId && e.PositionX == move.x && e.PositionY == move.y);
+
+                if (!isStairs && !isObstacle && !isOtherEnemy)
+                {
+                    enemy.PositionX = move.x;
+                    enemy.PositionY = move.y;
+                    _context.Entry(enemy).State = EntityState.Modified;
+                    break;
+                }
+            }
+        }
+    }
+
+    private async Task<ActionResult?> ProcessFloorInteractions(Player player, Mine? playerMine)
+    {
+        var floorItem = _context.FloorItems.Local
+            .FirstOrDefault(fi => fi.FloorId == player.FloorId &&
+                                 fi.PositionX == player.SubPositionX &&
+                                 fi.PositionY == player.SubPositionY)
+            ?? await _context.FloorItems
+                .Include(fi => fi.Chest)
+                .Include(fi => fi.Enemy)
+                .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
+                                           fi.PositionX == player.SubPositionX &&
+                                           fi.PositionY == player.SubPositionY);
+
+        if (floorItem == null) return null;
+
+        if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)
+        {
+            await HandleChestOpening(player, floorItem);
+        }
+        else if (floorItem.FloorItemType == FloorItemType.Enemy && floorItem.Enemy != null)
+        {
+            _logger.LogWarning("Combat collision detected at ({X}, {Y})", player.SubPositionX, player.SubPositionY);
+
+            var random = new Random();
+            player.Health -= random.Next(1, 4);
+
+            if (player.Health <= 0)
+            {
+                player.Health = 0;
+                player.ScreenType = ScreenTypes.Lose;
+                var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
+                if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
+            }
+            else
+            {
+                player.ScreenType = ScreenTypes.Fight;
+            }
+
+            await _context.SaveChangesAsync();
+            var fightDto = _mapper.Map<PlayerDto>(player);
+            fightDto.MineId = playerMine?.MineId;
+            return new OkObjectResult(fightDto);
         }
         return null;
     }
@@ -65,79 +171,6 @@ public class DungeonService : IDungeonService
         return null;
     }
 
-    private async Task MoveEnemiesAsync(Player player)
-    {
-        var enemiesOnFloor = await _context.FloorItems
-            .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType == FloorItemType.Enemy)
-            .ToListAsync();
-
-        var currentOccupied = await _context.FloorItems
-            .Where(fi => fi.FloorId == player.FloorId)
-            .Select(fi => new { fi.PositionX, fi.PositionY })
-            .ToListAsync();
-
-        var stairs = new[] { (2, 2), (5, 2) };
-
-        foreach (var enemy in enemiesOnFloor)
-        {
-            int nextX = enemy.PositionX;
-            int nextY = enemy.PositionY;
-            int diffX = player.SubPositionX - enemy.PositionX;
-            int diffY = player.SubPositionY - enemy.PositionY;
-
-            if (Math.Abs(diffX) > Math.Abs(diffY)) nextX += Math.Sign(diffX);
-            else nextY += Math.Sign(diffY);
-
-            if (!stairs.Any(s => s.Item1 == nextX && s.Item2 == nextY) &&
-                !(nextX == player.SubPositionX && nextY == player.SubPositionY) &&
-                !currentOccupied.Any(p => p.PositionX == nextX && p.PositionY == nextY))
-            {
-                currentOccupied.RemoveAll(p => p.PositionX == enemy.PositionX && p.PositionY == enemy.PositionY);
-                enemy.PositionX = nextX;
-                enemy.PositionY = nextY;
-                currentOccupied.Add(new { PositionX = nextX, PositionY = nextY });
-                _context.Entry(enemy).State = EntityState.Modified;
-            }
-        }
-    }
-
-    private async Task<ActionResult?> ProcessFloorInteractions(Player player, Mine? playerMine)
-    {
-        var floorItem = await _context.FloorItems
-            .Include(fi => fi.Chest)
-            .Include(fi => fi.Enemy)
-            .FirstOrDefaultAsync(fi => fi.FloorId == player.FloorId &&
-                                       fi.PositionX == player.SubPositionX &&
-                                       fi.PositionY == player.SubPositionY);
-
-        if (floorItem == null) return null;
-
-        if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)
-        {
-            await HandleChestOpening(player, floorItem);
-        }
-        else if (floorItem.FloorItemType == FloorItemType.Enemy && floorItem.Enemy != null)
-        {
-            var random = new Random();
-            player.Health -= random.Next(1, 4);
-
-            if (player.Health <= 0)
-            {
-                player.Health = 0;
-                player.ScreenType = ScreenTypes.Lose;
-                var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
-                if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
-            }
-            else player.ScreenType = ScreenTypes.Fight;
-
-            await _context.SaveChangesAsync();
-            var fightDto = _mapper.Map<PlayerDto>(player);
-            fightDto.MineId = playerMine?.MineId;
-            return new OkObjectResult(fightDto);
-        }
-        return null;
-    }
-
     private async Task HandleChestOpening(Player player, FloorItem floorItem)
     {
         var random = new Random();
@@ -151,7 +184,6 @@ public class DungeonService : IDungeonService
         bool isEven = floor.Level % 2 == 0;
         var stairsUp = (x: isEven ? 5 : 2, y: 2);
         var stairsDown = (x: isEven ? 2 : 5, y: 2);
-
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
 
         var emptyTiles = new List<(int x, int y)>();

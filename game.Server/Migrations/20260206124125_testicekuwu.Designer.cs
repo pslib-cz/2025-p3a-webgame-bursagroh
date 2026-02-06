@@ -11,14 +11,94 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260205110145_testfd")]
-    partial class testfd
+    [Migration("20260206124125_testicekuwu")]
+    partial class testicekuwu
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.11");
+
+            modelBuilder.Entity("Player", b =>
+                {
+                    b.Property<Guid>("PlayerId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ActiveInventoryItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BankBalance")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("FloorId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Health")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MaxHealth")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MineId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Money")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PositionX")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PositionY")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ScreenType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Seed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SubPositionX")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SubPositionY")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PlayerId");
+
+                    b.HasIndex("ActiveInventoryItemId");
+
+                    b.HasIndex("FloorId");
+
+                    b.ToTable("Players");
+
+                    b.HasData(
+                        new
+                        {
+                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
+                            BankBalance = 0,
+                            Capacity = 10,
+                            Health = 10,
+                            MaxHealth = 10,
+                            MineId = 0,
+                            Money = 100,
+                            Name = "Seeded Player",
+                            PositionX = 0,
+                            PositionY = 0,
+                            ScreenType = 0,
+                            Seed = 252,
+                            SubPositionX = 0,
+                            SubPositionY = 0
+                        });
+                });
 
             modelBuilder.Entity("RecipeTime", b =>
                 {
@@ -1746,86 +1826,6 @@ namespace game.Server.Migrations
                         });
                 });
 
-            modelBuilder.Entity("game.Server.Models.Player", b =>
-                {
-                    b.Property<Guid>("PlayerId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("ActiveInventoryItemId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("BankBalance")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Capacity")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("FloorId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Health")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MaxHealth")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("MineId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Money")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("PositionX")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PositionY")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ScreenType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Seed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SubPositionX")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SubPositionY")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("PlayerId");
-
-                    b.HasIndex("ActiveInventoryItemId");
-
-                    b.HasIndex("FloorId");
-
-                    b.ToTable("Players");
-
-                    b.HasData(
-                        new
-                        {
-                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
-                            BankBalance = 0,
-                            Capacity = 10,
-                            Health = 20,
-                            MaxHealth = 20,
-                            MineId = 0,
-                            Money = 100,
-                            Name = "Seeded Player",
-                            PositionX = 0,
-                            PositionY = 0,
-                            ScreenType = 0,
-                            Seed = 252,
-                            SubPositionX = 0,
-                            SubPositionY = 0
-                        });
-                });
-
             modelBuilder.Entity("game.Server.Models.Recipe", b =>
                 {
                     b.Property<int>("RecipeId")
@@ -1898,6 +1898,21 @@ namespace game.Server.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Player", b =>
+                {
+                    b.HasOne("game.Server.Models.InventoryItem", "ActiveInventoryItem")
+                        .WithMany()
+                        .HasForeignKey("ActiveInventoryItemId");
+
+                    b.HasOne("game.Server.Models.Floor", "Floor")
+                        .WithMany()
+                        .HasForeignKey("FloorId");
+
+                    b.Navigation("ActiveInventoryItem");
+
+                    b.Navigation("Floor");
+                });
+
             modelBuilder.Entity("game.Server.Models.Block", b =>
                 {
                     b.HasOne("game.Server.Models.Item", "Item")
@@ -1928,7 +1943,7 @@ namespace game.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("game.Server.Models.Player", "Player")
+                    b.HasOne("Player", "Player")
                         .WithMany()
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2028,7 +2043,7 @@ namespace game.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("game.Server.Models.Player", null)
+                    b.HasOne("Player", null)
                         .WithMany("InventoryItems")
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2101,19 +2116,9 @@ namespace game.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("game.Server.Models.Player", b =>
+            modelBuilder.Entity("Player", b =>
                 {
-                    b.HasOne("game.Server.Models.InventoryItem", "ActiveInventoryItem")
-                        .WithMany()
-                        .HasForeignKey("ActiveInventoryItemId");
-
-                    b.HasOne("game.Server.Models.Floor", "Floor")
-                        .WithMany()
-                        .HasForeignKey("FloorId");
-
-                    b.Navigation("ActiveInventoryItem");
-
-                    b.Navigation("Floor");
+                    b.Navigation("InventoryItems");
                 });
 
             modelBuilder.Entity("game.Server.Models.Blueprint", b =>
@@ -2151,11 +2156,6 @@ namespace game.Server.Migrations
             modelBuilder.Entity("game.Server.Models.MineLayer", b =>
                 {
                     b.Navigation("MineBlocks");
-                });
-
-            modelBuilder.Entity("game.Server.Models.Player", b =>
-                {
-                    b.Navigation("InventoryItems");
                 });
 
             modelBuilder.Entity("game.Server.Models.Recipe", b =>
