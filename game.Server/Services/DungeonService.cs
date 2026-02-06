@@ -11,13 +11,11 @@ public class DungeonService : IDungeonService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
-    private readonly ILogger<DungeonService> _logger;
 
-    public DungeonService(ApplicationDbContext context, IMapper mapper, ILogger<DungeonService> logger)
+    public DungeonService(ApplicationDbContext context, IMapper mapper)
     {
         _context = context;
         _mapper = mapper;
-        _logger = logger;
     }
 
     public async Task<ActionResult?> HandleInternalLogic(Player player, Mine? playerMine, MovePlayerRequest request)
@@ -60,6 +58,7 @@ public class DungeonService : IDungeonService
             .Select(fi => new { fi.PositionX, fi.PositionY })
             .ToListAsync();
 
+        var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
         var stairs = new[] { (2, 2), (5, 2) };
 
         foreach (var enemy in enemiesOnFloor)
@@ -86,11 +85,12 @@ public class DungeonService : IDungeonService
                 if (move.x == enemy.PositionX && move.y == enemy.PositionY) continue;
                 if (move.x < 0 || move.x > 7 || move.y < 0 || move.y > 7) continue;
 
+                bool isExit = exits.Any(e => e.x == move.x && e.y == move.y);
                 bool isStairs = stairs.Any(s => s.Item1 == move.x && s.Item2 == move.y);
                 bool isObstacle = obstacles.Any(o => o.PositionX == move.x && o.PositionY == move.y);
                 bool isOtherEnemy = enemiesOnFloor.Any(e => e.FloorItemId != enemy.FloorItemId && e.PositionX == move.x && e.PositionY == move.y);
 
-                if (!isStairs && !isObstacle && !isOtherEnemy)
+                if (!isExit && !isStairs && !isObstacle && !isOtherEnemy)
                 {
                     enemy.PositionX = move.x;
                     enemy.PositionY = move.y;
@@ -122,8 +122,6 @@ public class DungeonService : IDungeonService
         }
         else if (floorItem.FloorItemType == FloorItemType.Enemy && floorItem.Enemy != null)
         {
-            _logger.LogWarning("Combat collision detected at ({X}, {Y})", player.SubPositionX, player.SubPositionY);
-
             var random = new Random();
             player.Health -= random.Next(1, 4);
 
