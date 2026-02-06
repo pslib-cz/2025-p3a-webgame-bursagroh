@@ -22,11 +22,25 @@ namespace game.Server.Services
             int previousX = player.PositionX;
             int previousY = player.PositionY;
 
-            //tady
-            player.PositionX = request.NewPositionX;
-            player.PositionY = request.NewPositionY;
+            if (request.NewPositionX == 0 && request.NewPositionY == -2) 
+            {
+                player.ScreenType = ScreenTypes.Restaurant;
+            }
+            else if (request.NewPositionX == 0 && request.NewPositionY == 2)
+            {
+                player.ScreenType = ScreenTypes.Blacksmith;
+            }
+            else if (request.NewPositionX == -2 && request.NewPositionY == 0)
+            {
+                player.ScreenType = ScreenTypes.Bank;
+            } else
+            {
+                player.PositionX = request.NewPositionX;
+                player.PositionY = request.NewPositionY;
+            }
 
             if (player.PositionX == 0 && player.PositionY == 0) player.ScreenType = ScreenTypes.Fountain;
+            
 
             var building = await GetOrGenerateBuilding(player, id);
             if (building != null)
@@ -119,8 +133,8 @@ namespace game.Server.Services
             await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
             player.FloorId = mineFloor.FloorId;
-            player.SubPositionX = 0;
-            player.SubPositionY = 0;
+            player.SubPositionX = 4;
+            player.SubPositionY = -3;
         }
 
     }

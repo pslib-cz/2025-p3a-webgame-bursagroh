@@ -48,14 +48,14 @@ public class RecipeService : IRecipeService
     {
         var recipeExists = await _context.Recipes.AnyAsync(r => r.RecipeId == recipeId);
 
-        if (!recipeExists) return new NotFoundObjectResult("Recept nenalezen.");
+        if (!recipeExists) return new NotFoundObjectResult("Recipe not found.");
 
         var activeRecipeTime = await _context.RecipeTimes
             .FirstOrDefaultAsync(rt => rt.RecipeId == recipeId
                                     && rt.PlayerId == request.PlayerId
                                     && rt.EndTime == null);
 
-        if (activeRecipeTime != null) return new ConflictObjectResult("uz to bezi");
+        if (activeRecipeTime != null) return new ConflictObjectResult("The game is already running.");
 
         RecipeTime newRecipeTime = new RecipeTime
         {
@@ -77,7 +77,7 @@ public class RecipeService : IRecipeService
             .Include(r => r.Ingrediences)
             .FirstOrDefaultAsync(r => r.RecipeId == recipeId);
 
-        if (recipe == null) return new NotFoundObjectResult("spatny rId");
+        if (recipe == null) return new NotFoundObjectResult("This recipeId doesn't exist.");
 
         List<IngredienceTypes> correctOrder = recipe.Ingrediences
             .OrderBy(i => i.Order)
@@ -91,14 +91,14 @@ public class RecipeService : IRecipeService
         bool orderIsCorrect = correctOrder.Count == playerOrder.Count &&
                               correctOrder.SequenceEqual(playerOrder);
 
-        if (!orderIsCorrect) return new BadRequestObjectResult("mas to spatne");
+        if (!orderIsCorrect) return new BadRequestObjectResult("Incorrect order.");
 
         RecipeTime? activeRecipeTime = await _context.RecipeTimes
             .Where(rt => rt.RecipeId == recipeId && rt.PlayerId == request.PlayerId)
             .OrderByDescending(rt => rt.StartTime)
             .FirstOrDefaultAsync(rt => rt.EndTime == null);
 
-        if (activeRecipeTime == null) return new NotFoundObjectResult("nemuzes dat end bez startu");
+        if (activeRecipeTime == null) return new NotFoundObjectResult("You cannot end a nonexisting game.");
 
         DateTime endTime = DateTime.UtcNow;
         activeRecipeTime.EndTime = endTime;
