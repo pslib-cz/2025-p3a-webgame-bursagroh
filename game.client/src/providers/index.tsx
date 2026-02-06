@@ -22,7 +22,7 @@ const Providers: React.FC<React.PropsWithChildren> = ({ children }) => {
         <>
             <QueryProvider>
                 <ProviderGroupLoadingWrapper providers={providers} contextsToLoad={contextsToLoad}>
-                    <ProviderGroupLoadingWrapper providers={[FloorProvider, SaveProvider]} contextsToLoad={[FloorContext as React.Context<TLoadingWrapperContextState>]}>
+                    <ProviderGroupLoadingWrapper providers={[FloorProvider, SaveProvider]} contextsToLoad={[FloorContext] as Array<React.Context<TLoadingWrapperContextState>>}>
                         {children}
                     </ProviderGroupLoadingWrapper>
                 </ProviderGroupLoadingWrapper>

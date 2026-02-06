@@ -5,6 +5,7 @@ import { itemIdToAssetType } from '../../utils/item'
 import { PlayerIdContext } from '../../providers/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
 import { buyBlueprintMutation } from '../../api/blueprint'
+import styles from './blueprintItem.module.css'
 
 type BlueprintItemProps = {
     blueprint: Blueprint
@@ -20,11 +21,11 @@ const BlueprintItem: React.FC<BlueprintItemProps> = ({ blueprint }) => {
     }
 
     return (
-        <div onClick={handleClick}>
+        <div className={styles.container} onClick={handleClick}>
             <svg width="128" height="128" viewBox="0 0 128 128">
-                <Asset assetType={itemIdToAssetType(blueprint.item.itemId)} />
+                <Asset assetType={itemIdToAssetType(blueprint.item.itemId)} width={128} height={128} />
             </svg>
-            <span>{blueprint.price}</span>
+            <span className={styles.price}>{blueprint.price}$</span>
         </div>
     )
 }

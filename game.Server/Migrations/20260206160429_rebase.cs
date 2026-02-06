@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace game.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class sfd : Migration
+    public partial class rebase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -288,6 +288,7 @@ namespace game.Server.Migrations
                     EnemyId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Health = table.Column<int>(type: "INTEGER", nullable: false),
+                    MaxHealth = table.Column<int>(type: "INTEGER", nullable: false),
                     EnemyType = table.Column<int>(type: "INTEGER", nullable: false),
                     FloorItemId = table.Column<int>(type: "INTEGER", nullable: false),
                     ItemInstanceId = table.Column<int>(type: "INTEGER", nullable: true)
@@ -499,7 +500,7 @@ namespace game.Server.Migrations
             migrationBuilder.InsertData(
                 table: "Players",
                 columns: new[] { "PlayerId", "ActiveInventoryItemId", "BankBalance", "Capacity", "FloorId", "Health", "MaxHealth", "MineId", "Money", "Name", "PositionX", "PositionY", "ScreenType", "Seed", "SubPositionX", "SubPositionY" },
-                values: new object[] { new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), null, 0, 10, null, 20, 20, 0, 100, "Seeded Player", 0, 0, 0, 252, 0, 0 });
+                values: new object[] { new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), null, 0, 10, null, 10, 10, 0, 100, "Seeded Player", 0, 0, 0, 252, 0, 0 });
 
             migrationBuilder.InsertData(
                 table: "RecipeTimes",

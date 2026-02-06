@@ -1,11 +1,18 @@
 import type { GenericGET, GenericPATCH } from ".."
-import type { IngredienceType, Recipe, RecipeResult } from "../models/recipe"
+import type { IngredienceType, LeaderboardEntry, Recipe, RecipeResult } from "../models/recipe"
 
 export interface APIGetRecipes extends GenericGET {
     res: {
         200: Array<Recipe>
     }
 }
+
+export interface APIGetLeaderboard extends GenericGET {
+    res: {
+        200: Array<LeaderboardEntry>
+    }
+}
+
 
 export interface APIGetRandomRecipe extends GenericGET {
     res: {

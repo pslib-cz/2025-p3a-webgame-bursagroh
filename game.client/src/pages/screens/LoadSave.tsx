@@ -9,6 +9,9 @@ import { useMutation } from '@tanstack/react-query';
 import { loadMutation } from '../../api/save';
 import { PlayerIdContext } from '../../providers/PlayerIdProvider';
 import styles from './loadSave.module.css'
+import { screenTypeToURL } from '../layouts/Game';
+import { getPlayerQuery } from '../../api/player';
+import { queryClient } from '../../api';
 
 const LoadSaveScreen = () => {
     const navigate = useNavigate()
@@ -34,12 +37,18 @@ const LoadSaveScreen = () => {
     const handleSaveAndLoad = async () => {
         await save()
         await loadAsync()
-        navigate("/game/city")
+
+        await queryClient.refetchQueries({ queryKey: [playerId, "player"] })
+        const player = queryClient.getQueryData(getPlayerQuery(playerId).queryKey)!
+        navigate(screenTypeToURL(player.screenType))
     }
 
     const handleJustLoad = async () => {
         await loadAsync()
-        navigate("/game/city")
+        
+        await queryClient.refetchQueries({ queryKey: [playerId, "player"] })
+        const player = queryClient.getQueryData(getPlayerQuery(playerId).queryKey)!
+        navigate(screenTypeToURL(player.screenType))
     }
 
     return (

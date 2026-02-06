@@ -8,6 +8,12 @@ export const getRecipesQuery = () =>
         queryFn: () => api.get("/api/Recipe", {}, {}),
     })
 
+export const getLeaderboardQuery = () =>
+    queryOptions({
+        queryKey: ["leaderboard"],
+        queryFn: () => api.get("/api/Recipe/Leaderboard", {}, {}),
+    })
+
 export const getRandomRecipeMutation = () =>
     mutationOptions({
         mutationFn: () => api.get("/api/Recipe/Random", {}, {}),
@@ -27,5 +33,6 @@ export const endRecipeMutation = ( playerId: string) =>
         mutationFn: ({recipeId, playerAssembly}: {recipeId: number, playerAssembly: IngredienceType[]}) => api.patch("/api/Recipe/{recipeId}/Action/end", { recipeId }, {}, { playerId, playerAssembly: reassembleIngrediences(playerAssembly) }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+            queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
         },
     })
