@@ -23,11 +23,11 @@ public class DungeonService : IDungeonService
         var mineResult = await ProcessMineLogic(player, playerMine, request);
         if (mineResult != null) return mineResult;
 
+        player.SubPositionX = request.NewPositionX;
+        player.SubPositionY = request.NewPositionY;
+
         if (player.FloorId != null)
         {
-            player.SubPositionX = request.NewPositionX;
-            player.SubPositionY = request.NewPositionY;
-
             await MoveEnemiesAsync(player);
 
             var interactionResult = await ProcessFloorInteractions(player, playerMine);
@@ -38,12 +38,6 @@ public class DungeonService : IDungeonService
 
             await ProcessStairNavigation(player);
         }
-        else
-        {
-            player.SubPositionX = request.NewPositionX;
-            player.SubPositionY = request.NewPositionY;
-        }
-
         return null;
     }
 
