@@ -40,6 +40,7 @@ export type FloorItem = {
 export type Enemy = {
     enemyId: number
     health: number
+    maxHealth: number,
     enemyType: EnemyType
 }
 

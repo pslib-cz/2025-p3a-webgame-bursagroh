@@ -1,7 +1,8 @@
 import React from 'react'
-import { Link } from 'react-router'
 import { PlayerIdContext } from '../../providers/PlayerIdProvider'
 import useBlur from '../../hooks/useBlur'
+import styles from './win.module.css'
+import Link from '../../components/Link'
 
 const WinScreen = () => {
     useBlur(true)
@@ -13,8 +14,8 @@ const WinScreen = () => {
     }
 
     return (
-        <div>
-            <span>Win</span>
+        <div className={styles.container}>
+            <span className={styles.heading}>Win</span>
             <Link to="/game/city" onClick={handleClick}>New Game</Link>
         </div>
     )
