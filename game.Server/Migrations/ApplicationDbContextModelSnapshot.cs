@@ -795,9 +795,6 @@ namespace game.Server.Migrations
                     b.Property<int?>("ItemInstanceId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("MaxHealth")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("EnemyId");
 
                     b.HasIndex("FloorItemId")

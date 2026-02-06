@@ -1,5 +1,4 @@
 import React from "react"
-import AssetImporter from "./SVG/AssetImporter"
 
 type DisplayProps = {
     displayWidth?: number
@@ -12,7 +11,7 @@ type DisplayProps = {
 const SVGDisplay: React.FC<DisplayProps> = ({ children, displayWidth = 10, displayHeight = 10, centerX = 0, centerY = 0, ...props }) => {
     return (
         <svg {...props} viewBox={`${centerX - displayWidth / 2} ${centerY - displayHeight / 2} ${displayWidth} ${displayHeight}`} preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-            <AssetImporter />
+            {/* <AssetImporter /> */}
             {children}
         </svg>
     )

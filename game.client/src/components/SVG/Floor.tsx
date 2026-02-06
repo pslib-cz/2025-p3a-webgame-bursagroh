@@ -1,7 +1,6 @@
-import Tile from './Tile'
-import type { TileType } from '../../types'
+import FloorTile from './tiles/floor/FloorTile'
 
-const mapPositionToTileType = (x: number, y: number): TileType => {
+const mapPositionToTileType = (x: number, y: number) => {
     if (x === 0 && y === 0) return "wall-top-left"
     if (x === 0 && y === 7) return "wall-bottom-left"
     if (x === 7 && y === 0) return "wall-top-right"
@@ -14,13 +13,13 @@ const mapPositionToTileType = (x: number, y: number): TileType => {
 }
 
 const Floor = () => {
-  return (
-    <>
-        {new Array(8).fill(null).flatMap((_, y) => new Array(8).fill(null).map((_, x) => {
-            return <Tile key={`x:${x};y:${y}`} x={x} y={y} width={1} height={1} tileType={mapPositionToTileType(x, y)} />
-        }))}
-    </>
-  )
+    return (
+        <>
+            {new Array(8).fill(null).flatMap((_, y) => new Array(8).fill(null).map((_, x) => {
+                return <FloorTile key={`x:${x};y:${y}`} x={x} y={y} width={1} height={1} floorTileType={mapPositionToTileType(x, y)} />
+            }))}
+        </>
+    )
 }
 
 export default Floor
