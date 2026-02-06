@@ -231,11 +231,16 @@ public class DungeonService : IDungeonService
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
         if (player.ScreenType == ScreenTypes.Floor && exits.Any(e => e.x == player.SubPositionX && e.y == player.SubPositionY))
         {
-            var floor = await _context.Floors.Include(f => f.Building).FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+            var floor = await _context.Floors
+                .Include(f => f.Building)
+                .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+
             if (floor?.Level == 0)
             {
-                if (floor.Building?.BuildingType == BuildingTypes.AbandonedTrap) return new BadRequestObjectResult("The door is locked!");
-
+                if (floor.Building?.BuildingType == BuildingTypes.AbandonedTrap && floor.Building.IsBossDefeated != true)
+                {
+                    return new BadRequestObjectResult("Defeat the Dragon to escape.");
+                }
                 player.ScreenType = ScreenTypes.City;
                 player.FloorId = null;
 

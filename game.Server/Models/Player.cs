@@ -25,7 +25,7 @@ public class Player
     public Floor? Floor { get; set; }
     public int Capacity { get; set; } = 10;
     public int Seed { get; set; } = new Random().Next();
-    public int Health { get; set; } = 20;
+    public int Health { get; set; } = 200;
     public int MaxHealth { get; set; } = 20;
 
     public int MineId { get; set; }
