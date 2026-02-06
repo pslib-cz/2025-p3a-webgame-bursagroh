@@ -19,6 +19,7 @@ public class Player
     public int SubPositionX { get; set; } = 0;
     public int SubPositionY { get; set; } = 0;
 
+    public DateTime LastModified { get; set; }
     public int? FloorId { get; set; }
     [ForeignKey("FloorId")]
     public Floor? Floor { get; set; }

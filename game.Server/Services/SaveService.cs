@@ -132,18 +132,18 @@ public class SaveService : ISaveService
             SELECT nb.BuildingId, [of].Level
             FROM Floors [of]
             JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
+            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY AND nb.PlayerId = {1}
+            WHERE ob.PlayerId = {0}", fromId, toId);
 
         await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO FloorItems (FloorId, PositionX, PositionY, FloorItemType, ItemInstanceId)
-            SELECT nf.FloorId, fi.PositionX, fi.PositionY, fi.FloorItemType, fi.ItemInstanceId
+            INSERT INTO FloorItems (FloorId, PositionX, PositionY, FloorItemType)
+            SELECT nf.FloorId, fi.PositionX, fi.PositionY, fi.FloorItemType
             FROM FloorItems fi
             JOIN Floors [of] ON fi.FloorId = [of].FloorId
             JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
+            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY AND nb.PlayerId = {1}
             JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
+            WHERE ob.PlayerId = {0}", fromId, toId);
 
         await _context.Database.ExecuteSqlRawAsync(@"
             INSERT INTO Enemies (FloorItemId, Health, MaxHealth, EnemyType)
@@ -152,13 +152,12 @@ public class SaveService : ISaveService
             JOIN FloorItems ofi ON e.FloorItemId = ofi.FloorItemId
             JOIN Floors [of] ON ofi.FloorId = [of].FloorId
             JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
+            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY AND nb.PlayerId = {1}
             JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
             JOIN FloorItems nfi ON nf.FloorId = nfi.FloorId 
                  AND ofi.PositionX = nfi.PositionX 
                  AND ofi.PositionY = nfi.PositionY
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1} 
-                  AND nfi.FloorItemType = 1", fromId, toId); 
+            WHERE ob.PlayerId = {0}", fromId, toId);
 
         await _context.Database.ExecuteSqlRawAsync(@"
             INSERT INTO Chests (FloorItemId)
@@ -167,13 +166,12 @@ public class SaveService : ISaveService
             JOIN FloorItems ofi ON c.FloorItemId = ofi.FloorItemId
             JOIN Floors [of] ON ofi.FloorId = [of].FloorId
             JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
+            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY AND nb.PlayerId = {1}
             JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
             JOIN FloorItems nfi ON nf.FloorId = nfi.FloorId 
                  AND ofi.PositionX = nfi.PositionX 
                  AND ofi.PositionY = nfi.PositionY
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}
-                  AND nfi.FloorItemType = 2", fromId, toId);
+            WHERE ob.PlayerId = {0}", fromId, toId);
     }
 
     private async Task SyncPlayerStatsAsync(Guid sourcePlayerId, Guid targetPlayerId)

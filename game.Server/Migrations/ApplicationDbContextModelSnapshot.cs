@@ -38,6 +38,9 @@ namespace game.Server.Migrations
                     b.Property<int>("Health")
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("MaxHealth")
                         .HasColumnType("INTEGER");
 
@@ -83,8 +86,9 @@ namespace game.Server.Migrations
                             PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
                             BankBalance = 0,
                             Capacity = 10,
-                            Health = 10,
-                            MaxHealth = 10,
+                            Health = 20,
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MaxHealth = 20,
                             MineId = 0,
                             Money = 100,
                             Name = "Seeded Player",
