@@ -7,6 +7,9 @@ import ArrowLeftDoubleIcon from '../../assets/icons/ArrowLeftDoubleIcon'
 import { useMutation } from '@tanstack/react-query'
 import { moveBankItemMutation } from '../../api/bank'
 import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import styles from './bankItem.module.css'
+import WeightIcon from '../../assets/icons/WeightIcon'
+import ConditionalDisplay from '../wrappers/ConditionalDisplay'
 
 type BankItemProps = {
     items: InventoryItemType[]
@@ -26,17 +29,20 @@ const BankItem: React.FC<BankItemProps> = ({ items }) => {
     }
 
     return (
-        <div>
+        <div className={styles.container}>
             <svg width="128" height="128" viewBox="0 0 128 128">
-                <Asset assetType={itemIdToAssetType(items[0].itemInstance.item.itemId)} />
+                <Asset assetType={itemIdToAssetType(items[0].itemInstance.item.itemId)} width={128} height={128} />
             </svg>
-            <span>{items[0].itemInstance.durability}</span>
-            {","}
-            <span>{items[0].itemInstance.item.weight}</span>
-            {","}
-            <span>{items.length}x</span>
-            <ArrowLeftIcon width={24} height={24} onClick={handleSingleMove} />
-            <ArrowLeftDoubleIcon width={24} height={24} onClick={handleMultipleMove} />
+            <ConditionalDisplay condition={items[0].itemInstance.durability !== 0}>
+                <span className={styles.durability}>{items[0].itemInstance.durability}</span>
+            </ConditionalDisplay>
+            <div className={styles.weight}>
+                <WeightIcon className={styles.weightIcon} width={24} height={24} />
+                <span className={styles.weightText}>{items[0].itemInstance.item.weight}</span>
+            </div>
+            <span className={styles.amount}>{items.length}x</span>
+            <ArrowLeftIcon className={styles.transferSingle} width={32} height={32} onClick={handleSingleMove} />
+            <ArrowLeftDoubleIcon className={styles.transferMulti} width={32} height={32} onClick={handleMultipleMove} />
         </div>
     )
 }

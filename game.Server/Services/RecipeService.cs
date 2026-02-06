@@ -48,14 +48,14 @@ public class RecipeService : IRecipeService
     {
         var recipeExists = await _context.Recipes.AnyAsync(r => r.RecipeId == recipeId);
 
-        if (!recipeExists) return new NotFoundObjectResult("Recipe not found.");
+        if (!recipeExists) return new NotFoundObjectResult("Recept nenalezen.");
 
         var activeRecipeTime = await _context.RecipeTimes
             .FirstOrDefaultAsync(rt => rt.RecipeId == recipeId
                                     && rt.PlayerId == request.PlayerId
                                     && rt.EndTime == null);
 
-        if (activeRecipeTime != null) return new ConflictObjectResult("The game is already running.");
+        if (activeRecipeTime != null) return new ConflictObjectResult("uz to bezi");
 
         RecipeTime newRecipeTime = new RecipeTime
         {
@@ -77,7 +77,7 @@ public class RecipeService : IRecipeService
             .Include(r => r.Ingrediences)
             .FirstOrDefaultAsync(r => r.RecipeId == recipeId);
 
-        if (recipe == null) return new NotFoundObjectResult("This recipeId doesn't exist.");
+        if (recipe == null) return new NotFoundObjectResult("spatny rId");
 
         List<IngredienceTypes> correctOrder = recipe.Ingrediences
             .OrderBy(i => i.Order)
@@ -91,14 +91,14 @@ public class RecipeService : IRecipeService
         bool orderIsCorrect = correctOrder.Count == playerOrder.Count &&
                               correctOrder.SequenceEqual(playerOrder);
 
-        if (!orderIsCorrect) return new BadRequestObjectResult("Incorrect order.");
+        if (!orderIsCorrect) return new BadRequestObjectResult("mas to spatne");
 
         RecipeTime? activeRecipeTime = await _context.RecipeTimes
             .Where(rt => rt.RecipeId == recipeId && rt.PlayerId == request.PlayerId)
             .OrderByDescending(rt => rt.StartTime)
             .FirstOrDefaultAsync(rt => rt.EndTime == null);
 
-        if (activeRecipeTime == null) return new NotFoundObjectResult("You cannot end a nonexisting game.");
+        if (activeRecipeTime == null) return new NotFoundObjectResult("nemuzes dat end bez startu");
 
         DateTime endTime = DateTime.UtcNow;
         activeRecipeTime.EndTime = endTime;
@@ -120,7 +120,7 @@ public class RecipeService : IRecipeService
         });
     }
 
-    public async Task<ActionResult<List<LeaderboardDto>>> GetRecipeLeaderboardAsync()
+    public async Task<ActionResult<List<RecipeTime>>> GetRecipeLeaderboardAsync()
     {
         List<RecipeTime> completedTimes = await _context.RecipeTimes
             .Where(rt => rt.EndTime > rt.StartTime)
@@ -143,21 +143,6 @@ public class RecipeService : IRecipeService
             .OrderBy(rt => rt.Duration)
             .ToList();
 
-        var leaderboardDtos = _mapper.Map<List<LeaderboardDto>>(finalLeaderboard);
-        var playerIds = leaderboardDtos.Select(d => d.PlayerId).Distinct().ToList();
-
-        var playerNames = await _context.Players
-            .Where(p => playerIds.Contains(p.PlayerId))
-            .ToDictionaryAsync(p => p.PlayerId, p => p.Name);
-
-        foreach (var dto in leaderboardDtos)
-        {
-            dto.Player = new PlayerNameDto
-            {
-                Name = playerNames.TryGetValue(dto.PlayerId, out var name) ? name : "Unknown Player"
-            };
-        }
-
-        return new OkObjectResult(leaderboardDtos);
+        return new OkObjectResult(finalLeaderboard);
     }
 }

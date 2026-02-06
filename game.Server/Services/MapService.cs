@@ -193,11 +193,11 @@ public class MapGeneratorService
         return false;
     }
 
-    private BuildingTypes DetermineBuildingType(int x, int y, Random coordRng)
+    private game.Server.Types.BuildingTypes DetermineBuildingType(int x, int y, Random coordRng)
     {
-        if (IsRoad(x, y)) return BuildingTypes.Road;
-        return coordRng.NextDouble() < 0.10 ? BuildingTypes.AbandonedTrap : BuildingTypes.Abandoned;
+        if (IsRoad(x, y)) return game.Server.Types.BuildingTypes.Road;
+        return coordRng.NextDouble() < 0.10 ? game.Server.Types.BuildingTypes.AbandonedTrap : game.Server.Types.BuildingTypes.Abandoned;
     }
 
-    private bool IsHostileBuilding(BuildingTypes type) => type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap;
+    private bool IsHostileBuilding(game.Server.Types.BuildingTypes type) => type == game.Server.Types.BuildingTypes.Abandoned || type == game.Server.Types.BuildingTypes.AbandonedTrap;
 }

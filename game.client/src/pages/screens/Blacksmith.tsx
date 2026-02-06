@@ -8,6 +8,7 @@ import styles from "./blacksmith.module.css"
 import BlueprintItem from "../../components/item/BlueprintItem"
 import Crafting from "../../components/Crafting"
 import useBlur from "../../hooks/useBlur"
+import CloseIcon from "../../assets/icons/CloseIcon"
 
 const BlacksmithScreen = () => {
     useBlur(true)
@@ -51,7 +52,7 @@ const BlacksmithScreen = () => {
                             <BlueprintItem blueprint={blueprint} key={blueprint.blueprintId} />
                         ))}
                     </div>
-                    <button className={styles.close} onClick={handleClick}>close</button>
+                    <CloseIcon className={styles.close} onClick={handleClick} width={24} height={24} />
                 </div>
             </div>
         )

@@ -15,3 +15,8 @@ export type RecipeResult = {
     duration: string
     money: number
 }
+
+export type LeaderboardEntry = {
+    recipeId: number,
+    duration: number
+}

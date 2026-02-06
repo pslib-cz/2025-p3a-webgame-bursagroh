@@ -28,7 +28,7 @@ namespace game.Server.Services
 
         public async Task<ActionResult<PlayerDto>> GeneratePlayer(GeneratePlayerRequest request)
         {
-            Player player = new Player { Name = request.Name, LastModified = DateTime.UtcNow };
+            Player player = new Player { Name = request.Name };
             var fixedBuildings = _buildingService.GetCoreBuildings(player.PlayerId);
             Mine mine = new Mine { MineId = new Random().Next(), PlayerId = player.PlayerId };
             player.MineId = mine.MineId;
@@ -68,7 +68,6 @@ namespace game.Server.Services
         public async Task<ActionResult<PlayerDto>> MovePlayerAsync(Guid id, MovePlayerRequest request)
         {
             var player = await _context.Players.Include(p => p.Floor).Include(p => p.InventoryItems).FirstOrDefaultAsync(p => p.PlayerId == id);
-            player.LastModified = DateTime.UtcNow;
             if (player == null) return new NotFoundResult();
 
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);

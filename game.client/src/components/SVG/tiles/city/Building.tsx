@@ -38,10 +38,10 @@ const Building: React.FC<BuildingProps> = ({x, y, width, height, buildingType}) 
 
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(player.playerId, x, y))
 
-    const handleClick = () => {
+    const handleClick = async () => {
         if (!validMove(player.positionX, player.positionY, x, y)) return
 
-        updatePlayerPositionAsync()
+        await updatePlayerPositionAsync()
 
         switch (buildingType) {
             case 'bank':

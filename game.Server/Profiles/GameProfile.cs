@@ -38,9 +38,6 @@ namespace game.Server.Profiles
             //recipe
             CreateMap<Recipe, RecipeDto>();
             CreateMap<Ingredience, RecipeIngredienceDto>();
-            CreateMap<Player, PlayerNameDto>();
-            CreateMap<RecipeTime, LeaderboardDto>()
-                .ForMember(dest => dest.Player, opt => opt.Ignore());
 
         }
     }

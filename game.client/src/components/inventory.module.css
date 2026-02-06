@@ -1,6 +1,10 @@
 .container {
     background-color: var(--darker);
     padding: 0 0.5rem 0.5rem 0.5rem;
+    max-height: calc(100vh - var(--navbar-height) - 1rem - 1rem);
+    box-sizing: border-box;
+    overflow: auto;
+    align-self: start;
 }
 
 .header {
@@ -25,6 +29,10 @@
 .itemContainer {
     background-color: var(--dark);
     padding: 1rem;
+    display: grid;
+    grid-template-columns: repeat(5, min-content);
+    grid-auto-rows: min-content;
+    gap: 1rem;
 }
 
 .text {

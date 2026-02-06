@@ -15,6 +15,7 @@ import BankInventoryItem from "../../components/item/BankInventoryItem"
 import { groupInventoryItems } from "../../utils/inventory"
 import BankItem from "../../components/item/BankItem"
 import useBlur from "../../hooks/useBlur"
+import SendIcon from "../../assets/icons/SendIcon"
 
 // const InventoryItem = ({ playerId, item }: { playerId: string, item: InventoryItemType }) => {
 //     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, item.inventoryItemId))
@@ -92,10 +93,10 @@ const BankScreen = () => {
                         <span className={styles.balance}>/ {player.money}</span>
                         <MoneyIcon className={styles.money} width={32} height={32} />
                     </div>
-                    <button onClick={handleTransferToBank}>Send</button>
+                    <SendIcon className={styles.sendIcon} width={32} height={32} onClick={handleTransferToBank} />
                 </div>
                 <div className={styles.transferContainer}>
-                    <button onClick={handleTransferToPlayer}>Send</button>
+                    <SendIcon className={styles.sendIconFlipped} width={32} height={32} onClick={handleTransferToPlayer} />
                     <Input type="number" placeholder="Amount" value={toPlayerAmount} onChange={(e) => setToPlayerAmount(Number.parseInt(e.target.value))} />
                     <div className={styles.transferSubContainer}>
                         <span className={styles.balance}>/ {player.bankBalance}</span>

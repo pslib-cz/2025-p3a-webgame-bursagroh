@@ -1,5 +1,4 @@
-<svg id="blacksmith" viewBox="0 0 512 512"
-    xmlns="http://www.w3.org/2000/svg">
+<svg id="blacksmith" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
     <rect width="64" height="64" fill="#282828"/>
     <rect x="64" width="64" height="64" fill="#710000"/>
     <rect x="128" width="64" height="64" fill="#710000"/>
