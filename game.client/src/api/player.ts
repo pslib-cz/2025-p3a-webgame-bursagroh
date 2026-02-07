@@ -26,9 +26,9 @@ export const getPlayerInventoryQuery = (playerId: string) =>
 export const updatePlayerPositionMutation = (playerId: string, newPositionX: number, newPositionY: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX, newPositionY, newFloorId: null }),
-        onSuccess(data) {
+        onSuccess: async (data) => {
             queryClient.setQueryData([playerId, "player"], data)
-            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
+            await queryClient.invalidateQueries({ queryKey: [playerId, "floor"], refetchType: "active" })
         },
         onError
     })
@@ -36,7 +36,7 @@ export const updatePlayerPositionMutation = (playerId: string, newPositionX: num
 export const updatePlayerFloorMutation = (playerId: string, newPositionX: number, newPositionY: number, newFloorId: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move", { playerId }, {}, { newPositionX, newPositionY, newFloorId }),
-        onSuccess(data) {
+        onSuccess: (data) => {
             queryClient.setQueryData([playerId, "player"], data)
         },
         onError
@@ -45,9 +45,9 @@ export const updatePlayerFloorMutation = (playerId: string, newPositionX: number
 export const updatePlayerScreenMutation = (playerId: string, newScreenType: ScreenType, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/move-screen", { playerId }, {}, { newScreenType }),
-        onSuccess(data) {
+        onSuccess: async (data) => {
             queryClient.setQueryData([playerId, "player"], data)
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+            await queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" })
         },
         onError
     })
@@ -55,10 +55,12 @@ export const updatePlayerScreenMutation = (playerId: string, newScreenType: Scre
 export const pickItemMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: (floorItemId: number) => api.patch("/api/Player/{playerId}/Action/pick", { playerId }, {}, { floorItemId }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "mine"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "mine"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "floor"], refetchType: "active" })
+            ])
         },
         onError
     })
@@ -66,11 +68,13 @@ export const pickItemMutation = (playerId: string, onError?: (error: Error) => v
 export const dropItemMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/drop", { playerId }, {}, { inventoryItemId }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "mine"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "mine"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "floor"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" })
+            ])
         },
         onError
     })
@@ -78,8 +82,8 @@ export const dropItemMutation = (playerId: string, onError?: (error: Error) => v
 export const equipItemMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/set-active-item", { playerId }, {}, { inventoryItemId }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" })
         },
         onError
     })
@@ -87,10 +91,12 @@ export const equipItemMutation = (playerId: string, onError?: (error: Error) => 
 export const useItemMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Player/{playerId}/Action/use", { playerId }, {}, {}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "floor"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "floor"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" })
+            ])
         },
         onError
     })

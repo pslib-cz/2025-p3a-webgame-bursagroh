@@ -14,20 +14,29 @@ type BlockProps = {
     maxHealth: number
 } & AssetProps
 
-const Block: React.FC<BlockProps> = ({x, y, width, height, blockType, health, maxHealth}) => {
+const Block: React.FC<BlockProps> = ({ x, y, width, height, blockType, health, maxHealth }) => {
     const notify = useNotification()
 
     const player = React.useContext(PlayerContext)!.player!
 
+    const lock = React.useRef(false)
+
     const { mutateAsync: mineMineBlockAsync } = useMutation(mineMineBlockMutation(player.playerId, player.mineId, x, y))
-    
-    const handleClick = () => {
+
+    const handleClick = async () => {
         if (!validMove(player.subPositionX, player.subPositionY, x, y)) {
             notify("Error", "You cannot mine that far.", 1000)
             return
         }
 
-        mineMineBlockAsync()
+        if (lock.current) return
+
+        lock.current = true
+        try {
+            await mineMineBlockAsync()
+        } finally {
+            lock.current = false
+        }
     }
 
     let breakStage = 0

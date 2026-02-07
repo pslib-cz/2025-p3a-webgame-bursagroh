@@ -28,10 +28,12 @@ export const getMineItemsQuery = (playerId: string, mineId: number) =>
 export const mineMineBlockMutation = (playerId: string, mineId: number, targetX: number, targetY: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Mine/{mineId}/Action/mine", { mineId }, {}, { targetX, targetY }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" }),
+            ])
         },
         onError,
     })
@@ -39,9 +41,11 @@ export const mineMineBlockMutation = (playerId: string, mineId: number, targetX:
 export const rentPickMutation = (playerId: string, amount: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Mine/Action/buy", {}, { playerId, amount }, {}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" }),
+            ])
         },
         onError,
     })

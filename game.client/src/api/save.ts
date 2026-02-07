@@ -12,8 +12,8 @@ export const saveMutation = (playerId: string, onSuccess: (data: API["post"]["/a
 export const loadMutation = (targetPlayerId: string, saveString: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.post("/api/Load", {}, { saveString, targetPlayerId }, {}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [targetPlayerId] })
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [targetPlayerId], refetchType: "active" })
         },
         onError
     })

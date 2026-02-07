@@ -16,9 +16,11 @@ export const getPlayerBlueprintsQuery = (playerId: string) =>
 export const buyBlueprintMutation = (playerId: string, blueprintId: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Blueprint/{blueprintId}/Action/buy", { blueprintId }, { playerId }, {}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: [playerId, "blueprint"]})
-            queryClient.invalidateQueries({queryKey: [playerId, "player"]})
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({queryKey: [playerId, "blueprint"], refetchType: "active"}),
+                queryClient.invalidateQueries({queryKey: [playerId, "player"], refetchType: "active"})
+            ])
         },
         onError
     })
@@ -26,8 +28,8 @@ export const buyBlueprintMutation = (playerId: string, blueprintId: number, onEr
 export const craftBlueprintMutation = (playerId: string, blueprintId: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Blueprint/{blueprintId}/Action/craft", { blueprintId }, { playerId }, {}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: [playerId, "inventory"]})
+        onSuccess: async() => {
+            await queryClient.invalidateQueries({queryKey: [playerId, "inventory"], refetchType: "active"})
         },
         onError
     })

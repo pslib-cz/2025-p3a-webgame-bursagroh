@@ -33,9 +33,11 @@ const reassembleIngrediences = (ingrediences: Array<IngredienceType>) => {
 export const endRecipeMutation = ( playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: ({recipeId, playerAssembly}: {recipeId: number, playerAssembly: IngredienceType[]}) => api.patch("/api/Recipe/{recipeId}/Action/end", { recipeId }, {}, { playerId, playerAssembly: reassembleIngrediences(playerAssembly) }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
-            queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: ["leaderboard"], refetchType: "active" })
+            ])
         },
         onError
     })
