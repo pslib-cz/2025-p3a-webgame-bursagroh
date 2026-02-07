@@ -12,7 +12,7 @@ const FloorTile: React.FC<FloorTileProps> = ({ x, y, width, height, floorTileTyp
     const handleMove = useMove()
 
     return (
-        <TileSelector width={width} height={height} x={x} y={y} tileType={floorTileType} onClick={() => handleMove(x, y)} />
+        <TileSelector width={width} height={height} x={x} y={y} tileType={floorTileType} onClick={() => handleMove(x, y, true)} />
     )
 }
 

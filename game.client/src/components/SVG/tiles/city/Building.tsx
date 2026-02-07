@@ -33,7 +33,7 @@ const Building: React.FC<BuildingProps> = ({x, y, width, height, buildingType}) 
     const navigate = useNavigate()
 
     const handleClick = async () => {
-        await handleMove(x, y)
+        await handleMove(x, y, false)
 
         switch (buildingType) {
             case 'bank':

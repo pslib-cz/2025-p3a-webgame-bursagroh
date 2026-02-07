@@ -14,8 +14,11 @@ const useMove = () => {
 
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(player.playerId, genericError))
 
-    const handleMove = async (newPositionX: number, newPositionY: number) => {
-        if (!validMove(player.positionX, player.positionY, newPositionX, newPositionY)) {
+    const handleMove = async (newPositionX: number, newPositionY: number, isSubMove: boolean) => {
+        const playerX = isSubMove ? player.subPositionX : player.positionX
+        const playerY = isSubMove ? player.subPositionY : player.positionY
+
+        if (!validMove(playerX, playerY, newPositionX, newPositionY)) {
             notify("Error", "You cannot move that far.", 1000)
             return
         }
