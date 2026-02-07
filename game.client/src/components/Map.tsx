@@ -7,12 +7,15 @@ import FloorSVG from './SVG/screen/FloorSVG'
 import { useMutation } from '@tanstack/react-query'
 import { dropItemMutation } from '../api/player'
 import { PlayerIdContext } from '../providers/PlayerIdProvider'
+import useNotification from '../hooks/useNotification'
 
 const Map: React.FC = () => {
+    const {genericError} = useNotification()
+    
     const mapType = React.useContext(MapContext)!.mapType
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
-    const {mutateAsync: dropItemAsync} = useMutation(dropItemMutation(playerId))
+    const {mutateAsync: dropItemAsync} = useMutation(dropItemMutation(playerId, genericError))
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()

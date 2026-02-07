@@ -16,6 +16,7 @@ import { groupInventoryItems } from "../../utils/inventory"
 import BankItem from "../../components/item/BankItem"
 import useBlur from "../../hooks/useBlur"
 import SendIcon from "../../assets/icons/SendIcon"
+import useNotification from "../../hooks/useNotification"
 
 // const InventoryItem = ({ playerId, item }: { playerId: string, item: InventoryItemType }) => {
 //     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, item.inventoryItemId))
@@ -51,14 +52,15 @@ const BankScreen = () => {
     useBlur(true)
     
     const navigate = useNavigate()
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const {genericError} = useNotification()
 
+    const playerId = React.useContext(PlayerIdContext)!.playerId!
     const player = React.useContext(PlayerContext)!.player!
     const inventory = React.useContext(InventoryContext)!.inventory!
     const bank = React.useContext(BankContext)!.bank!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
-    const { mutateAsync: moveBankMoneyAsync } = useMutation(moveBankMoneyMutation(playerId))
+    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
+    const { mutateAsync: moveBankMoneyAsync } = useMutation(moveBankMoneyMutation(playerId, genericError))
 
     const [toBankAmount, setToBankAmount] = React.useState(0)
     const [toPlayerAmount, setToPlayerAmount] = React.useState(0)

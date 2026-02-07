@@ -6,15 +6,18 @@ import { useNavigate } from 'react-router'
 import CloseIcon from '../../assets/icons/CloseIcon'
 import styles from './fountain.module.css'
 import useBlur from '../../hooks/useBlur'
+import useNotification from '../../hooks/useNotification'
 
 const FountainScreen = () => {
     useBlur(true)
 
     const navigate = useNavigate()
+    const {genericError} = useNotification()
+    
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
-    const { mutateAsync: dropItemAsync } = useMutation(dropItemMutation(playerId))
+    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
+    const { mutateAsync: dropItemAsync } = useMutation(dropItemMutation(playerId, genericError))
 
     const handleClick = async () => {
         await updatePlayerScreenAsync()

@@ -10,6 +10,7 @@ import styles from './mineSVG.module.css'
 import MineTile from '../tiles/mine/MineTile'
 import { itemIdToAssetType } from '../../../utils/item'
 import Minecard from '../tiles/mine/Minecard'
+import useNotification from '../../../hooks/useNotification'
 
 const chunkSize = 8
 const viewDistanceInChunks = 2
@@ -52,9 +53,11 @@ const DisplayMineItems = ({ mineId }: { mineId: number }) => {
 }
 
 const MineSVG = () => {
+    const {genericError} = useNotification()
+    
     const player = React.useContext(PlayerContext)!.player!
 
-    const { mutateAsync: rentPickAsync } = useMutation(rentPickMutation(player.playerId, 1))
+    const { mutateAsync: rentPickAsync } = useMutation(rentPickMutation(player.playerId, 1, genericError))
 
     const handleBuy = async () => {               
         await rentPickAsync()

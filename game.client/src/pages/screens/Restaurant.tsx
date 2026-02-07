@@ -13,20 +13,22 @@ import Asset from "../../components/SVG/Asset"
 import CloseIcon from "../../assets/icons/CloseIcon"
 import Button from "../../components/Button"
 import { LeaderboardContext } from "../../providers/game/LeaderboardProvider"
+import useNotification from "../../hooks/useNotification"
 
 const RestaurantScreen = () => {
     useBlur(true)
 
     const navigate = useNavigate()
+    const {genericError} = useNotification()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const recipes = React.useContext(RecipesContext)!.recipes!
     const leaderboard = React.useContext(LeaderboardContext)!.leaderboard!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
-    const { mutateAsync: getRandomRecipeAsync } = useMutation(getRandomRecipeMutation())
-    const { mutateAsync: startRecipeAsync } = useMutation(startRecipeMutation(playerId))
-    const { mutateAsync: endRecipeAsync } = useMutation(endRecipeMutation(playerId))
+    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
+    const { mutateAsync: getRandomRecipeAsync } = useMutation(getRandomRecipeMutation(genericError))
+    const { mutateAsync: startRecipeAsync } = useMutation(startRecipeMutation(playerId, genericError))
+    const { mutateAsync: endRecipeAsync } = useMutation(endRecipeMutation(playerId, genericError))
 
     const [isMaking, setIsMaking] = React.useState(false)
     const [currentBurgerStack, setCurrentBurgerStack] = React.useState<Array<IngredienceType>>([])
