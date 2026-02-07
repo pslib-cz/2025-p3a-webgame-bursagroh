@@ -2,6 +2,7 @@
 using game.Server.Models;
 using game.Server.Requests;
 using game.Server.Types;
+using game.Server.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
@@ -10,11 +11,13 @@ namespace game.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly MineGenerationService _mineService;
+        private readonly IErrorService _errorService;
 
-        public CityService(ApplicationDbContext context, MineGenerationService mineService)
+        public CityService(ApplicationDbContext context, MineGenerationService mineService, IErrorService errorService)
         {
             _context = context;
             _mineService = mineService;
+            _errorService = errorService;
         }
 
         public async Task HandleCityMovement(Player player, MovePlayerRequest request, Guid id)
@@ -22,7 +25,6 @@ namespace game.Server.Services
             int previousX = player.PositionX;
             int previousY = player.PositionY;
 
-            //tady
             player.PositionX = request.NewPositionX;
             player.PositionY = request.NewPositionY;
 
@@ -109,6 +111,7 @@ namespace game.Server.Services
             player.ScreenType = ScreenTypes.Mine;
 
             if (playerMine != null) _context.Mines.Remove(playerMine);
+
             playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
             _context.Mines.Add(playerMine);
 
@@ -119,9 +122,8 @@ namespace game.Server.Services
             await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
             player.FloorId = mineFloor.FloorId;
-            player.SubPositionX = 0;
-            player.SubPositionY = 0;
+            player.SubPositionX = 4;
+            player.SubPositionY = -3;
         }
-
     }
 }

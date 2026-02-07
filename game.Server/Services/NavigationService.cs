@@ -4,6 +4,7 @@ using game.Server.DTOs;
 using game.Server.Types;
 using game.Server.Models;
 using game.Server.Requests;
+using game.Server.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,14 +17,16 @@ namespace game.Server.Services
         private readonly ICityService _cityService;
         private readonly IDungeonService _dungeonService;
         private readonly IBuildingService _buildingService;
+        private readonly IErrorService _errorService;
 
-        public NavigationService(ApplicationDbContext context, IMapper mapper, ICityService cityService, IDungeonService dungeonService, IBuildingService buildingService)
+        public NavigationService(ApplicationDbContext context, IMapper mapper, ICityService cityService, IDungeonService dungeonService, IBuildingService buildingService, IErrorService errorService)
         {
             _context = context;
             _mapper = mapper;
             _cityService = cityService;
             _dungeonService = dungeonService;
             _buildingService = buildingService;
+            _errorService = errorService;
         }
 
         public async Task<ActionResult<PlayerDto>> GeneratePlayer(GeneratePlayerRequest request)
@@ -44,7 +47,8 @@ namespace game.Server.Services
         public async Task<ActionResult<PlayerDto>> GetPlayerAsync(Guid id)
         {
             var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
-            if (player == null) return new NotFoundResult();
+
+            if (player == null) return _errorService.CreateErrorResponse(404, 9001, "Player profile not found.", "Not Found");
 
             var dto = _mapper.Map<PlayerDto>(player);
             var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
@@ -58,7 +62,7 @@ namespace game.Server.Services
                 .Include(p => p.Floor)
                 .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-            if (player == null) return new NotFoundResult();
+            if (player == null) return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
 
             if (player.ScreenType == ScreenTypes.Lose)
             {
@@ -83,19 +87,26 @@ namespace game.Server.Services
 
         public async Task<ActionResult<PlayerDto>> MovePlayerAsync(Guid id, MovePlayerRequest request)
         {
-            var player = await _context.Players.Include(p => p.Floor).Include(p => p.InventoryItems).FirstOrDefaultAsync(p => p.PlayerId == id);
-            player.LastModified = DateTime.UtcNow;
-            if (player == null) return new NotFoundResult();
+            var player = await _context.Players
+                .Include(p => p.Floor)
+                .Include(p => p.InventoryItems)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
 
+            if (player == null) return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
+
+            player.LastModified = DateTime.UtcNow;
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+
             int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
             int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
 
             if ((Math.Abs(request.NewPositionX - currentX) + Math.Abs(request.NewPositionY - currentY)) != 1)
-                return new BadRequestObjectResult("Move must be exactly 1 square.");
+                return _errorService.CreateErrorResponse(400, 9002, "Invalid movement: you can only move one square at a time.", "Movement Error");
 
             if (player.ScreenType == ScreenTypes.City)
+            {
                 await _cityService.HandleCityMovement(player, request, id);
+            }
             else
             {
                 var result = await _dungeonService.HandleInternalLogic(player, playerMine, request);
@@ -103,6 +114,7 @@ namespace game.Server.Services
             }
 
             await _context.SaveChangesAsync();
+
             var dto = _mapper.Map<PlayerDto>(player);
             dto.MineId = playerMine?.MineId;
             return new OkObjectResult(dto);

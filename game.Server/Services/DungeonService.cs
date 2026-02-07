@@ -4,6 +4,7 @@ using game.Server.DTOs;
 using game.Server.Types;
 using game.Server.Models;
 using game.Server.Requests;
+using game.Server.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,11 +12,13 @@ public class DungeonService : IDungeonService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IErrorService _errorService;
 
-    public DungeonService(ApplicationDbContext context, IMapper mapper)
+    public DungeonService(ApplicationDbContext context, IMapper mapper, IErrorService errorService)
     {
         _context = context;
         _mapper = mapper;
+        _errorService = errorService;
     }
 
     public async Task<ActionResult?> HandleInternalLogic(Player player, Mine? playerMine, MovePlayerRequest request)
@@ -43,7 +46,7 @@ public class DungeonService : IDungeonService
 
     private async Task<ActionResult?> ProcessMineLogic(Player player, Mine? playerMine, MovePlayerRequest request)
     {
-        if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 0 && request.NewPositionY == 0)
+        if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 4 && request.NewPositionY == -3)
         {
             player.ScreenType = ScreenTypes.City;
             player.FloorId = null;
@@ -60,7 +63,8 @@ public class DungeonService : IDungeonService
                 .AnyAsync(mb => mb.MineLayer.MineId == playerMine.MineId &&
                                 mb.MineLayer.Depth == request.NewPositionY &&
                                 mb.Index == request.NewPositionX);
-            if (blockAtTarget) return new BadRequestObjectResult("Movement blocked by a mine block.");
+
+            if (blockAtTarget) return _errorService.CreateErrorResponse(400, 6001, "Movement blocked by a mine block.", "Path Blocked");
         }
         return null;
     }
@@ -104,7 +108,6 @@ public class DungeonService : IDungeonService
                 if (move.x < 0 || move.x > 7 || move.y < 0 || move.y > 7) continue;
 
                 bool isPlayer = move.x == player.SubPositionX && move.y == player.SubPositionY;
-
                 bool isExit = exits.Any(e => e.x == move.x && e.y == move.y);
                 bool isStairs = stairs.Any(s => s.Item1 == move.x && s.Item2 == move.y);
                 bool isObstacle = obstacles.Any(o => o.PositionX == move.x && o.PositionY == move.y);
@@ -164,8 +167,7 @@ public class DungeonService : IDungeonService
         int[] lootIds = { 10, 20, 30, 11, 21, 31, 12, 22, 32, 40, 41, 42 };
         int scatterCount = random.Next(2, 6);
 
-        var floor = await _context.Floors.AsNoTracking()
-            .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+        var floor = await _context.Floors.AsNoTracking().FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
         if (floor == null) return;
 
         bool isEven = floor.Level % 2 == 0;
@@ -182,9 +184,7 @@ public class DungeonService : IDungeonService
                 if (exits.Any(e => e.x == x && e.y == y)) continue;
                 if ((x == stairsUp.x && y == stairsUp.y) || (x == stairsDown.x && y == stairsDown.y)) continue;
 
-                bool isOccupied = await _context.FloorItems.AnyAsync(f =>
-                    f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
-
+                bool isOccupied = await _context.FloorItems.AnyAsync(f => f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
                 if (!isOccupied) emptyTiles.Add((x, y));
             }
         }
@@ -220,16 +220,15 @@ public class DungeonService : IDungeonService
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
         if (player.ScreenType == ScreenTypes.Floor && exits.Any(e => e.x == player.SubPositionX && e.y == player.SubPositionY))
         {
-            var floor = await _context.Floors
-                .Include(f => f.Building)
-                .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+            var floor = await _context.Floors.Include(f => f.Building).FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
 
             if (floor?.Level == 0)
             {
                 if (floor.Building?.BuildingType == BuildingTypes.AbandonedTrap && floor.Building.IsBossDefeated != true)
                 {
-                    return new BadRequestObjectResult("Defeat the Dragon to escape.");
+                    return _errorService.CreateErrorResponse(400, 6002, "Defeat the Dragon to escape.", "Locked Exit");
                 }
+
                 player.ScreenType = ScreenTypes.City;
                 player.FloorId = null;
 

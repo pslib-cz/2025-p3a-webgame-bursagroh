@@ -1,10 +1,11 @@
 using game.Server.Data;
+using game.Server.Interfaces;
 using game.Server.Services;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.HttpOverrides; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+builder.Services.AddScoped<IErrorService, ErrorService>();
 builder.Services.AddScoped<MineGenerationService>();
 builder.Services.AddScoped<ISaveService, SaveService>();
 builder.Services.AddScoped<IBankService, BankService>();
@@ -50,6 +52,9 @@ builder.Services.AddCors(options => {
 
 var app = builder.Build();
 
+
+app.UseMiddleware<game.Server.Middleware.ExceptionMiddleware>();
+
 app.UseForwardedHeaders();
 
 app.UseDefaultFiles();
@@ -58,7 +63,7 @@ app.MapStaticAssets();
 app.MapOpenApi();
 app.MapScalarApiReference();
 
-app.UseRouting(); 
+app.UseRouting();
 
 app.UseCors("AllowFrontend");
 
