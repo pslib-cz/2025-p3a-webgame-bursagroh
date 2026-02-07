@@ -71,32 +71,52 @@ public class DungeonService : IDungeonService
             .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType == FloorItemType.Enemy)
             .ToListAsync();
 
-        var currentOccupied = await _context.FloorItems
-            .Where(fi => fi.FloorId == player.FloorId)
+        var obstacles = await _context.FloorItems
+            .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType != FloorItemType.Enemy)
             .Select(fi => new { fi.PositionX, fi.PositionY })
             .ToListAsync();
 
+        var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
         var stairs = new[] { (2, 2), (5, 2) };
 
         foreach (var enemy in enemiesOnFloor)
         {
-            int nextX = enemy.PositionX;
-            int nextY = enemy.PositionY;
             int diffX = player.SubPositionX - enemy.PositionX;
             int diffY = player.SubPositionY - enemy.PositionY;
 
-            if (Math.Abs(diffX) > Math.Abs(diffY)) nextX += Math.Sign(diffX);
-            else nextY += Math.Sign(diffY);
+            if (diffX == 0 && diffY == 0) continue;
 
-            if (!stairs.Any(s => s.Item1 == nextX && s.Item2 == nextY) &&
-                !(nextX == player.SubPositionX && nextY == player.SubPositionY) &&
-                !currentOccupied.Any(p => p.PositionX == nextX && p.PositionY == nextY))
+            var movesToTry = new List<(int x, int y)>();
+            if (Math.Abs(diffX) >= Math.Abs(diffY))
             {
-                currentOccupied.RemoveAll(p => p.PositionX == enemy.PositionX && p.PositionY == enemy.PositionY);
-                enemy.PositionX = nextX;
-                enemy.PositionY = nextY;
-                currentOccupied.Add(new { PositionX = nextX, PositionY = nextY });
-                _context.Entry(enemy).State = EntityState.Modified;
+                movesToTry.Add((enemy.PositionX + Math.Sign(diffX), enemy.PositionY));
+                movesToTry.Add((enemy.PositionX, enemy.PositionY + Math.Sign(diffY)));
+            }
+            else
+            {
+                movesToTry.Add((enemy.PositionX, enemy.PositionY + Math.Sign(diffY)));
+                movesToTry.Add((enemy.PositionX + Math.Sign(diffX), enemy.PositionY));
+            }
+
+            foreach (var move in movesToTry)
+            {
+                if (move.x == enemy.PositionX && move.y == enemy.PositionY) continue;
+                if (move.x < 0 || move.x > 7 || move.y < 0 || move.y > 7) continue;
+
+                bool isPlayer = move.x == player.SubPositionX && move.y == player.SubPositionY;
+
+                bool isExit = exits.Any(e => e.x == move.x && e.y == move.y);
+                bool isStairs = stairs.Any(s => s.Item1 == move.x && s.Item2 == move.y);
+                bool isObstacle = obstacles.Any(o => o.PositionX == move.x && o.PositionY == move.y);
+                bool isOtherEnemy = enemiesOnFloor.Any(e => e.FloorItemId != enemy.FloorItemId && e.PositionX == move.x && e.PositionY == move.y);
+
+                if (!isPlayer && !isExit && !isStairs && !isObstacle && !isOtherEnemy)
+                {
+                    enemy.PositionX = move.x;
+                    enemy.PositionY = move.y;
+                    _context.Entry(enemy).State = EntityState.Modified;
+                    break;
+                }
             }
         }
     }
@@ -144,12 +164,27 @@ public class DungeonService : IDungeonService
         int[] lootIds = { 10, 20, 30, 11, 21, 31, 12, 22, 32, 40, 41, 42 };
         int scatterCount = random.Next(2, 6);
 
+        var floor = await _context.Floors.AsNoTracking()
+            .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+        if (floor == null) return;
+
+        bool isEven = floor.Level % 2 == 0;
+        var stairsUp = (x: isEven ? 5 : 2, y: 2);
+        var stairsDown = (x: isEven ? 2 : 5, y: 2);
+        var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
+
         var emptyTiles = new List<(int x, int y)>();
         for (int x = floorItem.PositionX - 1; x <= floorItem.PositionX + 1; x++)
         {
             for (int y = floorItem.PositionY - 1; y <= floorItem.PositionY + 1; y++)
             {
-                bool isOccupied = await _context.FloorItems.AnyAsync(f => f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
+                if (x < 0 || x > 7 || y < 0 || y > 7) continue;
+                if (exits.Any(e => e.x == x && e.y == y)) continue;
+                if ((x == stairsUp.x && y == stairsUp.y) || (x == stairsDown.x && y == stairsDown.y)) continue;
+
+                bool isOccupied = await _context.FloorItems.AnyAsync(f =>
+                    f.FloorId == player.FloorId && f.PositionX == x && f.PositionY == y);
+
                 if (!isOccupied) emptyTiles.Add((x, y));
             }
         }
@@ -185,11 +220,16 @@ public class DungeonService : IDungeonService
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
         if (player.ScreenType == ScreenTypes.Floor && exits.Any(e => e.x == player.SubPositionX && e.y == player.SubPositionY))
         {
-            var floor = await _context.Floors.Include(f => f.Building).FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+            var floor = await _context.Floors
+                .Include(f => f.Building)
+                .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+
             if (floor?.Level == 0)
             {
-                if (floor.Building?.BuildingType == BuildingTypes.AbandonedTrap) return new BadRequestObjectResult("The door is locked!");
-
+                if (floor.Building?.BuildingType == BuildingTypes.AbandonedTrap && floor.Building.IsBossDefeated != true)
+                {
+                    return new BadRequestObjectResult("Defeat the Dragon to escape.");
+                }
                 player.ScreenType = ScreenTypes.City;
                 player.FloorId = null;
 

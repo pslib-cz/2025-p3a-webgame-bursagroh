@@ -28,7 +28,7 @@ namespace game.Server.Services
 
         public async Task<ActionResult<PlayerDto>> GeneratePlayer(GeneratePlayerRequest request)
         {
-            Player player = new Player { Name = request.Name };
+            Player player = new Player { Name = request.Name, LastModified = DateTime.UtcNow };
             var fixedBuildings = _buildingService.GetCoreBuildings(player.PlayerId);
             Mine mine = new Mine { MineId = new Random().Next(), PlayerId = player.PlayerId };
             player.MineId = mine.MineId;
@@ -54,20 +54,37 @@ namespace game.Server.Services
 
         public async Task<ActionResult<PlayerDto>> MoveScreenAsync(Guid id, MoveScreenRequest request)
         {
-            var player = await _context.Players.Include(p => p.Floor).FirstOrDefaultAsync(p => p.PlayerId == id);
+            var player = await _context.Players
+                .Include(p => p.Floor)
+                .FirstOrDefaultAsync(p => p.PlayerId == id);
+
             if (player == null) return new NotFoundResult();
 
+            if (player.ScreenType == ScreenTypes.Lose)
+            {
+                player.Health = player.MaxHealth;
+                player.PositionX = 0;
+                player.PositionY = 0;
+                player.SubPositionX = 0;
+                player.SubPositionY = 0;
+                player.FloorId = null;
+            }
+
             player.ScreenType = request.NewScreenType;
+
             await _context.SaveChangesAsync();
 
             var dto = _mapper.Map<PlayerDto>(player);
-            dto.MineId = (await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id))?.MineId;
+            dto.MineId = (await _context.Mines.AsNoTracking()
+                .FirstOrDefaultAsync(m => m.PlayerId == id))?.MineId;
+
             return new OkObjectResult(dto);
         }
 
         public async Task<ActionResult<PlayerDto>> MovePlayerAsync(Guid id, MovePlayerRequest request)
         {
             var player = await _context.Players.Include(p => p.Floor).Include(p => p.InventoryItems).FirstOrDefaultAsync(p => p.PlayerId == id);
+            player.LastModified = DateTime.UtcNow;
             if (player == null) return new NotFoundResult();
 
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
