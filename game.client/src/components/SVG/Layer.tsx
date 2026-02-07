@@ -59,7 +59,7 @@ const Layer: React.FC<LayerProps> = ({ depth, size, mineId }) => {
                         }
 
                         return (
-                            <Block key={`${layer.depth}-${index}`} width={1} height={1} x={index} y={layer.depth} blockType={mapBlockTypeToTileType(block.block.blockType)} />
+                            <Block key={`${layer.depth}-${index}`} width={1} height={1} x={index} y={layer.depth} blockType={mapBlockTypeToTileType(block.block.blockType)} health={block.health} maxHealth={5} />
                         )
                     })
                 })}

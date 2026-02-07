@@ -31,6 +31,7 @@ export const mineMineBlockMutation = (playerId: string, mineId: number, targetX:
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },
         onError,
     })

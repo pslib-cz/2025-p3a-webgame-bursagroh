@@ -227,5 +227,13 @@ export const assetTypeToHref = (assetType: AssetType | undefined): string => {
             return "/mine/rail_straight.svg#rail_vertical"
         case "rail_corner":
             return "/mine/rail_corner.svg#rail_corner"
+        case "break_pattern_1":
+            return "/mine/break_pattern/1.svg#break_pattern_1"
+        case "break_pattern_2":
+            return "/mine/break_pattern/2.svg#break_pattern_2"
+        case "break_pattern_3":
+            return "/mine/break_pattern/3.svg#break_pattern_3"
+        case "break_pattern_4":
+            return "/mine/break_pattern/4.svg#break_pattern_4"
     }
 }
