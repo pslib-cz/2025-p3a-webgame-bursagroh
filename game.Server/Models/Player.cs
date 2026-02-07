@@ -19,13 +19,14 @@ public class Player
     public int SubPositionX { get; set; } = 0;
     public int SubPositionY { get; set; } = 0;
 
+    public DateTime LastModified { get; set; }
     public int? FloorId { get; set; }
     [ForeignKey("FloorId")]
     public Floor? Floor { get; set; }
     public int Capacity { get; set; } = 10;
     public int Seed { get; set; } = new Random().Next();
-    public int Health { get; set; } = 10;
-    public int MaxHealth { get; set; } = 10;
+    public int Health { get; set; } = 2;
+    public int MaxHealth { get; set; } = 20;
 
     public int MineId { get; set; }
 

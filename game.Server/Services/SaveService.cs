@@ -5,6 +5,8 @@ using game.Server.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+#pragma warning disable CS8620 
+#pragma warning disable CS8602 
 public class SaveService : ISaveService
 {
     private readonly ApplicationDbContext _context;
@@ -123,55 +125,90 @@ public class SaveService : ISaveService
     private async Task TransferWorldDataAsync(Guid fromId, Guid toId)
     {
         await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO Buildings (BuildingType, Height, IsBossDefeated, PlayerId, PositionX, PositionY, ReachedHeight)
-            SELECT BuildingType, Height, IsBossDefeated, {1}, PositionX, PositionY, ReachedHeight
-            FROM Buildings WHERE PlayerId = {0}", fromId, toId);
+        INSERT INTO Buildings (BuildingType, Height, IsBossDefeated, PlayerId, PositionX, PositionY, ReachedHeight)
+        SELECT BuildingType, Height, IsBossDefeated, {1}, PositionX, PositionY, ReachedHeight
+        FROM Buildings ob WHERE ob.PlayerId = {0}
+        AND NOT EXISTS (SELECT 1 FROM Buildings nb WHERE nb.PlayerId = {1} AND nb.PositionX = ob.PositionX AND nb.PositionY = ob.PositionY)", fromId, toId);
 
         await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO Floors (BuildingId, Level)
-            SELECT nb.BuildingId, [of].Level
-            FROM Floors [of]
-            JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
+        INSERT INTO Floors (BuildingId, Level)
+        SELECT nb.BuildingId, [of].Level
+        FROM Floors [of]
+        JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
+        JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY AND nb.PlayerId = {1}
+        WHERE ob.PlayerId = {0}
+        AND NOT EXISTS (SELECT 1 FROM Floors nf WHERE nf.BuildingId = nb.BuildingId AND nf.Level = [of].Level)", fromId, toId);
 
-        await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO FloorItems (FloorId, PositionX, PositionY, FloorItemType)
-            SELECT nf.FloorId, fi.PositionX, fi.PositionY, fi.FloorItemType
-            FROM FloorItems fi
-            JOIN Floors [of] ON fi.FloorId = [of].FloorId
-            JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
-            JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
 
-        await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO Enemies (FloorItemId, Health, MaxHealth, EnemyType)
-            SELECT nfi.FloorItemId, e.Health, e.MaxHealth, e.EnemyType
-            FROM Enemies e
-            JOIN FloorItems ofi ON e.FloorItemId = ofi.FloorItemId
-            JOIN Floors [of] ON ofi.FloorId = [of].FloorId
-            JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
-            JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
-            JOIN FloorItems nfi ON nf.FloorId = nfi.FloorId 
-                 AND ofi.PositionX = nfi.PositionX 
-                 AND ofi.PositionY = nfi.PositionY
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
+        var sourceData = await _context.Floors
+            .Include(f => f.Building)
+            .Include(f => f.FloorItems).ThenInclude(fi => fi.Enemy)
+            .Include(f => f.FloorItems).ThenInclude(fi => fi.Chest)
+            .Include(f => f.FloorItems).ThenInclude(fi => fi.ItemInstance)
+            .Where(f => f.Building.PlayerId == fromId)
+            .AsNoTracking()
+            .ToListAsync();
 
-        await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO Chests (FloorItemId)
-            SELECT nfi.FloorItemId
-            FROM Chests c
-            JOIN FloorItems ofi ON c.FloorItemId = ofi.FloorItemId
-            JOIN Floors [of] ON ofi.FloorId = [of].FloorId
-            JOIN Buildings ob ON [of].BuildingId = ob.BuildingId
-            JOIN Buildings nb ON ob.PositionX = nb.PositionX AND ob.PositionY = nb.PositionY
-            JOIN Floors nf ON nb.BuildingId = nf.BuildingId AND [of].Level = nf.Level
-            JOIN FloorItems nfi ON nf.FloorId = nfi.FloorId 
-                 AND ofi.PositionX = nfi.PositionX 
-                 AND ofi.PositionY = nfi.PositionY
-            WHERE ob.PlayerId = {0} AND nb.PlayerId = {1}", fromId, toId);
+        var targetFloors = await _context.Floors
+            .Include(f => f.Building)
+            .Where(f => f.Building.PlayerId == toId)
+            .ToListAsync();
+
+        foreach (var oldFloor in sourceData)
+        {
+            var newFloor = targetFloors.FirstOrDefault(f =>
+                f.Level == oldFloor.Level &&
+                f.Building.PositionX == oldFloor.Building.PositionX &&
+                f.Building.PositionY == oldFloor.Building.PositionY);
+
+            if (newFloor == null) continue;
+
+            foreach (var oldFi in oldFloor.FloorItems)
+            {
+                bool alreadyExists = await _context.FloorItems.AnyAsync(fi =>
+                    fi.FloorId == newFloor.FloorId &&
+                    fi.PositionX == oldFi.PositionX &&
+                    fi.PositionY == oldFi.PositionY);
+
+                if (alreadyExists) continue;
+
+                var newFi = new FloorItem
+                {
+                    FloorId = newFloor.FloorId,
+                    PositionX = oldFi.PositionX,
+                    PositionY = oldFi.PositionY,
+                    FloorItemType = oldFi.FloorItemType
+                };
+
+                if (oldFi.Enemy != null)
+                {
+                    newFi.Enemy = new Enemy
+                    {
+                        Health = oldFi.Enemy.Health,
+                        MaxHealth = oldFi.Enemy.MaxHealth,
+                        EnemyType = oldFi.Enemy.EnemyType
+                    };
+                }
+
+                if (oldFi.Chest != null)
+                {
+                    newFi.Chest = new Chest();
+                }
+
+                if (oldFi.ItemInstance != null)
+                {
+                    newFi.ItemInstance = new ItemInstance
+                    {
+                        ItemId = oldFi.ItemInstance.ItemId,
+                        Durability = oldFi.ItemInstance.Durability
+                    };
+                }
+
+                _context.FloorItems.Add(newFi);
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     private async Task SyncPlayerStatsAsync(Guid sourcePlayerId, Guid targetPlayerId)
