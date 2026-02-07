@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260207115747_fdsgfd")]
-    partial class fdsgfd
+    [Migration("20260207165144_rebase")]
+    partial class rebase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -89,7 +89,7 @@ namespace game.Server.Migrations
                             PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
                             BankBalance = 0,
                             Capacity = 10,
-                            Health = 20,
+                            Health = 2,
                             LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             MaxHealth = 20,
                             MineId = 0,

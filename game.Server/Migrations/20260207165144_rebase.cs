@@ -424,6 +424,7 @@ namespace game.Server.Migrations
                     PositionY = table.Column<int>(type: "INTEGER", nullable: false),
                     SubPositionX = table.Column<int>(type: "INTEGER", nullable: false),
                     SubPositionY = table.Column<int>(type: "INTEGER", nullable: false),
+                    LastModified = table.Column<DateTime>(type: "TEXT", nullable: false),
                     FloorId = table.Column<int>(type: "INTEGER", nullable: true),
                     Capacity = table.Column<int>(type: "INTEGER", nullable: false),
                     Seed = table.Column<int>(type: "INTEGER", nullable: false),
@@ -499,8 +500,8 @@ namespace game.Server.Migrations
 
             migrationBuilder.InsertData(
                 table: "Players",
-                columns: new[] { "PlayerId", "ActiveInventoryItemId", "BankBalance", "Capacity", "FloorId", "Health", "MaxHealth", "MineId", "Money", "Name", "PositionX", "PositionY", "ScreenType", "Seed", "SubPositionX", "SubPositionY" },
-                values: new object[] { new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), null, 0, 10, null, 10, 10, 0, 100, "Seeded Player", 0, 0, 0, 252, 0, 0 });
+                columns: new[] { "PlayerId", "ActiveInventoryItemId", "BankBalance", "Capacity", "FloorId", "Health", "LastModified", "MaxHealth", "MineId", "Money", "Name", "PositionX", "PositionY", "ScreenType", "Seed", "SubPositionX", "SubPositionY" },
+                values: new object[] { new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), null, 0, 10, null, 2, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 20, 0, 100, "Seeded Player", 0, 0, 0, 252, 0, 0 });
 
             migrationBuilder.InsertData(
                 table: "RecipeTimes",

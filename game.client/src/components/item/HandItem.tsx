@@ -4,28 +4,23 @@ import Asset from '../SVG/Asset'
 import { itemIdToAssetType } from '../../utils/item'
 import ConditionalDisplay from '../wrappers/ConditionalDisplay'
 import styles from './handItem.module.css'
-import { useMutation } from '@tanstack/react-query'
-import { useItemMutation } from '../../api/player'
-import { PlayerContext } from '../../providers/game/PlayerProvider'
+import useUse from '../../hooks/useUse'
 
 type HandItemProps = {
     item: InventoryItem
 }
 
 const HandItem: React.FC<HandItemProps> = ({ item }) => {
-    const player = React.useContext(PlayerContext)!.player!
-
-    const { mutateAsync: useItemAsync } = useMutation(useItemMutation(player.playerId))
+    const handleUse = useUse()
 
     const handleOnDragStart = (event: React.DragEvent<HTMLDivElement>) => {
         event.dataTransfer.setData("text/plain", item.inventoryItemId.toString())
     }
 
-    const handleClick = () => {
+    const handleClick = async () => {
         if (item.itemInstance.item.itemType !== "Potion") return
 
-        // eslint-disable-next-line react-hooks/rules-of-hooks
-        useItemAsync()
+        await handleUse()
     }
 
     return (

@@ -44,7 +44,7 @@ const DisplayMineItems = ({ mineId }: { mineId: number }) => {
         return (
             <>
                 {mineItems.data.map((item) => (
-                    <Asset key={`mineItem:${item.floorItemId}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} />
+                    <Asset key={`mineItem:${item.floorItemId}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} pointerEvents="none" />
                 ))}
             </>
         )
