@@ -60,4 +60,4 @@ type ItemAssetType =
 
 type BurgerAssetType = "bun_up" | "bun_down" | "meat" | "tomato" | "salad" | "bacon" | "sauce" | "cheese"
 
-export type AssetType = "player" | "table_left" | "table_right" | "chest" | "minecard" | "rail_straight" | "rail_corner" | BuildingAssetType | BlockAssetType | FloorAssetType | EnemyAssetType | ItemAssetType | BurgerAssetType
+export type AssetType = "player" | "table_left" | "table_right" | "chest" | "minecard" | "rail_horizontal" | "rail_vertical" | "rail_corner" | BuildingAssetType | BlockAssetType | FloorAssetType | EnemyAssetType | ItemAssetType | BurgerAssetType

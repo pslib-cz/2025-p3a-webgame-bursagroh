@@ -30,11 +30,26 @@ const FightScreen = () => {
 
     const { mutateAsync: useItemAsync } = useMutation(useItemMutation(player.playerId))
 
-    const enemy = floor.floorItems.filter(item => item.floorItemType === "Enemy").filter(enemy => enemy.positionX === player.subPositionX && enemy.positionY === player.subPositionY)[0]
+    const enemies = floor.floorItems.filter(item => item.floorItemType === "Enemy").filter(enemy => enemy.positionX === player.subPositionX && enemy.positionY === player.subPositionY)
+    const enemy = enemies.length > 0 ? enemies[0] : null
 
     const handleClick = () => {
         // eslint-disable-next-line react-hooks/rules-of-hooks
         useItemAsync()
+    }
+
+    if (!enemy) {
+        return (
+            <div className={styles.container}>
+                <div className={styles.entityContainer}>
+                    <svg width={512} height={512} viewBox="0 0 512 512">
+                        <Asset assetType="player" x={0} y={0} width={512} height={512} />
+                    </svg>
+                    <span className={styles.entityText}>{player.health} / {player.maxHealth}</span>
+                </div>
+                <div className={styles.entityContainer} />
+            </div>
+        )
     }
     
     return (

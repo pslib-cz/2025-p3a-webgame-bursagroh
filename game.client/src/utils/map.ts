@@ -14,3 +14,10 @@ export const getChunkList = (playerPositionX: number, playerPositionY: number, h
 
     return new Array(height).fill(0).flatMap((_, yIndex) => new Array(width).fill(0).map((_, xIndex) => {return {x: xFrom + xIndex * chunkSize, y: yFrom + yIndex * chunkSize}}))
 }
+
+export const getChunkCoords = (positionX: number, positionY: number, chunkSize: number): ChunkCoords => {
+    return {
+        x: positionX - (positionX % chunkSize),
+        y: positionY - (positionY % chunkSize)
+    }
+}

@@ -73,8 +73,33 @@ const MineSVG = () => {
 
     return (
         <SVGDisplay className={styles.mine} centerX={player.subPositionX} centerY={player.subPositionY}>
+            <Asset assetType='empty' x={1} y={-3} width={1} height={1} />
+            <Asset assetType='empty' x={2} y={-3} width={1} height={1} />
+
+            <Asset assetType='empty' x={4} y={-3} width={1} height={1} />
+            <Asset assetType='empty' x={5} y={-3} width={1} height={1} />
+            <Asset assetType='empty' x={6} y={-3} width={1} height={1} />
+            <Asset assetType='empty' x={7} y={-3} width={1} height={1} />
+            <Asset assetType='empty' x={7} y={-4} width={1} height={1} />
+            <Asset assetType='empty' x={7} y={-5} width={1} height={1} />
+            <Asset assetType='empty' x={7} y={-6} width={1} height={1} />
+            <Asset assetType='empty' x={7} y={-7} width={1} height={1} />
+            <Asset assetType='empty' x={7} y={-8} width={1} height={1} />
+
             <Asset assetType='table_left' x={1} y={-3} width={1} height={1} onClick={handleLeave} />
             <Asset assetType='table_right' x={2} y={-3} width={1} height={1} onClick={handleBuy} />
+
+            <Asset assetType='rail_horizontal' x={4} y={-3} width={1} height={1} />
+            <Asset assetType='rail_horizontal' x={5} y={-3} width={1} height={1} />
+            <Asset assetType='rail_horizontal' x={6} y={-3} width={1} height={1} />
+            <Asset assetType='rail_corner' x={7} y={-3} width={1} height={1} />
+            <Asset assetType='rail_vertical' x={7} y={-4} width={1} height={1} />
+            <Asset assetType='rail_vertical' x={7} y={-5} width={1} height={1} />
+            <Asset assetType='rail_vertical' x={7} y={-6} width={1} height={1} />
+            <Asset assetType='rail_vertical' x={7} y={-7} width={1} height={1} />
+            <Asset assetType='rail_vertical' x={7} y={-8} width={1} height={1} />
+            
+            <Asset assetType='minecard' x={4} y={-3} width={1} height={1} onClick={handleLeave} />
 
             <MineTile x={0} y={-1} width={1} height={1} mineTileType="empty" />
             <MineTile x={1} y={-1} width={1} height={1} mineTileType="empty" />

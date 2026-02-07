@@ -31,7 +31,7 @@ const FloorSVG = () => {
 
     return (
         <SVGDisplay className={styles.floor} centerX={player.subPositionX} centerY={player.subPositionY}>
-            <Floor />
+            <Floor positionX={player.positionX} positionY={player.positionY} level={floor.level} />
             {floor.floorItems.map((item) => {
                 if (item.floorItemType === "Stair") {
                     return (

@@ -18,9 +18,9 @@ const LoadSaveScreen = () => {
     const saveString = useParams().saveString!
 
     const { saves, save } = React.useContext(SaveContext)!
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
+    const playerId = React.useContext(PlayerIdContext)!
 
-    const { mutateAsync: loadAsync } = useMutation(loadMutation(playerId, saveString))
+    const { mutateAsync: loadAsync } = useMutation(loadMutation(playerId.playerId!, saveString))
 
     const isAutosave = saves.autosaves.some(save => save.saveString === saveString)
     const isSave = saves.saves.some(save => save.saveString === saveString)
@@ -38,16 +38,20 @@ const LoadSaveScreen = () => {
         await save()
         await loadAsync()
 
-        await queryClient.refetchQueries({ queryKey: [playerId, "player"] })
-        const player = queryClient.getQueryData(getPlayerQuery(playerId).queryKey)!
+        await queryClient.refetchQueries({ queryKey: [playerId.playerId, "player"] })
+        const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
         navigate(screenTypeToURL(player.screenType))
     }
 
     const handleJustLoad = async () => {
+        if (!playerId.playerId) {
+            await playerId.generatePlayerIdAsync()
+        }
+
         await loadAsync()
         
-        await queryClient.refetchQueries({ queryKey: [playerId, "player"] })
-        const player = queryClient.getQueryData(getPlayerQuery(playerId).queryKey)!
+        await queryClient.refetchQueries({ queryKey: [playerId.playerId, "player"] })
+        const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
         navigate(screenTypeToURL(player.screenType))
     }
 
@@ -62,7 +66,7 @@ const LoadSaveScreen = () => {
                             <span className={styles.saveText}>{displaySaveString}</span>
                         </div>
                         <div className={styles.buttonContainer}>
-                            <Button onClick={handleSaveAndLoad}>Save and Load</Button>
+                            <Button onClick={handleSaveAndLoad} disabled={playerId.playerId === null}>Save and Load</Button>
                             <Button onClick={handleJustLoad}>Just Load</Button>
                         </div>
                     </div>

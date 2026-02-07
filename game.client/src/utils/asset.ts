@@ -221,8 +221,10 @@ export const assetTypeToHref = (assetType: AssetType | undefined): string => {
             return "/mine/unobtainium_ore.svg#unobtainium_ore"
         case "minecard":
             return "/mine/minecard.svg#minecard"
-        case "rail_straight":
-            return "/mine/rail_straight.svg#rail_straight"
+        case "rail_horizontal":
+            return "/mine/rail_straight.svg#rail_horizontal"
+        case "rail_vertical":
+            return "/mine/rail_straight.svg#rail_vertical"
         case "rail_corner":
             return "/mine/rail_corner.svg#rail_corner"
     }

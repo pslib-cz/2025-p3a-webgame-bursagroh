@@ -11,7 +11,7 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260206160429_rebase")]
+    [Migration("20260207123432_rebase")]
     partial class rebase
     {
         /// <inheritdoc />

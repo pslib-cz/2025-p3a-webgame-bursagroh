@@ -15,8 +15,6 @@ const Root = () => {
     const player = React.useContext(PlayerContext)!
     const save = React.useContext(SaveContext)!.save
 
-    
-    
     const handleClick = () => {
         playerId.generatePlayerIdAsync()
     }
@@ -32,7 +30,7 @@ const Root = () => {
                 <div className={styles.linkContainer}>
                     <Link to={screenTypeToURL(player.player?.screenType ?? "City")} disabled={playerId.playerId === null}>Continue</Link>
                     <Link to="/game/city" onClick={handleClick}>New Game</Link>
-                    <Link to="/save" onClick={handleSave}>Save</Link>
+                    <Link to="/save" onClick={handleSave} disabled={playerId.playerId === null}>Save</Link>
                     <Link to="/load">Load</Link>
                     <Link to="/settings">Settings</Link>
                 </div>
