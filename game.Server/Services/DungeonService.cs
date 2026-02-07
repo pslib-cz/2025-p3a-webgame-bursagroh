@@ -252,6 +252,8 @@ public class DungeonService : IDungeonService
         var floor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
         if (floor == null) return;
 
+        if (player.ScreenType == ScreenTypes.Mine) { return; }
+
         bool isEven = floor.Level % 2 == 0;
         if (player.SubPositionX == (isEven ? 5 : 2) && player.SubPositionY == 2)
         {
