@@ -25,20 +25,22 @@ export const getMineItemsQuery = (playerId: string, mineId: number) =>
         queryFn: () => api.get("/api/Mine/{mineId}/Items", { mineId }, {}),
     })
 
-export const mineMineBlockMutation = (playerId: string, mineId: number, targetX: number, targetY: number) =>
+export const mineMineBlockMutation = (playerId: string, mineId: number, targetX: number, targetY: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Mine/{mineId}/Action/mine", { mineId }, {}, { targetX, targetY }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
         },
+        onError,
     })
 
-export const rentPickMutation = (playerId: string, amount: number) =>
+export const rentPickMutation = (playerId: string, amount: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Mine/Action/buy", {}, { playerId, amount }, {}),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
             queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
         },
+        onError,
     })

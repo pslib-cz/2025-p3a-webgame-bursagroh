@@ -6,11 +6,10 @@ import { PlayerIdContext } from '../../../providers/PlayerIdProvider'
 import { getMineItemsQuery, rentPickMutation } from '../../../api/mine'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { PlayerContext } from '../../../providers/game/PlayerProvider'
-import { updatePlayerScreenMutation } from '../../../api/player'
-import { useNavigate } from 'react-router'
 import styles from './mineSVG.module.css'
 import MineTile from '../tiles/mine/MineTile'
 import { itemIdToAssetType } from '../../../utils/item'
+import Minecard from '../tiles/mine/Minecard'
 
 const chunkSize = 8
 const viewDistanceInChunks = 2
@@ -53,19 +52,11 @@ const DisplayMineItems = ({ mineId }: { mineId: number }) => {
 }
 
 const MineSVG = () => {
-    const navigate = useNavigate()
-
     const player = React.useContext(PlayerContext)!.player!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(player.playerId, "City"))
     const { mutateAsync: rentPickAsync } = useMutation(rentPickMutation(player.playerId, 1))
 
-    const handleLeave = async () => {
-        await updatePlayerScreenAsync()
-        navigate("/game/city")
-    }
-
-    const handleBuy = async () => {
+    const handleBuy = async () => {               
         await rentPickAsync()
     }
 
@@ -86,7 +77,7 @@ const MineSVG = () => {
             <Asset assetType='empty' x={7} y={-7} width={1} height={1} />
             <Asset assetType='empty' x={7} y={-8} width={1} height={1} />
 
-            <Asset assetType='table_left' x={1} y={-3} width={1} height={1} onClick={handleLeave} />
+            <Asset assetType='table_left' x={1} y={-3} width={1} height={1} onClick={handleBuy} />
             <Asset assetType='table_right' x={2} y={-3} width={1} height={1} onClick={handleBuy} />
 
             <Asset assetType='rail_horizontal' x={4} y={-3} width={1} height={1} />
@@ -98,8 +89,8 @@ const MineSVG = () => {
             <Asset assetType='rail_vertical' x={7} y={-6} width={1} height={1} />
             <Asset assetType='rail_vertical' x={7} y={-7} width={1} height={1} />
             <Asset assetType='rail_vertical' x={7} y={-8} width={1} height={1} />
-            
-            <Asset assetType='minecard' x={4} y={-3} width={1} height={1} onClick={handleLeave} />
+
+            <Minecard x={4} y={-3} width={1} height={1} />
 
             <MineTile x={0} y={-1} width={1} height={1} mineTileType="empty" />
             <MineTile x={1} y={-1} width={1} height={1} mineTileType="empty" />

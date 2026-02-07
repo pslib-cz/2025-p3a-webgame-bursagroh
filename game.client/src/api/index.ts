@@ -1,5 +1,5 @@
 import { QueryClient } from "@tanstack/react-query"
-import type { API, NoContentURL, Param, Query } from "../types/api"
+import type { API, APIError, NoContentURL, Param, Query } from "../types/api"
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL as string
 
@@ -31,7 +31,18 @@ export const api = {
         const response = await fetch(uri)
 
         if (!response.ok) {
-            throw new Error(`Error getting ${uri}: ${response.statusText}`)
+            let errorMessage: APIError
+            try {
+                errorMessage = await response.json() as APIError
+            } catch {
+                errorMessage = {
+                    errorId: -1,
+                    statusCode: response.status,
+                    message: response.statusText,
+                }
+            }
+
+            throw new Error(JSON.stringify(errorMessage))
         }
 
         return await response.json() as API["get"][URL]["res"][200]
@@ -41,7 +52,18 @@ export const api = {
         const response = await fetch(uri)
 
         if (!response.ok) {
-            throw new Error(`Error getting ${uri}: ${response.statusText}`)
+            let errorMessage: APIError
+            try {
+                errorMessage = await response.json() as APIError
+            } catch {
+                errorMessage = {
+                    errorId: -1,
+                    statusCode: response.status,
+                    message: response.statusText,
+                }
+            }
+
+            throw new Error(JSON.stringify(errorMessage))
         }
 
         if (response.status === 204) {
@@ -61,7 +83,18 @@ export const api = {
         })
 
         if (!response.ok) {
-            throw new Error(`Error posting to ${uri}: ${response.statusText}`)
+            let errorMessage: APIError
+            try {
+                errorMessage = await response.json() as APIError
+            } catch {
+                errorMessage = {
+                    errorId: -1,
+                    statusCode: response.status,
+                    message: response.statusText,
+                }
+            }
+
+            throw new Error(JSON.stringify(errorMessage))
         }
 
         return await response.json() as API["post"][URL]["res"][200]
@@ -77,7 +110,18 @@ export const api = {
         })
 
         if (!response.ok) {
-            throw new Error(`Error putting to ${uri}: ${response.statusText}`)
+            let errorMessage: APIError
+            try {
+                errorMessage = await response.json() as APIError
+            } catch {
+                errorMessage = {
+                    errorId: -1,
+                    statusCode: response.status,
+                    message: response.statusText,
+                }
+            }
+
+            throw new Error(JSON.stringify(errorMessage))
         }
 
         return await response.json() as API["put"][URL]["res"][200]
@@ -93,7 +137,18 @@ export const api = {
         })
 
         if (!response.ok) {
-            throw new Error(`Error patching to ${uri}: ${response.statusText}`)
+            let errorMessage: APIError
+            try {
+                errorMessage = await response.json() as APIError
+            } catch {
+                errorMessage = {
+                    errorId: -1,
+                    statusCode: response.status,
+                    message: response.statusText,
+                }
+            }
+
+            throw new Error(JSON.stringify(errorMessage))
         }
 
         const text = await response.text()
@@ -115,7 +170,18 @@ export const api = {
         })
 
         if (!response.ok) {
-            throw new Error(`Error patching to ${uri}: ${response.statusText}`)
+            let errorMessage: APIError
+            try {
+                errorMessage = await response.json() as APIError
+            } catch {
+                errorMessage = {
+                    errorId: -1,
+                    statusCode: response.status,
+                    message: response.statusText,
+                }
+            }
+
+            throw new Error(JSON.stringify(errorMessage))
         }
 
         if (response.status === 204) {
@@ -134,7 +200,18 @@ export const api = {
         })
 
         if (!response.ok) {
-            throw new Error(`Error deleting to ${uri}: ${response.statusText}`)
+            let errorMessage: APIError
+            try {
+                errorMessage = await response.json() as APIError
+            } catch {
+                errorMessage = {
+                    errorId: -1,
+                    statusCode: response.status,
+                    message: response.statusText,
+                }
+            }
+
+            throw new Error(JSON.stringify(errorMessage))
         }
 
         return await response.json() as API["delete"][URL]["res"][200]

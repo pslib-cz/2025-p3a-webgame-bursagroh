@@ -7,6 +7,7 @@ import { validMove } from '../../../../utils/player'
 import TileSelector from '../../TileSelector'
 import { useMutation } from '@tanstack/react-query'
 import { queryClient } from '../../../../api'
+import useNotification from '../../../../hooks/useNotification'
 
 type BuildingProps = {
     buildingType: | "bank"
@@ -34,13 +35,17 @@ type BuildingProps = {
 
 const Building: React.FC<BuildingProps> = ({x, y, width, height, buildingType}) => {
     const navigate = useNavigate()
+    const notify = useNotification()
 
     const player = React.useContext(PlayerContext)!.player!
 
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(player.playerId, x, y))
 
     const handleClick = async () => {
-        if (!validMove(player.positionX, player.positionY, x, y)) return
+        if (!validMove(player.positionX, player.positionY, x, y)) {
+            notify("Error", "You cannot move that far.", 1000)
+            return
+        }
 
         await updatePlayerPositionAsync()
 

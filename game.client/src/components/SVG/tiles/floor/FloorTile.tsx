@@ -5,6 +5,7 @@ import { PlayerContext } from '../../../../providers/game/PlayerProvider'
 import { validMove } from '../../../../utils/player'
 import { updatePlayerPositionMutation } from '../../../../api/player'
 import { useMutation } from '@tanstack/react-query'
+import useNotification from '../../../../hooks/useNotification'
 
 type FloorTileProps = {
     floorTileType: "stair" | "chest" | "floor" | "wall-top" | "wall-bottom" | "wall-left" | "wall-right" | "wall-top-left" | "wall-top-right" | "wall-bottom-left" | "wall-bottom-right" 
@@ -12,12 +13,17 @@ type FloorTileProps = {
 } & AssetProps
 
 const FloorTile: React.FC<FloorTileProps> = ({ x, y, width, height, floorTileType }) => {
+    const notify = useNotification()
+
     const player = React.useContext(PlayerContext)!.player!
 
     const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(player.playerId, x, y))
 
     const handleClick = () => {
-        if (!validMove(player.subPositionX, player.subPositionY, x, y)) return
+        if (!validMove(player.subPositionX, player.subPositionY, x, y)) {
+            notify("Error", "You cannot move that far.", 1000)
+            return
+        }
 
         updatePlayerPositionAsync()
     }
