@@ -3,6 +3,7 @@ using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Types;
 using game.Server.Models;
+using game.Server.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,11 +13,13 @@ namespace game.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IErrorService _errorService;
 
-        public BuildingService(ApplicationDbContext context, IMapper mapper)
+        public BuildingService(ApplicationDbContext context, IMapper mapper, IErrorService errorService)
         {
             _context = context;
             _mapper = mapper;
+            _errorService = errorService;
         }
 
         public List<Building> GetCoreBuildings(Guid playerId) => new List<Building>
@@ -30,13 +33,10 @@ namespace game.Server.Services
 
         public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildingsAsync(Guid playerId, int top, int left, int width, int height)
         {
-            if (width > 20 || height > 20 || width <= 0 || height <= 0)
-            {
-                return new BadRequestObjectResult("Requested area is too large or invalid. Maximum size is 20x20.");
-            }
+            if (width > 20 || height > 20 || width <= 0 || height <= 0) return _errorService.CreateErrorResponse(400, 3001, "Requested area is too large or invalid. Maximum size is 20x20.", "Invalid Request");
 
             var player = await _context.Players.AsNoTracking().FirstOrDefaultAsync(p => p.PlayerId == playerId);
-            if (player == null) return new NotFoundResult();
+            if (player == null) return _errorService.CreateErrorResponse(404, 3002, "Player record not found.", "Not Found");
 
             int minX = left;
             int maxX = left + width - 1;
@@ -84,52 +84,38 @@ namespace game.Server.Services
 
         public async Task<ActionResult<IEnumerable<BuildingDto>>> GetAllMaterializedBuildingsAsync(int page, int pageSize)
         {
-            try
-            {
-                if (page < 1) page = 1;
-                if (pageSize > 200) pageSize = 200;
+            if (page < 1) page = 1;
+            if (pageSize > 200) pageSize = 200;
 
-                var buildings = await _context.Buildings
-                    .AsNoTracking()
-                    .OrderBy(b => b.PlayerId)
-                    .ThenBy(b => b.PositionX)
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToListAsync();
+            var buildings = await _context.Buildings
+                .AsNoTracking()
+                .OrderBy(b => b.PlayerId)
+                .ThenBy(b => b.PositionX)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
 
-                return new OkObjectResult(_mapper.Map<IEnumerable<BuildingDto>>(buildings));
-            }
-            catch (Exception ex)
-            {
-                return new ObjectResult($"Internal server error: {ex.Message}") { StatusCode = 500 };
-            }
+            return new OkObjectResult(_mapper.Map<IEnumerable<BuildingDto>>(buildings));
         }
 
         public async Task<ActionResult<FloorDto>> GetFloorByIdAsync(int floorId)
         {
-            try
-            {
-                var floor = await _context.Floors
-                    .AsNoTracking()
-                    .Include(f => f.FloorItems!)
-                        .ThenInclude(fi => fi.Chest)
-                    .Include(f => f.FloorItems!)
-                        .ThenInclude(fi => fi.Enemy)
-                            .ThenInclude(e => e!.ItemInstance)
-                                .ThenInclude(ii => ii!.Item)
-                    .Include(f => f.FloorItems!)
-                        .ThenInclude(fi => fi.ItemInstance)
+            var floor = await _context.Floors
+                .AsNoTracking()
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.Chest)
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.Enemy)
+                        .ThenInclude(e => e!.ItemInstance)
                             .ThenInclude(ii => ii!.Item)
-                    .FirstOrDefaultAsync(f => f.FloorId == floorId);
+                .Include(f => f.FloorItems!)
+                    .ThenInclude(fi => fi.ItemInstance)
+                        .ThenInclude(ii => ii!.Item)
+                .FirstOrDefaultAsync(f => f.FloorId == floorId);
 
-                if (floor == null) return new NotFoundObjectResult($"Floor with ID {floorId} not found.");
+            if (floor == null) return _errorService.CreateErrorResponse(404, 3003, $"Floor with ID {floorId} not found.", "Not Found");
 
-                return new OkObjectResult(_mapper.Map<FloorDto>(floor));
-            }
-            catch (Exception ex)
-            {
-                return new ObjectResult("Internal server error: " + ex.Message) { StatusCode = 500 };
-            }
+            return new OkObjectResult(_mapper.Map<FloorDto>(floor));
         }
     }
 }

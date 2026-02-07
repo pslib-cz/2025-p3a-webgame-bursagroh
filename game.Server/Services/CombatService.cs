@@ -3,7 +3,7 @@ using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Types;
 using game.Server.Models;
-
+using game.Server.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +13,13 @@ namespace game.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IErrorService _errorService;
 
-        public CombatService(ApplicationDbContext context, IMapper mapper)
+        public CombatService(ApplicationDbContext context, IMapper mapper, IErrorService errorService)
         {
             _context = context;
             _mapper = mapper;
+            _errorService = errorService;
         }
 
         public async Task<ActionResult> UseItemAsync(Guid id)
@@ -27,7 +29,7 @@ namespace game.Server.Services
                 .Include(p => p.InventoryItems)
                 .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-            if (player == null) return new NotFoundObjectResult("Player not found.");
+            if (player == null) return _errorService.CreateErrorResponse(404, 5001, "Player not found.", "Not Found");
 
             int playerDamage = 1;
             string itemName = "Fist";
@@ -43,8 +45,7 @@ namespace game.Server.Services
 
             if (itemType == ItemTypes.Sword)
             {
-                if (player.ScreenType != ScreenTypes.Fight)
-                    return new BadRequestObjectResult("You can only attack during a fight.");
+                if (player.ScreenType != ScreenTypes.Fight) return _errorService.CreateErrorResponse(400, 5002, "You can only attack during a fight.", "Combat Denied");
 
                 var floorItem = await _context.FloorItems
                     .Include(fi => fi.Enemy)
@@ -56,7 +57,7 @@ namespace game.Server.Services
                 {
                     player.ScreenType = ScreenTypes.Floor;
                     await _context.SaveChangesAsync();
-                    return new BadRequestObjectResult("No enemy found here.");
+                    return _errorService.CreateErrorResponse(400, 5003, "No enemy found here.", "Target Lost");
                 }
 
                 var enemy = floorItem.Enemy;
@@ -102,7 +103,7 @@ namespace game.Server.Services
                     {
                         enemyHealth = enemy.Health,
                         playerHealth = player.Health,
-                        itemBroken = activeInstance?.Durability <= 0 
+                        itemBroken = activeInstance?.Durability <= 0
                     });
                 }
 
@@ -138,7 +139,7 @@ namespace game.Server.Services
                 {
                     if (itemData.ItemId == 40)
                     {
-                        if (player.Health >= player.MaxHealth) return new BadRequestObjectResult("Full health.");
+                        if (player.Health >= player.MaxHealth) return _errorService.CreateErrorResponse(400, 5004, "Full health.", "Healing Failed");
                         player.Health = Math.Min(player.MaxHealth, player.Health + 5);
                     }
                     else if (itemData.ItemId == 41) player.MaxHealth += 5;
@@ -156,8 +157,7 @@ namespace game.Server.Services
                 }
             }
 
-            return new BadRequestObjectResult($"{itemName} is not usable this way.");
+            return _errorService.CreateErrorResponse(400, 5005, $"{itemName} is not usable this way.", "Invalid Action");
         }
     }
 }
-
