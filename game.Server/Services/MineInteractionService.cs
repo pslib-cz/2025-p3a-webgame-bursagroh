@@ -122,50 +122,68 @@ namespace game.Server.Services
 
         public async Task<ActionResult> MineBlockAsync(int mineId, MineInteractionRequest request)
         {
-            var mine = await _context.Mines
-                .Include(m => m.MineLayers).ThenInclude(l => l.MineBlocks).ThenInclude(mb => mb.Block).ThenInclude(b => b.Item)
-                .FirstOrDefaultAsync(m => m.MineId == mineId);
+            var strategy = _context.Database.CreateExecutionStrategy();
 
-            if (mine == null) return _errorService.CreateErrorResponse(404, 8006, "Mine not found.", "Not Found");
-
-            var player = await _context.Players
-                .Include(p => p.ActiveInventoryItem).ThenInclude(ai => ai.ItemInstance).ThenInclude(ins => ins.Item)
-                .FirstOrDefaultAsync(p => p.PlayerId == mine.PlayerId);
-
-            if (player?.ActiveInventoryItem?.ItemInstance?.Item == null || !player.ActiveInventoryItem.ItemInstance.Item.Name.Contains("Pickaxe"))
-                return _errorService.CreateErrorResponse(400, 8012, "You must have a pickaxe active to mine.", "Equipment Required");
-
-            if (Math.Abs(player.SubPositionX - request.TargetX) + Math.Abs(player.SubPositionY - request.TargetY) != 1)
-                return _errorService.CreateErrorResponse(400, 8013, "Mining target is too far away.", "Range Error");
-
-            var targetBlock = mine.MineLayers.FirstOrDefault(l => l.Depth == request.TargetY)?
-                                  .MineBlocks.FirstOrDefault(mb => mb.Index == request.TargetX);
-
-            if (targetBlock == null) return _errorService.CreateErrorResponse(404, 8014, "No mineable block found at the target location.", "Invalid Target");
-
-            targetBlock.Health -= player.ActiveInventoryItem.ItemInstance.Item.Damage;
-            player.ActiveInventoryItem.ItemInstance.Durability--;
-
-            if (player.ActiveInventoryItem.ItemInstance.Durability <= 0) _context.InventoryItems.Remove(player.ActiveInventoryItem);
-
-            if (targetBlock.Health > 0) { await _context.SaveChangesAsync(); return new OkObjectResult(new { hit = true }); }
-
-            var random = new Random();
-            int amount = random.Next(targetBlock.Block.MinAmount, targetBlock.Block.MaxAmount + 1);
-            for (int i = 0; i < amount; i++)
+            return await strategy.ExecuteAsync(async () =>
             {
-                _context.FloorItems.Add(new FloorItem
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    FloorId = player.FloorId.Value,
-                    PositionX = request.TargetX,
-                    PositionY = request.TargetY,
-                    ItemInstance = new ItemInstance { ItemId = targetBlock.Block.ItemId }
-                });
-            }
+                    var mine = await _context.Mines
+                        .Include(m => m.MineLayers).ThenInclude(l => l.MineBlocks).ThenInclude(mb => mb.Block)
+                        .FirstOrDefaultAsync(m => m.MineId == mineId);
 
-            _context.MineBlocks.Remove(targetBlock);
-            await _context.SaveChangesAsync();
-            return new OkObjectResult(new { destroyed = true });
+                    if (mine == null) return _errorService.CreateErrorResponse(404, 8006, "Mine not found.", "Not Found");
+
+                    var player = await _context.Players
+                        .Include(p => p.ActiveInventoryItem).ThenInclude(ai => ai.ItemInstance).ThenInclude(ins => ins.Item)
+                        .FirstOrDefaultAsync(p => p.PlayerId == mine.PlayerId);
+
+                    if (player?.ActiveInventoryItem?.ItemInstance?.Item == null || !player.ActiveInventoryItem.ItemInstance.Item.Name.Contains("Pickaxe"))
+                        return _errorService.CreateErrorResponse(400, 8012, "No pickaxe active.", "Equipment Required");
+
+                    if (Math.Abs(player.SubPositionX - request.TargetX) + Math.Abs(player.SubPositionY - request.TargetY) != 1)
+                        return _errorService.CreateErrorResponse(400, 8013, "Target too far.", "Range Error");
+
+                    var targetBlock = mine.MineLayers.FirstOrDefault(l => l.Depth == request.TargetY)?
+                                          .MineBlocks.FirstOrDefault(mb => mb.Index == request.TargetX);
+
+                    if (targetBlock == null) return _errorService.CreateErrorResponse(404, 8014, "No block found.", "Invalid Target");
+
+                    targetBlock.Health -= player.ActiveInventoryItem.ItemInstance.Item.Damage;
+                    player.ActiveInventoryItem.ItemInstance.Durability--;
+
+                    if (player.ActiveInventoryItem.ItemInstance.Durability <= 0)
+                        _context.InventoryItems.Remove(player.ActiveInventoryItem);
+
+                    if (targetBlock.Health <= 0)
+                    {
+                        var random = new Random();
+                        int amount = random.Next(targetBlock.Block.MinAmount, targetBlock.Block.MaxAmount + 1);
+                        for (int i = 0; i < amount; i++)
+                        {
+                            _context.FloorItems.Add(new FloorItem
+                            {
+                                FloorId = player.FloorId!.Value,
+                                PositionX = request.TargetX,
+                                PositionY = request.TargetY,
+                                ItemInstance = new ItemInstance { ItemId = targetBlock.Block.ItemId }
+                            });
+                        }
+                        _context.MineBlocks.Remove(targetBlock);
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return new OkObjectResult(new { success = true, destroyed = targetBlock.Health <= 0 });
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
         }
     }
 }
