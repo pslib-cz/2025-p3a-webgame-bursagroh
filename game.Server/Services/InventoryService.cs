@@ -37,7 +37,7 @@ namespace game.Server.Services
 
             var itemsOnGround = await _context.FloorItems
                 .Where(fi => fi.FloorId == player.FloorId && fi.PositionX == player.SubPositionX &&
-                       fi.PositionY == player.SubPositionY && fi.FloorItemId == floorItemId && fi.FloorItemType == FloorItemType.Item)
+                       fi.PositionY == player.SubPositionY && fi.FloorItemId == floorItemId)
                 .ToListAsync();
 
             if (!itemsOnGround.Any()) return new BadRequestObjectResult("Nothing here to pick up.");
@@ -67,7 +67,7 @@ namespace game.Server.Services
 
             if (inventoryItem == null) return new BadRequestObjectResult("Item not found.");
 
-            bool isWin = inventoryItem.ItemInstance.ItemId == 100 && player.SubPositionX == 0 && player.SubPositionY == 0;
+            bool isWin = inventoryItem.ItemInstance.ItemId == 100 && player.PositionX == 0 && player.PositionY == 0;
             if (isWin) player.ScreenType = ScreenTypes.Win;
             else if (player.FloorId == null) return new BadRequestObjectResult("Can only drop in floor/mine.");
 

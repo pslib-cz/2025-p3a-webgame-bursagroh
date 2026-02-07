@@ -20,23 +20,23 @@ namespace game.Server.Services
 
             if (startDepth > actualEndDepth)
             {
-                throw new ArgumentException("Start depth cannot be greater than end depth.");
+                return new List<MineLayer>();
             }
             if (startDepth < 0)
             {
-                throw new ArgumentException("Depth cannot be negative.");
+                return new List<MineLayer>();
             }
 
             var mineExists = await _context.Mines.AnyAsync(m => m.MineId == mineId);
             if (!mineExists)
             {
-                throw new InvalidOperationException($"Mine with ID {mineId} does not exist.");
+                return new List<MineLayer>();
             }
 
             var availableBlocks = await _context.Blocks.Include(b => b.Item).ToListAsync();
             if (!availableBlocks.Any())
             {
-                throw new InvalidOperationException("No block definitions available to generate mine layer.");
+                return new List<MineLayer>();
             }
 
             var existingLayers = await _context.MineLayers

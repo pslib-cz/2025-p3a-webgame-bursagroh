@@ -24,38 +24,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
-builder.Services.AddRateLimiter(options =>
-{
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-
-    static string GetUserIdentifier(HttpContext context)
-    {
-        return context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
-    }
-
-    options.AddPolicy("per_user_limit", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: GetUserIdentifier(httpContext),
-            factory: partition => new FixedWindowRateLimiterOptions
-            {
-                AutoReplenishment = true,
-                PermitLimit = 500,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
-
-    options.AddPolicy("per_user_limit_10", httpContext =>
-        RateLimitPartition.GetFixedWindowLimiter(
-            partitionKey: GetUserIdentifier(httpContext),
-            factory: partition => new FixedWindowRateLimiterOptions
-            {
-                AutoReplenishment = true,
-                PermitLimit = 10,
-                Window = TimeSpan.FromMinutes(1),
-                QueueLimit = 0
-            }));
-});
-
 builder.Services.AddScoped<MineGenerationService>();
 builder.Services.AddScoped<ISaveService, SaveService>();
 builder.Services.AddScoped<IBankService, BankService>();
@@ -93,8 +61,6 @@ app.MapScalarApiReference();
 app.UseRouting(); 
 
 app.UseCors("AllowFrontend");
-
-app.UseRateLimiter();
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
