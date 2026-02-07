@@ -85,7 +85,7 @@ namespace game.Server.Services
 
                     if (enemy.Health > 0)
                     {
-                        if (rng.NextDouble() < 0.07)
+                        if (rng.NextDouble() < 0.30)
                         {
                             int enemyDamage = rng.Next(1, 3);
                             player.Health -= enemyDamage;
