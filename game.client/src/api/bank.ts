@@ -7,19 +7,23 @@ export const getBankInventoryQuery = (playerId: string) =>
         queryFn: () => api.getWith204("/api/Bank/Inventory", {}, { playerId }),
     })
 
-export const moveBankItemMutation = (playerId: string) =>
+export const moveBankItemMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: ({ inventoryItemIds }: { inventoryItemIds: Array<number> }) => api.patch("/api/Bank/Action/move", {}, { playerId }, { inventoryItemIds }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "bank"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "bank"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" })
+            ])
         },
+        onError
     })
 
-export const moveBankMoneyMutation = (playerId: string) =>
+export const moveBankMoneyMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: ({ amount, direction }: { amount: number; direction: "ToPlayer" | "ToBank" }) => api.patch("/api/Bank/Action/transfer", {}, { playerId }, { amount, direction }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" })
         },
+        onError
     })

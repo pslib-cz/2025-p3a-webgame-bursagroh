@@ -9,12 +9,12 @@ import useBlur from '../../hooks/useBlur'
 
 const FountainScreen = () => {
     useBlur(true)
-    
+
     const navigate = useNavigate()
     const playerId = React.useContext(PlayerIdContext)!.playerId!
-    
+
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
-    const {mutateAsync: dropItemAsync} = useMutation(dropItemMutation(playerId))
+    const { mutateAsync: dropItemAsync } = useMutation(dropItemMutation(playerId))
 
     const handleClick = async () => {
         await updatePlayerScreenAsync()
@@ -30,6 +30,12 @@ const FountainScreen = () => {
 
     return (
         <div className={styles.container}>
+            <div className={styles.legendContainer}>
+                <span className={styles.heading}>Legend</span>
+                <div className={styles.innerLegendContainer}>
+                    <span className={styles.legendText}>Once, a purple mist turned almost everyone into monsters. Only a few humans are left. Legend says that if a hero throws a Mythical Sword into the Magic Fountain, everyone will turn back into humans and the world will be saved.</span>
+                </div>
+            </div>
             <div className={styles.fountainContainer}>
                 <div className={styles.header}>
                     <span className={styles.heading}>Fountain of Sacrifice</span>
@@ -38,6 +44,21 @@ const FountainScreen = () => {
                 <div className={styles.transferContainer} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
                     <span className={styles.transferText}>Throw here the mythical sword</span>
                 </div>
+            </div>
+            <div className={styles.tutorialContainer}>
+                <span className={styles.heading}>How to Play</span>
+                <span className={styles.heading}>Survival Rules</span>
+                <ol className={styles.innerTutorialContainer}>
+                    <li>1. The Restaurant: Go here first. Work and serve the remaining humans to earn Cash.</li>
+                    <li>2. The Mines: Use your cash to rent a pickaxe and dig for Resources. You need these to craft better tools at the blacksmith.</li>
+                    <li>3. The Monster Buildings: Enter dangerous buildings to fight monsters. You will find a lot of valuable loot there.</li>
+                    <li>4. The Fountain: Once the sword is ready, take it to the fountain to win the game!</li>
+                </ol>
+                <ul className={styles.innerTutorialContainer}>
+                    <li>- Death Costs Everything: If you die, you lose your entire inventory. Store your items and money in the Bank to keep them safe.</li>
+                    <li>- Red Buildings (Traps): Red buildings are traps. Once you enter, the doors lock. You must defeat the Boss to be able to leave.</li>
+                    <li>- Crafting: Collect enough rare materials to forge the sword. Don't rush into big fights without good weapons and some potions!</li>
+                </ul>
             </div>
         </div>
     )

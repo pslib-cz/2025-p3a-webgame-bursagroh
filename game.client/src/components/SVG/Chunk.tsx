@@ -7,7 +7,8 @@ import Asset from "./Asset"
 import Road from "./tiles/city/Road"
 import BuildingTile from "./tiles/city/Building"
 
-const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null) => {
+// eslint-disable-next-line react-refresh/only-export-components
+export const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null) => {
     switch (buildingType) {
         case "Fountain":
             return "fountain"
@@ -47,7 +48,8 @@ const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: 
     }
 }
 
-const buildingToChunkPosition = (
+// eslint-disable-next-line react-refresh/only-export-components
+export const buildingToChunkPosition = (
     building: Building,
     chunkSize: number
 ): {

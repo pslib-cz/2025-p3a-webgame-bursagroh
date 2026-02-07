@@ -12,6 +12,16 @@ export type Param = Record<string, StringifyAble>
 export type Query = Record<string, StringifyAble>
 export type PossibleResponses = Record<number, object>
 
+export type APIError = {
+    statusCode: number
+    errorId: number
+    message: string
+    notification?: {
+        heading: string;
+        text: string;
+    }
+}
+
 export interface GenericGET {
     params: Param
     query: Query
