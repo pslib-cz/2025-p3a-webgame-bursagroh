@@ -56,7 +56,7 @@
     display: none;
     position: absolute;
     top: 50%;
-    left: 65%;
+    left: 35%;
     transform: translate(-50%, -50%);
     fill: var(--light);
 }
@@ -73,7 +73,7 @@
     display: none;
     position: absolute;
     top: 50%;
-    left: 35%;
+    left: 65%;
     transform: translate(-50%, -50%);
     fill: var(--light);
 }

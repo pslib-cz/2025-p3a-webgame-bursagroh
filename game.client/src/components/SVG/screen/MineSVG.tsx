@@ -52,16 +52,8 @@ const DisplayMineItems = ({ mineId }: { mineId: number }) => {
     }
 }
 
-const MineSVG = () => {
-    const {genericError} = useNotification()
-    
+const MineSVG = () => {   
     const player = React.useContext(PlayerContext)!.player!
-
-    const { mutateAsync: rentPickAsync } = useMutation(rentPickMutation(player.playerId, 1, genericError))
-
-    const handleBuy = async () => {               
-        await rentPickAsync()
-    }
 
     const layers = getLayerList(player.subPositionY, viewDistanceInChunks, chunkSize)
 
@@ -80,8 +72,8 @@ const MineSVG = () => {
             <Asset assetType='empty' x={7} y={-7} width={1} height={1} />
             <Asset assetType='empty' x={7} y={-8} width={1} height={1} />
 
-            <Asset assetType='table_left' x={1} y={-3} width={1} height={1} onClick={handleBuy} />
-            <Asset assetType='table_right' x={2} y={-3} width={1} height={1} onClick={handleBuy} />
+            <Asset assetType='table_left' x={1} y={-3} width={1} height={1} />
+            <Asset assetType='table_right' x={2} y={-3} width={1} height={1} />
 
             <Asset assetType='rail_horizontal' x={4} y={-3} width={1} height={1} />
             <Asset assetType='rail_horizontal' x={5} y={-3} width={1} height={1} />

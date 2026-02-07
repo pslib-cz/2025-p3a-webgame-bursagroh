@@ -8,6 +8,17 @@ import { groupFloorItems } from "../../utils/floor"
 import ConditionalDisplay from "../../components/wrappers/ConditionalDisplay"
 import { getMineItemsQuery } from "../../api/mine"
 import { useQuery } from "@tanstack/react-query"
+import type { Player } from "../../types/api/models/player"
+import RentItem from "../../components/item/RentItem"
+
+const isPlayerNextToTable = (player: Player) => {
+    const nextToTablePositions = [
+        { x: 1, y: -2 },
+        { x: 2, y: -2 }
+    ]
+
+    return nextToTablePositions.some(pos => pos.x === player.subPositionX && pos.y === player.subPositionY)
+}
 
 const MineScreen = () => {
     useBlur(false)
@@ -30,18 +41,30 @@ const MineScreen = () => {
         const groupedItems = groupFloorItems(items)
 
         return (
-            <ConditionalDisplay condition={items.length > 0}>
-                <div className={styles.container}>
-                    <div className={styles.groundContainer}>
-                        <span className={styles.heading}>Ground</span>
-                        <div className={styles.itemContainer}>
-                            {Object.entries(groupedItems).map(([itemString, itemIds]) => (
-                                <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
-                            ))}
+            <>
+                <ConditionalDisplay condition={items.length > 0}>
+                    <div className={styles.container}>
+                        <div className={styles.groundContainer}>
+                            <span className={styles.heading}>Ground</span>
+                            <div className={styles.itemContainer}>
+                                {Object.entries(groupedItems).map(([itemString, itemIds]) => (
+                                    <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
+                                ))}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </ConditionalDisplay>
+                </ConditionalDisplay>
+                <ConditionalDisplay condition={isPlayerNextToTable(player)}>
+                    <div className={styles.container}>
+                        <div className={styles.groundContainer}>
+                            <span className={styles.heading}>Rent a PICK!</span>
+                            <div className={styles.itemContainer}>
+                                <RentItem />
+                            </div>
+                        </div>
+                    </div>
+                </ConditionalDisplay>
+            </>
         )
     }
 }
