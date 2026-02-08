@@ -5,6 +5,7 @@ import type { BlockType, MineLayer } from "../../types/api/models/mine"
 import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import Block from "./tiles/mine/Block"
 import MineTile from "./tiles/mine/MineTile"
+import useNotification from "../../hooks/useNotification"
 
 const mapBlockTypeToTileType = (buildingType: BlockType) => {
     switch (buildingType) {
@@ -32,15 +33,14 @@ type LayerProps = {
 }
 
 const Layer: React.FC<LayerProps> = ({ depth, size, mineId }) => {
+    const {notify} = useNotification()
+
     const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const { data, isError, isPending, isSuccess } = useQuery(getMineLayersQuery(playerId, mineId, depth, depth + size - 1))
+
+    const { data, isSuccess, isError } = useQuery(getMineLayersQuery(playerId, mineId, depth, depth + size - 1))
 
     if (isError) {
-        return <div>Error loading.</div>
-    }
-
-    if (isPending) {
-        return <div>Loading layer...</div>
+        notify("Loading error", `Failed to load mine layers ${depth} to ${depth + size - 1}`, 2000)
     }
 
     if (isSuccess) {

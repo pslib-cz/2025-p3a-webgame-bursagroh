@@ -2,6 +2,7 @@ import React from "react"
 import { useMutation } from "@tanstack/react-query"
 import { queryClient } from "../../api"
 import { generatePlayerMutation, getPlayerQuery } from "../../api/player"
+import styles from "./playerIdProvider.module.css"
 
 const PLAYER_ID_STORAGE_KEY = "playerId"
 const ONE_HOUR_MS = 60 * 60 * 1000
@@ -74,15 +75,15 @@ const PlayerIdProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [generatePlayerAsync])
 
     if (isRestoring) {
-        return <div>Restoring player...</div>
+        return <span className={styles.loading}>Restoring player...</span>
     }
 
     if (isError) {
-        return <div>ERROR: Generating player</div>
+        return <span className={styles.loading}>Error generating player!</span>
     }
 
     if (isPending) {
-        return <div>Generating player...</div>
+        return <span className={styles.loading}>Generating player...</span>
     }
 
     return <PlayerIdContext.Provider value={{ playerId, setPlayerId, generatePlayerIdAsync }}>{children}</PlayerIdContext.Provider>

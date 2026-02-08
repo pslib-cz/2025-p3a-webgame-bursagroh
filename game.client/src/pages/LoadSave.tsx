@@ -1,26 +1,26 @@
 import React from 'react'
 import { useNavigate, useParams } from 'react-router';
-import Layer from '../../components/wrappers/layer/Layer';
-import { SaveContext } from '../../providers/global/SaveProvider';
-import { parseSave } from '../../utils/save';
-import Link from '../../components/Link';
-import Button from '../../components/Button';
+import Layer from '../components/wrappers/layer/Layer';
+import { SaveContext } from '../providers/global/SaveProvider';
+import { parseSave } from '../utils/save';
+import Link from '../components/Link';
+import Button from '../components/Button';
 import { useMutation } from '@tanstack/react-query';
-import { loadMutation } from '../../api/save';
-import { PlayerIdContext } from '../../providers/global/PlayerIdProvider';
+import { loadMutation } from '../api/save';
+import { PlayerIdContext } from '../providers/global/PlayerIdProvider';
 import styles from './loadSave.module.css'
-import { screenTypeToURL } from '../layouts/Game';
-import { getPlayerQuery } from '../../api/player';
-import { queryClient } from '../../api';
-import useNotification from '../../hooks/useNotification';
-import useKeyboard from '../../hooks/useKeyboard';
-import useBlur from '../../hooks/useBlur';
+import { screenTypeToURL } from './layouts/Game';
+import { getPlayerQuery } from '../api/player';
+import { queryClient } from '../api';
+import useNotification from '../hooks/useNotification';
+import useKeyboard from '../hooks/useKeyboard';
+import useBlur from '../hooks/useBlur';
 
 const LoadSaveScreen = () => {
     useBlur(true)
 
     const navigate = useNavigate()
-    const {genericError} = useNotification()
+    const { genericError } = useNotification()
     const saveString = useParams().saveString!
 
     const { saves, save } = React.useContext(SaveContext)!
@@ -56,7 +56,7 @@ const LoadSaveScreen = () => {
         }
 
         await loadAsync()
-        
+
         const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
         navigate(screenTypeToURL(player.screenType))
     }

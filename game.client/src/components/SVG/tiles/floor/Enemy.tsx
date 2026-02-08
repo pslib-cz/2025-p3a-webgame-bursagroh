@@ -13,7 +13,7 @@ const Enemy: React.FC<EnemyProps> = ({ width, height, x, y, enemyType }) => {
     const handleMove = useMove()
 
     const handleClick = async () => {
-        await handleMove(x, y, true)
+        await handleMove(x, y)
 
         navigate("/game/fight")
     }

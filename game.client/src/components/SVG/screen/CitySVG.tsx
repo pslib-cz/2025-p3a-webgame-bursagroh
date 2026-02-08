@@ -15,7 +15,7 @@ const CitySVG = () => {
     const player = React.useContext(PlayerContext)?.player
 
     if (!player) {
-        return <div>!!! Dummy MAP HERE !!!</div>
+        return <div className={styles.background} />
     }
 
     const chunks = getChunkList(player.positionX, player.positionY, horizontalViewDistanceInChunks, verticalViewDistanceInChunks, chunkSize)

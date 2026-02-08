@@ -23,12 +23,8 @@ const mapEnemyType = (enemyType: EnemyType) => {
 }
 
 const FloorSVG = () => {
-    const floor = React.useContext(FloorContext)!.floor
+    const floor = React.useContext(FloorContext)!.floor!
     const player = React.useContext(PlayerContext)!.player!
-
-    if (!floor) {
-        return <div>Loading floor...</div>
-    }
 
     return (
         <SVGDisplay className={styles.floor} centerX={player.subPositionX} centerY={player.subPositionY}>

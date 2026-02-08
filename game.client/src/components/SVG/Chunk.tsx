@@ -6,6 +6,7 @@ import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import Asset from "./Asset"
 import Road from "./tiles/city/Road"
 import BuildingTile from "./tiles/city/Building"
+import useNotification from "../../hooks/useNotification"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null) => {
@@ -69,7 +70,10 @@ type ChunkProps = {
 }
 
 const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
+    const { notify } = useNotification()
+
     const playerId = React.useContext(PlayerIdContext)!.playerId!
+
     const buildings = useQuery(getBuildingsQuery(playerId, y, x, size, size))
 
     const chunkTop = useQuery(getBuildingsQuery(playerId, y - size, x, size, size))
@@ -77,12 +81,24 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
     const chunkBottom = useQuery(getBuildingsQuery(playerId, y + size, x, size, size))
     const chunkLeft = useQuery(getBuildingsQuery(playerId, y, x - size, size, size))
 
-    if (buildings.isError || chunkTop.isError || chunkRight.isError || chunkBottom.isError || chunkLeft.isError) {
-        return <div>Error loading.</div>
+     if (buildings.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y}`, 2000)
     }
 
-    if (buildings.isPending || chunkTop.isPending || chunkRight.isPending || chunkBottom.isPending || chunkLeft.isPending) {
-        return <div>Loading...</div>
+    if (chunkTop.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y - size}`, 2000)
+    }
+
+    if (chunkRight.isError) {
+        notify("Loading error", `Failed to load chunk x:${x + size} y:${y}`, 2000)
+    }
+
+    if (chunkBottom.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y + size}`, 2000)
+    }
+
+    if (chunkLeft.isError) {
+        notify("Loading error", `Failed to load chunk x:${x - size} y:${y}`, 2000)
     }
 
     if (buildings.isSuccess && chunkTop.isSuccess && chunkRight.isSuccess && chunkBottom.isSuccess && chunkLeft.isSuccess) {

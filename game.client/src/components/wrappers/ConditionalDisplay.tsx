@@ -9,7 +9,7 @@ const ConditionalDisplay: React.FC<React.PropsWithChildren<ConditionalDisplayPro
         return null
     }
 
-    return <>{children}</>
+    return children
 }
 
 export default ConditionalDisplay
