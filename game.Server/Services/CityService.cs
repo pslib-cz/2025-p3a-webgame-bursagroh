@@ -9,10 +9,10 @@ namespace game.Server.Services
     public class CityService : ICityService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMineGenerationService _mineService;
+        private readonly MineGenerationService _mineService;
         private readonly IMapGeneratorService _mapGen; 
 
-        public CityService(ApplicationDbContext context, IMineGenerationService mineService, IMapGeneratorService mapGen)
+        public CityService(ApplicationDbContext context, MineGenerationService mineService, IMapGeneratorService mapGen)
         {
             _context = context;
             _mineService = mineService;

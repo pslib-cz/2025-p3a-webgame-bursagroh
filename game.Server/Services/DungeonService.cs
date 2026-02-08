@@ -228,7 +228,7 @@ public class DungeonService : IDungeonService
         {
             var blocks = await _context.MineBlocks
                 .Where(mb => mb.MineLayer!.MineId == mine.MineId && mb.MineLayer.Depth == player.SubPositionY)
-                .Select(mb => new { mb.Index, mb.MineLayer!.Depth })
+                .Select(mb => new { mb.Index, mb.MineLayer.Depth })
                 .ToListAsync();
 
             foreach (var b in blocks) blocked.Add((b.Index, (int)b.Depth));

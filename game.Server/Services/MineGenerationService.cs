@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
 {
-    public class MineGenerationService : IMineGenerationService
+    public class MineGenerationService
     {
         private readonly ApplicationDbContext _context;
 

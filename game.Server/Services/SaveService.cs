@@ -83,15 +83,7 @@ public class SaveService : ISaveService
                 await LinkPlayerLocationAsync(clonedId, originalPlayer.Floor.Level, originalPlayer.PositionX, originalPlayer.PositionY, originalPlayer.ScreenType);
             }
 
-            string saveStr;
-            bool isDuplicate;
-
-            do
-            {
-                saveStr = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 5));
-                isDuplicate = await _context.Saves.AnyAsync(s => s.SaveString == saveStr);
-            } while (isDuplicate);
-
+            var saveStr = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 5));
             _context.Saves.Add(new Save { PlayerId = clonedId, SaveString = saveStr });
 
             await _context.SaveChangesAsync();
