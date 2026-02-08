@@ -2,7 +2,6 @@
 {
     public class GameConstants
     {
-        // Mine Config
         public const int MineExitX = 4;
         public const int MineExitY = -3;
         public const int MineMaxX = 7;
@@ -10,7 +9,6 @@
         public const int InitialMineGenerationDepth = 1;
         public const int InitialMineGenerationRange = 5;
 
-        // Shop / Economy
         public const int PickaxeShopX1 = 1;
         public const int PickaxeShopX2 = 2;
         public const int PickaxeShopY = -2;
@@ -66,6 +64,18 @@
         public const int RestaurantY = -2;
         public const int BlacksmithX = 0;
         public const int BlacksmithY = 2;
+
+        public const double EnemyCounterAttackChance = 0.30;
+        public const int EnemyMinDamage = 1;
+        public const int EnemyMaxDamage = 3;
+        public const int DragonReward = 750;
+
+        public const int ItemIdSmallPotion = 40;
+        public const int ItemIdHealthUpgrade = 41;
+        public const int ItemIdCapacityUpgrade = 42;
+        public const int SmallPotionHealAmount = 5;
+        public const int HealthUpgradeAmount = 5;
+        public const int CapacityUpgradeAmount = 5;
 
         public const string ProtectedPlayerId = "4b1e8a93-7d92-4f7f-80c1-525c345b85e0";
     }

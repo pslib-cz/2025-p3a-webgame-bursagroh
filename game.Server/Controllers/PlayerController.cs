@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.RateLimiting;
 [EnableRateLimiting("per_user_limit")]
 public class PlayerController : ControllerBase
 {
-    private readonly INavigationService _nav;
+    private readonly IPlayerService _nav;
     private readonly IInventoryService _inv;
     private readonly ICombatService _combat;
 
-    public PlayerController(INavigationService nav, IInventoryService inv, ICombatService combat)
+    public PlayerController(IPlayerService nav, IInventoryService inv, ICombatService combat)
     {
         _nav = nav;
         _inv = inv;
@@ -22,6 +22,9 @@ public class PlayerController : ControllerBase
 
     [HttpPost("Generate")]
     public async Task<ActionResult<PlayerDto>> Generate([FromBody] GeneratePlayerRequest request) => await _nav.GeneratePlayer(request);
+
+    [HttpPatch("{id}/Action/rename")]
+    public async Task<ActionResult<PlayerDto>> RenamePlayer(Guid id, [FromBody] RenamePlayerRequest request) => await _nav.RenamePlayerAsync(id, request);
 
     [HttpGet("{id}")]
     public async Task<ActionResult<PlayerDto>> GetPlayer(Guid id) => await _nav.GetPlayerAsync(id);

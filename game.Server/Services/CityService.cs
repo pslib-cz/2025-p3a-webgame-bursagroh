@@ -2,6 +2,7 @@
 using game.Server.Models;
 using game.Server.Requests;
 using game.Server.Types;
+using game.Server.Interfaces; // Assuming your interface lives here
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
@@ -10,11 +11,13 @@ namespace game.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly MineGenerationService _mineService;
+        private readonly IMapGeneratorService _mapGen; 
 
-        public CityService(ApplicationDbContext context, MineGenerationService mineService)
+        public CityService(ApplicationDbContext context, MineGenerationService mineService, IMapGeneratorService mapGen)
         {
             _context = context;
             _mineService = mineService;
+            _mapGen = mapGen;
         }
 
         public async Task HandleCityMovement(Player player, MovePlayerRequest request, Guid id)
@@ -22,18 +25,44 @@ namespace game.Server.Services
             int previousX = player.PositionX;
             int previousY = player.PositionY;
 
-            player.PositionX = request.NewPositionX;
-            player.PositionY = request.NewPositionY;
+            int targetX = request.NewPositionX;
+            int targetY = request.NewPositionY;
 
-            if (player.PositionX == GameConstants.FountainX && player.PositionY == GameConstants.FountainY)
+            if (targetX == GameConstants.FountainX && targetY == GameConstants.FountainY)
             {
                 player.ScreenType = ScreenTypes.Fountain;
+                return;
             }
 
+            player.PositionX = targetX;
+            player.PositionY = targetY;
+
             var building = await GetOrGenerateBuilding(player, id);
+
             if (building != null)
             {
-                await ProcessBuildingEntry(player, building, previousX, previousY, id);
+                var externalEntryTypes = new[]
+                {
+                    BuildingTypes.Mine,
+                    BuildingTypes.Bank,
+                    BuildingTypes.Restaurant,
+                    BuildingTypes.Blacksmith
+                };
+
+                if (externalEntryTypes.Contains(building.BuildingType))
+                {
+                    await ProcessBuildingEntry(player, building, previousX, previousY, id);
+                    player.PositionX = previousX;
+                    player.PositionY = previousY;
+                }
+                else
+                {
+                    await ProcessBuildingEntry(player, building, previousX, previousY, id);
+                }
+            }
+            else
+            {
+                player.ScreenType = ScreenTypes.City;
             }
         }
 
@@ -44,8 +73,7 @@ namespace game.Server.Services
 
             if (building == null)
             {
-                var mapGen = new MapGeneratorService();
-                var proceduralArea = mapGen.GenerateMapArea(id, player.PositionX, player.PositionX, player.PositionY, player.PositionY, player.Seed);
+                var proceduralArea = _mapGen.GenerateMapArea(id, player.PositionX, player.PositionX, player.PositionY, player.PositionY, player.Seed);
                 var generatedBuilding = proceduralArea.FirstOrDefault();
 
                 if (generatedBuilding != null)
@@ -87,8 +115,7 @@ namespace game.Server.Services
 
             if (floor0 == null)
             {
-                var mapGen = new MapGeneratorService();
-                var generated = mapGen.GenerateInterior(building.BuildingId, player.Seed, 1, building.Height ?? 5, building.PositionX, building.PositionY);
+                var generated = _mapGen.GenerateInterior(building.BuildingId, player.Seed, 1, building.Height ?? 5, building.PositionX, building.PositionY);
                 floor0 = generated.First(f => f.Level == 0);
                 _context.Floors.Add(floor0);
                 await _context.SaveChangesAsync();
@@ -131,7 +158,6 @@ namespace game.Server.Services
             await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
             player.FloorId = mineFloor.FloorId;
-
             player.SubPositionX = GameConstants.MineExitX;
             player.SubPositionY = GameConstants.MineExitY;
         }

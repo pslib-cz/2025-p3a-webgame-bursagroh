@@ -1,7 +1,7 @@
 ﻿using game.Server.Types;
 using game.Server.Models;
 
-public class MapGeneratorService
+public class MapGeneratorService : IMapGeneratorService
 {
     public MapGeneratorService() { }
 

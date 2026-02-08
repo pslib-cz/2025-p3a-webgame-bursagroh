@@ -34,6 +34,11 @@ public class DungeonService : IDungeonService
 
         if (player.ScreenType == ScreenTypes.Mine)
         {
+            if (request.NewPositionX == 0 && request.NewPositionY == -2)
+            {
+                return _errorService.CreateErrorResponse(400, 6001, "Movement out of bounds.", "Invalid Move");
+            }
+
             bool isExitTile = request.NewPositionX == GameConstants.MineExitX && request.NewPositionY == GameConstants.MineExitY;
 
             if (!isExitTile && (request.NewPositionX < 0 || request.NewPositionX > GameConstants.MineMaxX || request.NewPositionY < GameConstants.MineMinY))
@@ -288,7 +293,10 @@ public class DungeonService : IDungeonService
 
     private async Task ProcessStairNavigation(Player player)
     {
-        var floor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+        var floor = await _context.Floors
+            .Include(f => f.Building)
+            .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+
         if (floor == null || player.ScreenType == ScreenTypes.Mine) return;
 
         bool isEven = floor.Level % 2 == 0;
@@ -298,16 +306,29 @@ public class DungeonService : IDungeonService
         if (player.SubPositionX == upX && player.SubPositionY == GameConstants.StairY)
         {
             int nextLvl = floor.Level + 1;
+
+            if (floor.Building != null)
+            {
+                if (!floor.Building.ReachedHeight.HasValue || nextLvl > floor.Building.ReachedHeight.Value)
+                {
+                    floor.Building.ReachedHeight = nextLvl;
+                }
+            }
+
             var nextF = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == floor.BuildingId && f.Level == nextLvl);
 
             if (nextF == null)
             {
-                var b = await _context.Buildings.FindAsync(floor.BuildingId);
+                var b = floor.Building;
                 if (b != null && (!b.Height.HasValue || nextLvl < b.Height.Value))
                 {
                     var gen = new MapGeneratorService().GenerateInterior(b.BuildingId, player.Seed, nextLvl + 1, b.Height ?? 5, b.PositionX, b.PositionY);
                     nextF = gen.FirstOrDefault(f => f.Level == nextLvl);
-                    if (nextF != null) { _context.Floors.Add(nextF); await _context.SaveChangesAsync(); }
+                    if (nextF != null)
+                    {
+                        _context.Floors.Add(nextF);
+                        await _context.SaveChangesAsync();
+                    }
                 }
             }
             if (nextF != null) player.FloorId = nextF.FloorId;
