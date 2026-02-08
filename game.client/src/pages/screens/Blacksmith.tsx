@@ -33,12 +33,12 @@ const BlacksmithScreenWithContext = () => {
             <div className={styles.blacksmithContainer}>
                 <span className={styles.heading}>Crafting</span>
                 <span className={styles.heading}>Blueprint</span>
-                <div className={styles.craftingContainer} >
+                <div className={styles.craftingContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(playerBlueprints).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={playerBlueprints.map((blueprint) => (
                         <Crafting blueprint={blueprint} key={blueprint.blueprintId} />
                     ))} ifEmpty={<span className={styles.text}>No blueprints available</span>} />
                 </div>
-                <div className={styles.blueprintContainer}>
+                <div className={styles.blueprintContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(blueprintsToBuy).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={blueprintsToBuy.map((blueprint) => (
                         <BlueprintItem blueprint={blueprint} key={blueprint.blueprintId} />
                     ))} ifEmpty={<span className={styles.text}>No blueprints available</span>} />

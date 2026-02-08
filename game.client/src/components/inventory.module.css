@@ -31,8 +31,7 @@
     background-color: var(--dark);
     padding: 1rem;
     display: grid;
-    grid-template-columns: repeat(5, min-content);
-    grid-auto-rows: min-content;
+    grid-auto-rows: max-content;
     gap: 1rem;
 }
 

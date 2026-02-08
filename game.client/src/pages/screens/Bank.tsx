@@ -80,12 +80,12 @@ const BankScreenWithContext = () => {
                         <span className={styles.balance}>/ {player.bankBalance} $</span>
                     </div>
                 </div>
-                <div className={styles.itemContainer}>
+                <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(inventoryItems).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={Object.entries(inventoryItems).map(([itemString, inventoryItems]) => (
                         <BankInventoryItem key={itemString} items={inventory.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
                     ))} ifEmpty={<span className={styles.text}>Empty inventory</span>} />
                 </div>
-                <div className={styles.itemContainer}>
+                <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(bankItems).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={Object.entries(bankItems).map(([itemString, inventoryItems]) => (
                         <BankItem key={itemString} items={bank.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
                     ))} ifEmpty={<span className={styles.text}>Empty bank</span>} />

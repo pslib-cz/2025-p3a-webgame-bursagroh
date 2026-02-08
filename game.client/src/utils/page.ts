@@ -32,7 +32,7 @@ export const pageTypeToURL = (pageType: PageType, saveString?: string) => {
         case "root":
             return "/"
         case "loadSave":
-            return `/loadSave/${encodeURIComponent(saveString!)}`
+            return `/load/${encodeURIComponent(saveString!)}`
     }
 }
 

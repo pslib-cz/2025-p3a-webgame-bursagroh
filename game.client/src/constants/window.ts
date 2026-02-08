@@ -1,0 +1,2 @@
+export const MIN_SUPPORTED_WIDTH = 1910
+export const MIN_SUPPORTED_HEIGHT = 950

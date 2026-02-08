@@ -35,7 +35,7 @@ const FloorScreenWithContext = () => {
             <div className={styles.container}>
                 <div className={styles.groundContainer}>
                     <span className={styles.heading}>Ground</span>
-                    <div className={styles.itemContainer}>
+                    <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.min(Object.keys(groupedItems).length, 3)}, max-content)`}}>
                         {Object.entries(groupedItems).map(([itemString, itemIds]) => (
                             <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
                         ))}
