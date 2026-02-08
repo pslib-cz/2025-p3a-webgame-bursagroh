@@ -33,6 +33,7 @@
 
 .close {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .transferContainer {

@@ -10,6 +10,7 @@
 
 .home {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .location {
@@ -22,6 +23,7 @@
 
 .save {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .saveText {

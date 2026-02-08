@@ -1,1 +1,0 @@
-export const DEFAULT_PLAYER_ID = "4b1e8a93-7d92-4f7f-80c1-525c345b85e0"

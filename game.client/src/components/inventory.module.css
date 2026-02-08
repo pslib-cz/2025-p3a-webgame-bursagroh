@@ -24,6 +24,7 @@
 
 .close {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .itemContainer {

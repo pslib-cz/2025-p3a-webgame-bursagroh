@@ -26,6 +26,7 @@
 
 .send {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .inputContainer {
