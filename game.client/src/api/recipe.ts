@@ -14,25 +14,30 @@ export const getLeaderboardQuery = () =>
         queryFn: () => api.get("/api/Recipe/Leaderboard", {}, {}),
     })
 
-export const getRandomRecipeMutation = () =>
+export const getRandomRecipeMutation = (onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.get("/api/Recipe/Random", {}, {}),
+        onError
     })
 
-export const startRecipeMutation = (playerId: string) =>
+export const startRecipeMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: (recipeId: number) => api.patchWith204("/api/Recipe/{recipeId}/Action/start", { recipeId }, {}, { playerId }),
+        onError
     })
 
 const reassembleIngrediences = (ingrediences: Array<IngredienceType>) => {
     return ingrediences.map((ingredience) => ({type: ingredience}))
 }
 
-export const endRecipeMutation = ( playerId: string) =>
+export const endRecipeMutation = ( playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: ({recipeId, playerAssembly}: {recipeId: number, playerAssembly: IngredienceType[]}) => api.patch("/api/Recipe/{recipeId}/Action/end", { recipeId }, {}, { playerId, playerAssembly: reassembleIngrediences(playerAssembly) }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
-            queryClient.invalidateQueries({ queryKey: ["leaderboard"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: ["leaderboard"], refetchType: "active" })
+            ])
         },
+        onError
     })

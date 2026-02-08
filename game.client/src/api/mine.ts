@@ -25,20 +25,27 @@ export const getMineItemsQuery = (playerId: string, mineId: number) =>
         queryFn: () => api.get("/api/Mine/{mineId}/Items", { mineId }, {}),
     })
 
-export const mineMineBlockMutation = (playerId: string, mineId: number, targetX: number, targetY: number) =>
+export const mineMineBlockMutation = (playerId: string, mineId: number, onError?: (error: Error) => void) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Mine/{mineId}/Action/mine", { mineId }, {}, { targetX, targetY }),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
+        mutationFn: ({ targetX, targetY }: { targetX: number, targetY: number }) => api.patch("/api/Mine/{mineId}/Action/mine", { mineId }, {}, { targetX, targetY }),
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" }),
+            ])
         },
+        onError,
     })
 
-export const rentPickMutation = (playerId: string, amount: number) =>
+export const rentPickMutation = (playerId: string, amount: number, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.patch("/api/Mine/Action/buy", {}, { playerId, amount }, {}),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [playerId, "inventory"] })
-            queryClient.invalidateQueries({ queryKey: [playerId, "player"] })
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" }),
+                queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" }),
+            ])
         },
+        onError,
     })

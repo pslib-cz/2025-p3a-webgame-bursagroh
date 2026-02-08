@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import React from "react"
+import React, { type JSX } from "react"
 import { getBuildingsQuery } from "../../api/building"
 import type { BuildingType, Building } from "../../types/api/models/building"
 import { PlayerIdContext } from "../../providers/PlayerIdProvider"
@@ -7,7 +7,8 @@ import Asset from "./Asset"
 import Road from "./tiles/city/Road"
 import BuildingTile from "./tiles/city/Building"
 
-const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null) => {
+// eslint-disable-next-line react-refresh/only-export-components
+export const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null) => {
     switch (buildingType) {
         case "Fountain":
             return "fountain"
@@ -47,7 +48,8 @@ const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: 
     }
 }
 
-const buildingToChunkPosition = (
+// eslint-disable-next-line react-refresh/only-export-components
+export const buildingToChunkPosition = (
     building: Building,
     chunkSize: number
 ): {
@@ -161,8 +163,28 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
                             )
                         }
 
+                        let text: JSX.Element | null = null
+                        if (building.buildingType === "Abandoned" || building.buildingType === "AbandonedTrap") {
+                            if (building.isBossDefeated) {
+                                text = (
+                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">x</text>
+                                )
+                            } else if (building.reachedHeight === building.height) {
+                                text = (
+                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">{building.height}</text>
+                                )
+                            } else if (building.reachedHeight !== 0) {
+                                text = (
+                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">{building.reachedHeight}/?</text>
+                                )
+                            }
+                        }
+
                         return (
-                            <BuildingTile key={`x:${building.positionX};y:${building.positionY}`} width={1} height={1} x={building.positionX} y={building.positionY} buildingType={tileType} />
+                            <>
+                                <BuildingTile key={`x:${building.positionX};y:${building.positionY}`} width={1} height={1} x={building.positionX} y={building.positionY} buildingType={tileType} />
+                                {text}
+                            </>
                         )
                     })
                 })}

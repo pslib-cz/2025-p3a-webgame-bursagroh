@@ -1,11 +1,8 @@
 import React from 'react'
 import type { AssetProps } from '../../../../types'
 import { useNavigate } from 'react-router'
-import { PlayerContext } from '../../../../providers/game/PlayerProvider'
-import { updatePlayerPositionMutation } from '../../../../api/player'
-import { validMove } from '../../../../utils/player'
 import TileSelector from '../../TileSelector'
-import { useMutation } from '@tanstack/react-query'
+import useMove from '../../../../hooks/useMove'
 
 type BuildingProps = {
     buildingType: | "bank"
@@ -32,16 +29,11 @@ type BuildingProps = {
 } & AssetProps
 
 const Building: React.FC<BuildingProps> = ({x, y, width, height, buildingType}) => {
+    const handleMove = useMove()
     const navigate = useNavigate()
 
-    const player = React.useContext(PlayerContext)!.player!
-
-    const { mutateAsync: updatePlayerPositionAsync } = useMutation(updatePlayerPositionMutation(player.playerId, x, y))
-
     const handleClick = async () => {
-        if (!validMove(player.positionX, player.positionY, x, y)) return
-
-        await updatePlayerPositionAsync()
+        await handleMove(x, y, false)
 
         switch (buildingType) {
             case 'bank':

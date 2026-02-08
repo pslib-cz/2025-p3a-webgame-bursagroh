@@ -5,6 +5,8 @@ import Map from "../../components/Map"
 import { IsBluredContext } from "../../providers/IsBluredProvider"
 import React from "react"
 import Layers from "../../components/wrappers/layer/Layers"
+import Notifications from "../../components/Notifications"
+import TooltipLayer from "../../components/TooltipLayer"
 
 const MapLayer = () => {
     const isBlured = React.useContext(IsBluredContext)!.isBlured
@@ -22,6 +24,8 @@ const Layout = () => {
             <Layers>
                 <MapLayer />
                 <Outlet />
+                <Notifications />
+                <TooltipLayer />
             </Layers>
         </Providers>
     )

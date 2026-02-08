@@ -12,13 +12,16 @@ import { useMutation } from '@tanstack/react-query'
 import HandItem from './item/HandItem'
 import { IsOpenInventoryContext } from '../providers/game/IsOpenInventoryProvider'
 import ArrayDisplay from './wrappers/ArrayDisplay'
+import useNotification from '../hooks/useNotification'
 
 const PlayerUI = () => {
+    const {genericError} = useNotification()
+    
     const player = React.useContext(PlayerContext)!.player!
     const inventory = React.useContext(InventoryContext)!.inventory!
     const { setIsOpen } = React.useContext(IsOpenInventoryContext)!
 
-    const {mutateAsync: equipItemAsync} = useMutation(equipItemMutation(player.playerId))
+    const {mutateAsync: equipItemAsync} = useMutation(equipItemMutation(player.playerId, genericError))
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()

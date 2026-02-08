@@ -31,7 +31,7 @@ const FloorSVG = () => {
 
     return (
         <SVGDisplay className={styles.floor} centerX={player.subPositionX} centerY={player.subPositionY}>
-            <Floor />
+            <Floor positionX={player.positionX} positionY={player.positionY} level={floor.level} />
             {floor.floorItems.map((item) => {
                 if (item.floorItemType === "Stair") {
                     return (
@@ -47,7 +47,7 @@ const FloorSVG = () => {
 
                 if (item.floorItemType === "Item" && item.itemInstance) {
                     return (
-                        <Asset key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} />
+                        <Asset key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} pointerEvents="none" />
                     )
                 }
 
