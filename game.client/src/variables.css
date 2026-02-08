@@ -9,7 +9,7 @@
     --darker: #2D2F30;
     --dangerous: #DD1C1A;
     --disabledDangerous: #ac1917;
-    --noMap: rgb(56, 56, 59);
+    --background: rgb(56, 56, 59);
 
     --h0: 12rem;
     --h1: 5.75rem;
@@ -19,4 +19,8 @@
     --h5: 1rem;
 
     --navbar-height: 6rem;
+}
+
+body {
+    background-color: var(--background);
 }
