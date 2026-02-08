@@ -23,11 +23,9 @@ public class DungeonService : IDungeonService
 
     public async Task<ActionResult?> HandleInternalLogic(Player player, Mine? playerMine, MovePlayerRequest request)
     {
-        // 1. Validate the move is physically possible (within walls/bounds)
         var boundaryError = CheckBoundaries(player, request);
         if (boundaryError != null) return boundaryError;
 
-        // 2. MINE EXIT CHECK (Recall Logic)
         if (player.ScreenType == ScreenTypes.Mine)
         {
             bool isExitTile = request.NewPositionX == GameConstants.MineExitX &&
@@ -37,44 +35,38 @@ public class DungeonService : IDungeonService
             {
                 player.ScreenType = ScreenTypes.City;
                 player.FloorId = null;
-                // SubPositions are reset; PositionX/Y are kept from when the player entered the mine
-                player.SubPositionX = 0;
-                player.SubPositionY = 0;
+                player.SubPositionX = GameConstants.MineExitX;
+                player.SubPositionY = GameConstants.MineExitY;
 
-                _context.Entry(player).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+
                 return new OkObjectResult(_mapper.Map<PlayerDto>(player));
             }
         }
 
-        // 3. Update internal position temporarily to check interactions
-        // Note: We don't save yet in case a collision happens below
         int oldSubX = player.SubPositionX;
         int oldSubY = player.SubPositionY;
         player.SubPositionX = request.NewPositionX;
         player.SubPositionY = request.NewPositionY;
 
-        // 4. BUILDING EXIT CHECK (Now used)
         if (player.ScreenType == ScreenTypes.Floor)
         {
             var buildingExitResult = await ProcessBuildingExit(player);
             if (buildingExitResult != null) return buildingExitResult;
         }
 
-        // 5. Collision & Context Logic
         var context = await GetMovementContextAsync(player, playerMine);
 
         if (player.ScreenType == ScreenTypes.Mine)
         {
             if (context.BlockedCoordinates.Contains((request.NewPositionX, request.NewPositionY)))
             {
-                // Revert position if blocked
                 player.SubPositionX = oldSubX;
                 player.SubPositionY = oldSubY;
                 return _errorService.CreateErrorResponse(400, 6002, "Movement blocked.", "Path Blocked");
             }
         }
 
-        // 6. Dungeon Floor Logic (Enemies, Stairs, Chests)
         if (player.FloorId != null)
         {
             await MoveEnemiesOptimizedAsync(player, context);
@@ -85,7 +77,7 @@ public class DungeonService : IDungeonService
             await ProcessStairNavigation(player);
         }
 
-        return null; // Return to PlayerService to trigger SaveChangesAsync()
+        return null; 
     }
 
     private ActionResult? CheckBoundaries(Player player, MovePlayerRequest request)
@@ -123,14 +115,12 @@ public class DungeonService : IDungeonService
     {
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
 
-        // Check if player is standing on an exit tile while on Floor 0
         if (exits.Any(e => e.x == player.SubPositionX && e.y == player.SubPositionY))
         {
             var floor = await _context.Floors.Include(f => f.Building).FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
 
             if (floor?.Level == 0)
             {
-                // Logic for Locked buildings (like the Abandoned Trap)
                 if (floor.Building?.BuildingType == BuildingTypes.AbandonedTrap && floor.Building.IsBossDefeated != true)
                 {
                     return null;
@@ -139,7 +129,6 @@ public class DungeonService : IDungeonService
                 player.ScreenType = ScreenTypes.City;
                 player.FloorId = null;
 
-                // Move player 1 tile away from the building door in the City map
                 if (player.SubPositionX == 0) player.PositionX -= 1;
                 else if (player.SubPositionX == GameConstants.FloorMaxX) player.PositionX += 1;
                 else if (player.SubPositionY == 0) player.PositionY -= 1;
