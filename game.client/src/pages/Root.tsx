@@ -22,7 +22,7 @@ const Root = () => {
 
     const handleClick = async () => {
         await playerId.generatePlayerIdAsync()
-        navigate("/game/city")
+        navigate("/game/fountain")
     }
 
     const handleSave = async () => {

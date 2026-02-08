@@ -20,12 +20,15 @@ import useNotification from "../../hooks/useNotification"
 import useKeyboard from "../../hooks/useKeyboard"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import ArrayDisplay from "../../components/wrappers/ArrayDisplay"
+import useLock from "../../hooks/useLock"
 
 const BankScreenWithContext = () => {
     useBlur(true)
     
     const navigate = useNavigate()
     const {genericError} = useNotification()
+    const handleLock = useLock()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const player = React.useContext(PlayerContext)!.player!
@@ -45,13 +48,17 @@ const BankScreenWithContext = () => {
     }
 
     const handleTransferToBank = async () => {
-        await moveBankMoneyAsync({ amount: toBankAmount ?? 0, direction: "ToBank" })
-        setToBankAmount(0)
+        await handleLock(async () => {
+            await moveBankMoneyAsync({ amount: toBankAmount ?? 0, direction: "ToBank" })
+            setToBankAmount(0)
+        })
     }
 
     const handleTransferToPlayer = async () => {
-        await moveBankMoneyAsync({ amount: toPlayerAmount ?? 0, direction: "ToPlayer" })
-        setToPlayerAmount(0)
+        await handleLock(async () => {
+            await moveBankMoneyAsync({ amount: toPlayerAmount ?? 0, direction: "ToPlayer" })
+            setToPlayerAmount(0)
+        })
     }
 
     const inventoryItems = groupInventoryItems(inventory)
@@ -81,14 +88,14 @@ const BankScreenWithContext = () => {
                     </div>
                 </div>
                 <div className={styles.itemContainer}>
-                    {Object.entries(inventoryItems).map(([itemString, inventoryItems]) => (
+                    <ArrayDisplay elements={Object.entries(inventoryItems).map(([itemString, inventoryItems]) => (
                         <BankInventoryItem key={itemString} items={inventory.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
-                    ))}
+                    ))} ifEmpty={<span className={styles.text}>Empty inventory</span>} />
                 </div>
                 <div className={styles.itemContainer}>
-                    {Object.entries(bankItems).map(([itemString, inventoryItems]) => (
+                    <ArrayDisplay elements={Object.entries(bankItems).map(([itemString, inventoryItems]) => (
                         <BankItem key={itemString} items={bank.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
-                    ))}
+                    ))} ifEmpty={<span className={styles.text}>Empty bank</span>} />
                 </div>
                 <CloseIcon width={24} height={24} className={styles.close} onClick={handleEscape} />
             </div>

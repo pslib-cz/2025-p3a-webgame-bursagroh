@@ -14,7 +14,7 @@ export type Building = {
     | {
           buildingType: "Abandoned" | "AbandonedTrap"
           height: number
-          reachedHeight: number
+          reachedHeight: number | null
           isBossDefeated: boolean
           floors: Array<Floor>
       }

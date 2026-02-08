@@ -7,7 +7,6 @@ import NavBar from "../../components/NavBar"
 import Inventory from "../../components/Inventory"
 import PlayerUI from "../../components/PlayerUI"
 import Layer from "../../components/wrappers/layer/Layer"
-import WrongScreen from "../WrongScreen"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import IsOpenInventoryProvider from "../../providers/game/IsOpenInventoryProvider"
 import InventoryProvider, { InventoryContext } from "../../providers/game/InventoryProvider"
@@ -41,12 +40,20 @@ export const screenTypeToURL = (screenType: ScreenType) => {
 }
 
 const ProperScreenChecker = () => {
-    const player = React.useContext(PlayerContext)!.player!
-
+    const navigate = useNavigate()
     const location = useLocation()
 
+    const player = React.useContext(PlayerContext)!.player!
+    
+
+    React.useEffect(() => {
+        if (screenTypeToURL(player.screenType) != location.pathname) {
+            navigate(screenTypeToURL(player.screenType)!)
+        }
+    }, [player.screenType, navigate, location.pathname])
+
     if (screenTypeToURL(player.screenType) != location.pathname) {
-        return <WrongScreen />
+        return null
     }
 
     return <Outlet />

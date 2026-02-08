@@ -13,7 +13,7 @@ const MapLayer = () => {
 
     return (
         <Layer layer={0} isBlured={isBlured}>
-            <Map />
+            <Map pointerEvents={isBlured ? "none" : "auto"} />
         </Layer>
     )
 }

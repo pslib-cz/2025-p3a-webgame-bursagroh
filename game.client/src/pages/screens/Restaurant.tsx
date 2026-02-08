@@ -17,12 +17,15 @@ import useNotification from "../../hooks/useNotification"
 import useKeyboard from "../../hooks/useKeyboard"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import useLock from "../../hooks/useLock"
+import Tooltip from "../../components/Tooltip"
 
 const RestaurantScreenWithContext = () => {
     useBlur(true)
 
     const navigate = useNavigate()
-    const {genericError} = useNotification()
+    const { genericError } = useNotification()
+    const handleLock = useLock()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const recipes = React.useContext(RecipesContext)!.recipes!
@@ -44,20 +47,24 @@ const RestaurantScreenWithContext = () => {
     }
 
     const handleStart = async () => {
-        const recipe = await getRandomRecipeAsync()
+        await handleLock(async () => {
+            const recipe = await getRandomRecipeAsync()
 
-        await startRecipeAsync(recipe.recipeId)
+            await startRecipeAsync(recipe.recipeId)
 
-        setCurrentBurger(recipe)
-        setIsMaking(true)
+            setCurrentBurger(recipe)
+            setIsMaking(true)
+        })
     }
 
     const handleStop = async () => {
-        await endRecipeAsync({ recipeId: currentBurger?.recipeId ?? -1, playerAssembly: currentBurgerStack })
+        await handleLock(async () => {
+            await endRecipeAsync({ recipeId: currentBurger?.recipeId ?? -1, playerAssembly: currentBurgerStack })
 
-        setCurrentBurgerStack([])
-        setCurrentBurger(undefined)
-        setIsMaking(false)
+            setCurrentBurgerStack([])
+            setCurrentBurger(undefined)
+            setIsMaking(false)
+        })
     }
 
     const addIngredience = (ingredienceType: IngredienceType) => {
@@ -73,30 +80,46 @@ const RestaurantScreenWithContext = () => {
                 <span className={styles.burgerName}>{currentBurger?.name}</span>
                 <Burger burger={{ recipeId: currentBurger?.recipeId ?? -1, name: "", ingrediences: currentBurgerStack.map((ingredienceType, index) => ({ order: index, ingredienceType })) }} />
                 <div className={styles.ingredienceButtons}>
-                    <svg onClick={() => addIngredience("BunDown")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="bun_down" />
-                    </svg>
-                    <svg onClick={() => addIngredience("Meat")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="meat" />
-                    </svg>
-                    <svg onClick={() => addIngredience("Cheese")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="cheese" />
-                    </svg>
-                    <svg onClick={() => addIngredience("Salad")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="salad" />
-                    </svg>
-                    <svg onClick={() => addIngredience("Tomato")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="tomato" />
-                    </svg>
-                    <svg onClick={() => addIngredience("Bacon")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="bacon" />
-                    </svg>
-                    <svg onClick={() => addIngredience("Sauce")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="sauce" />
-                    </svg>
-                    <svg onClick={() => addIngredience("BunUp")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                        <Asset x={0} y={0} width={32} height={32} assetType="bun_up" />
-                    </svg>
+                    <Tooltip heading="Ingredience" text="Bun down">
+                        <svg onClick={() => addIngredience("BunDown")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="bun_down" />
+                        </svg>
+                    </Tooltip>
+                    <Tooltip heading="Ingredience" text="Meat">
+                        <svg onClick={() => addIngredience("Meat")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="meat" />
+                        </svg>
+                    </Tooltip>
+                    <Tooltip heading="Ingredience" text="Cheese">
+                        <svg onClick={() => addIngredience("Cheese")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="cheese" />
+                        </svg>
+                    </Tooltip>
+                    <Tooltip heading="Ingredience" text="Salad">
+                        <svg onClick={() => addIngredience("Salad")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="salad" />
+                        </svg>
+                    </Tooltip>
+                    <Tooltip heading="Ingredience" text="Tomato">
+                        <svg onClick={() => addIngredience("Tomato")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="tomato" />
+                        </svg>
+                    </Tooltip>
+                    <Tooltip heading="Ingredience" text="Bacon">
+                        <svg onClick={() => addIngredience("Bacon")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="bacon" />
+                        </svg>
+                    </Tooltip>
+                    <Tooltip heading="Ingredience" text="Sauce">
+                        <svg onClick={() => addIngredience("Sauce")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="sauce" />
+                        </svg>
+                    </Tooltip>
+                    <Tooltip heading="Ingredience" text="Bun up">
+                        <svg onClick={() => addIngredience("BunUp")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={32} height={32} assetType="bun_up" />
+                        </svg>
+                    </Tooltip>
                 </div>
                 <div className={styles.buttonContainer}>
                     <Button onClick={handleStop}>Done</Button>

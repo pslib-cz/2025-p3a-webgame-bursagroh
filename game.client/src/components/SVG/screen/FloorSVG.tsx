@@ -33,31 +33,18 @@ const FloorSVG = () => {
     return (
         <SVGDisplay className={styles.floor} centerX={player.subPositionX} centerY={player.subPositionY}>
             <Floor positionX={player.positionX} positionY={player.positionY} level={floor.level} />
-            {floor.floorItems.map((item) => {
-                if (item.floorItemType === "Stair") {
-                    return (
-                        <FloorTile z-index={100} key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} floorTileType='stair' />
-                    )
-                }
-
-                if (item.floorItemType === "Enemy" && item.enemy) {
-                    return (
-                        <Enemy key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} enemyType={mapEnemyType(item.enemy.enemyType)} />
-                    )
-                }
-
-                if (item.floorItemType === "Item" && item.itemInstance) {
-                    return (
-                        <Asset key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} pointerEvents="none" />
-                    )
-                }
-
-                if (item.floorItemType === "Chest" && item.chest) {
-                    return (
-                        <FloorTile z-index={100} key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} floorTileType='chest' />
-                    )
-                }
-            })}
+            {floor.floorItems.filter((item) => item.floorItemType === "Stair").map((item) => (
+                <FloorTile key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} floorTileType='stair' />
+            ))}
+            {floor.floorItems.filter((item) => item.floorItemType === "Chest").map((item) => (
+                <FloorTile z-index={100} key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} floorTileType='chest' />
+            ))}
+            {floor.floorItems.filter((item) => item.floorItemType === "Item").map((item) => (
+                <Asset key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item!.itemInstance!.item!.itemId)} pointerEvents="none" />
+            ))}
+            {floor.floorItems.filter((item) => item.floorItemType === "Enemy").map((item) => (
+                <Enemy key={`x:${item.positionX};y:${item.positionY}`} x={item.positionX} y={item.positionY} width={1} height={1} enemyType={mapEnemyType(item!.enemy!.enemyType)} />
+            ))}
             <Tooltip heading='Player' text={`Player is located at x: ${player.subPositionX} y: ${player.subPositionY}`}>
                 <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
             </Tooltip>

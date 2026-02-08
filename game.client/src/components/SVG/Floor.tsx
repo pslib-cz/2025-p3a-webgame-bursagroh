@@ -148,8 +148,6 @@ const Floor: React.FC<FloorProps> = ({ positionX, positionY, level }) => {
         const playerRelativeX = positionX - x
         const playerRelativeY = positionY - y
 
-        console.log(playerRelativeX, playerRelativeY, x, y)
-
         const building = chunkBuildingMap[playerRelativeY][playerRelativeX]!
 
         const tileType = mapBuildingTypeToTileType(
