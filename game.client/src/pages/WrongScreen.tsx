@@ -1,5 +1,5 @@
 import React from 'react'
-import { PlayerIdContext } from '../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../providers/global/PlayerIdProvider'
 import { useQuery } from '@tanstack/react-query'
 import { getPlayerQuery } from '../api/player'
 import { NavLink } from 'react-router'

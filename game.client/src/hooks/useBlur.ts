@@ -1,5 +1,5 @@
 import React from 'react'
-import { IsBluredContext } from '../providers/IsBluredProvider'
+import { IsBluredContext } from '../providers/global/IsBluredProvider'
 
 const useBlur = (isBlured: boolean) => {
     const setIsBlured = React.useContext(IsBluredContext)!.setIsBlured

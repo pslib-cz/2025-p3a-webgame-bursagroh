@@ -1,14 +1,14 @@
 import { useMutation } from "@tanstack/react-query"
 import { updatePlayerScreenMutation } from "../../api/player"
 import React from "react"
-import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import { moveBankMoneyMutation } from "../../api/bank"
 import { useNavigate } from "react-router"
 import Input from "../../components/Input"
 import MoneyIcon from "../../assets/icons/MoneyIcon"
-import { PlayerContext } from "../../providers/game/PlayerProvider"
+import { PlayerContext } from "../../providers/global/PlayerProvider"
 import { InventoryContext } from "../../providers/game/InventoryProvider"
-import { BankContext } from "../../providers/game/BankProvider"
+import BankProvider, { BankContext } from "../../providers/game/BankProvider"
 import styles from "./bank.module.css"
 import CloseIcon from "../../assets/icons/CloseIcon"
 import BankInventoryItem from "../../components/item/BankInventoryItem"
@@ -18,38 +18,10 @@ import useBlur from "../../hooks/useBlur"
 import SendIcon from "../../assets/icons/SendIcon"
 import useNotification from "../../hooks/useNotification"
 import useKeyboard from "../../hooks/useKeyboard"
+import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
+import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
 
-// const InventoryItem = ({ playerId, item }: { playerId: string, item: InventoryItemType }) => {
-//     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, item.inventoryItemId))
-
-//     const handleClick = () => {
-//         moveBankItemAsync()
-//     }
-
-//     return (
-//         <div>
-//             Item: {item.itemInstance.item.name}
-//             <button onClick={handleClick}>move</button>
-//         </div>
-//     )
-// }
-
-// const BankItem = ({ playerId, item }: { playerId: string, item: InventoryItemType }) => {
-//     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, item.inventoryItemId))
-
-//     const handleClick = () => {
-//         moveBankItemAsync()
-//     }
-
-//     return (
-//         <div>
-//             Item: {item.itemInstance.item.name}
-//             <button onClick={handleClick}>move</button>
-//         </div>
-//     )
-// }
-
-const BankScreen = () => {
+const BankScreenWithContext = () => {
     useBlur(true)
     
     const navigate = useNavigate()
@@ -121,6 +93,14 @@ const BankScreen = () => {
                 <CloseIcon width={24} height={24} className={styles.close} onClick={handleEscape} />
             </div>
         </div>
+    )
+}
+
+const BankScreen = () => {
+    return (
+        <ProviderGroupLoadingWrapper providers={[BankProvider]} contextsToLoad={[BankContext] as Array<React.Context<TLoadingWrapperContextState>>}>
+            <BankScreenWithContext />
+        </ProviderGroupLoadingWrapper>
     )
 }
 

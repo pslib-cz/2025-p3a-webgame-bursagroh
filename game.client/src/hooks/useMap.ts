@@ -1,6 +1,6 @@
 import React from 'react'
 import type { MapType } from '../types/map'
-import { MapContext } from '../providers/MapProvider'
+import { MapContext } from '../providers/global/MapProvider'
 
 const useMap = (mapType: MapType) => {
     const setMapType = React.useContext(MapContext)!.setMapType

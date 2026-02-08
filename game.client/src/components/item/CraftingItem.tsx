@@ -1,6 +1,6 @@
 import React from 'react'
 import type { Blueprint } from '../../types/api/models/blueprint'
-import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
 import { craftBlueprintMutation } from '../../api/blueprint'
 import { itemIdToAssetType } from '../../utils/item'

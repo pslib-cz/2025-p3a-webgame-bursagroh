@@ -4,7 +4,7 @@ import { validMove } from '../../../../utils/player'
 import { useMutation } from '@tanstack/react-query'
 import { updatePlayerScreenMutation } from '../../../../api/player'
 import useNotification from '../../../../hooks/useNotification'
-import { PlayerContext } from '../../../../providers/game/PlayerProvider'
+import { PlayerContext } from '../../../../providers/global/PlayerProvider'
 import { useNavigate } from 'react-router'
 import type { AssetProps } from '../../../../types'
 

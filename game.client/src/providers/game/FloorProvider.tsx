@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
-import { PlayerIdContext } from "./PlayerIdProvider"
-import type { Floor } from "../types/api/models/building"
-import { getFloorQuery } from "../api/building"
-import { PlayerContext } from "./game/PlayerProvider"
+import { PlayerIdContext } from "../global/PlayerIdProvider"
+import type { Floor } from "../../types/api/models/building"
+import { getFloorQuery } from "../../api/building"
+import { PlayerContext } from "../global/PlayerProvider"
 
 type FloorContextType = {
     isError: boolean
@@ -19,11 +19,7 @@ const FloorProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     const player = React.useContext(PlayerContext)!.player!
 
-    const {data: floor, isError, isPending, isSuccess} = useQuery(getFloorQuery(playerId, player?.floorId ?? -1))
-
-    if (!player?.floorId) {
-        return <FloorContext.Provider value={{ floor: undefined, isError: false, isPending: false, isSuccess: true }}>{children}</FloorContext.Provider>
-    }
+    const {data: floor, isError, isPending, isSuccess} = useQuery(getFloorQuery(playerId, player.floorId!))
 
     return <FloorContext.Provider value={{ floor, isError, isPending, isSuccess }}>{children}</FloorContext.Provider>
 }

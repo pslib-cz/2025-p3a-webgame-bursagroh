@@ -11,7 +11,11 @@ type LoadingWrapperProps<T> = {
 } & React.PropsWithChildren
 
 const LoadingWrapper = <T extends TLoadingWrapperContextState>({ children, context }: LoadingWrapperProps<T>) => {
-    const ctx = React.useContext(context)!
+    const ctx = React.useContext(context)
+
+    if (!ctx) {
+        return children
+    }
 
     if (ctx.isPending) {
         return <div>Loading...</div>

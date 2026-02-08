@@ -1,6 +1,6 @@
 import React from 'react'
 import useMove from './useMove'
-import { PlayerContext } from '../providers/game/PlayerProvider'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 import useKeyboard from './useKeyboard'
 
 type Direction = "up" | "down" | "left" | "right"

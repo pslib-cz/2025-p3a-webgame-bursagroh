@@ -1,9 +1,9 @@
 import { useMutation } from "@tanstack/react-query"
 import React from "react"
-import { saveMutation } from "../api/save"
+import { saveMutation } from "../../api/save"
 import { PlayerIdContext } from "./PlayerIdProvider"
-import useStorage from "../hooks/useStorage"
-import { AutosaveContext } from "./AutosaveProvider"
+import useStorage from "../../hooks/useStorage"
+import { SettingsContext } from "./SettingsProvider"
 
 type SaveState = "idle" | "saving" | "saved"
 
@@ -29,7 +29,7 @@ export const SaveContext = React.createContext<SaveContextType | null>(null)
 
 const SaveProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const autosave = React.useContext(AutosaveContext)!
+    const autosave = React.useContext(SettingsContext)!
 
     const [saveString, setSaveString] = React.useState<string | null>(null)
     const [saveState, setSaveState] = React.useState<SaveState>("idle")

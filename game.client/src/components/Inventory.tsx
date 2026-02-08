@@ -6,7 +6,7 @@ import styles from "./inventory.module.css"
 import CloseIcon from '../assets/icons/CloseIcon'
 import InventoryItem from './item/InventoryItem'
 import { groupInventoryItems, removeEquippedItemFromInventory } from '../utils/inventory'
-import { PlayerContext } from '../providers/game/PlayerProvider'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 import { InventoryContext } from '../providers/game/InventoryProvider'
 import { IsOpenInventoryContext } from '../providers/game/IsOpenInventoryProvider'
 import ConditionalDisplay from './wrappers/ConditionalDisplay'

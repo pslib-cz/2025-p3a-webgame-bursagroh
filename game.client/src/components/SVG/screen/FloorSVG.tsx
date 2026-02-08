@@ -1,14 +1,15 @@
 import React from 'react'
 import SVGDisplay from '../../SVGDisplay'
 import Asset from '../Asset'
-import { PlayerContext } from '../../../providers/game/PlayerProvider'
-import { FloorContext } from '../../../providers/FloorProvider'
+import { PlayerContext } from '../../../providers/global/PlayerProvider'
+import { FloorContext } from '../../../providers/game/FloorProvider'
 import type { EnemyType } from '../../../types/api/models/building'
 import styles from './floorSVG.module.css'
 import Floor from '../Floor'
 import Enemy from '../tiles/floor/Enemy'
 import FloorTile from '../tiles/floor/FloorTile'
 import { itemIdToAssetType } from '../../../utils/item'
+import Tooltip from '../../Tooltip'
 
 const mapEnemyType = (enemyType: EnemyType) => {
     switch (enemyType) {
@@ -57,7 +58,9 @@ const FloorSVG = () => {
                     )
                 }
             })}
-            <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
+            <Tooltip heading='Player' text={`Player is located at x: ${player.subPositionX} y: ${player.subPositionY}`}>
+                <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
+            </Tooltip>
         </SVGDisplay>
     )
 }

@@ -5,7 +5,7 @@ import type { InventoryItem as InventoryItemType } from '../../types/api/models/
 import ArrowRightIcon from '../../assets/icons/ArrowRightIcon'
 import ArrowRightDoubleIcon from '../../assets/icons/ArrowRightDoubleIcon'
 import { moveBankItemMutation } from '../../api/bank'
-import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
 import styles from './bankInventoryItem.module.css'
 import ConditionalDisplay from '../wrappers/ConditionalDisplay'

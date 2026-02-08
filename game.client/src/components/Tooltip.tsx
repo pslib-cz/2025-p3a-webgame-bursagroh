@@ -1,14 +1,21 @@
 import React from 'react'
-import { TooltipContext } from '../providers/TooltipProvider'
+import { TooltipContext } from '../providers/global/TooltipProvider'
+
+type TooltipChildProps = {
+    onMouseEnter?: React.MouseEventHandler
+    onMouseLeave?: React.MouseEventHandler
+    onMouseMove?: React.MouseEventHandler
+}
 
 type TooltipProps = {
+    children: React.ReactElement<TooltipChildProps>
     heading: string
     text: string
     relativeX?: number
     relativeY?: number
 }
 
-const Tooltip: React.FC<React.PropsWithChildren<TooltipProps>> = ({ children, heading, text, relativeX = 12, relativeY = 16 }) => {
+const Tooltip: React.FC<TooltipProps> = ({ children, heading, text, relativeX = 12, relativeY = 16 }) => {
     const id = React.useId()
 
     const [open, setOpen] = React.useState(false)
@@ -41,9 +48,15 @@ const Tooltip: React.FC<React.PropsWithChildren<TooltipProps>> = ({ children, he
         }
     }, [open, pos, setTooltip, heading, text, id, relativeX, relativeY])
 
-    return (
-        <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onMouseMove={onMove}>{children}</div>
-    )
+    if (!React.isValidElement(children)) {
+        return null
+    }
+
+    return React.cloneElement(children, {
+        onMouseEnter,
+        onMouseLeave,
+        onMouseMove: onMove,
+    })
 }
 
 export default Tooltip

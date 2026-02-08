@@ -1,9 +1,9 @@
 import React from 'react'
 import HomeIcon from '../assets/icons/HomeIcon'
 import styles from './navbar.module.css'
-import { PlayerContext } from '../providers/game/PlayerProvider'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 import { useNavigate } from 'react-router'
-import { SaveContext } from '../providers/SaveProvider'
+import { SaveContext } from '../providers/global/SaveProvider'
 import SaveString from './SaveString'
 import SaveIcon from '../assets/icons/SaveIcon'
 

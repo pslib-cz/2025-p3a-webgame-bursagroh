@@ -1,6 +1,6 @@
 import React from 'react'
 import useNotification from './useNotification'
-import { PlayerContext } from '../providers/game/PlayerProvider'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 import { useMutation } from '@tanstack/react-query'
 import { updatePlayerPositionMutation } from '../api/player'
 import { validMove } from '../utils/player'

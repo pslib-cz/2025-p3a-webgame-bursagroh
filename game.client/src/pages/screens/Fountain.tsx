@@ -1,7 +1,7 @@
 import React from 'react'
 import { dropItemMutation, updatePlayerScreenMutation } from '../../api/player'
 import { useMutation } from '@tanstack/react-query'
-import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useNavigate } from 'react-router'
 import CloseIcon from '../../assets/icons/CloseIcon'
 import styles from './fountain.module.css'

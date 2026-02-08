@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
-import { PlayerIdContext } from "../PlayerIdProvider"
+import { PlayerIdContext } from "../global/PlayerIdProvider"
 import type { InventoryItem } from "../../types/api/models/player"
 import { getBankInventoryQuery } from "../../api/bank"
 

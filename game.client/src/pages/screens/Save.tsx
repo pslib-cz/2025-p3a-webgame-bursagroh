@@ -1,6 +1,6 @@
 import React from 'react'
 import Layer from '../../components/wrappers/layer/Layer'
-import { SaveContext } from '../../providers/SaveProvider'
+import { SaveContext } from '../../providers/global/SaveProvider'
 import Link from '../../components/Link'
 import SaveString from '../../components/SaveString'
 import useBlur from '../../hooks/useBlur'

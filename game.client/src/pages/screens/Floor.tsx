@@ -1,8 +1,8 @@
 import ConditionalDisplay from '../../components/wrappers/ConditionalDisplay'
 import useBlur from '../../hooks/useBlur'
 import useMap from '../../hooks/useMap'
-import { FloorContext } from '../../providers/FloorProvider'
-import { PlayerContext } from '../../providers/game/PlayerProvider'
+import FloorProvider, { FloorContext } from '../../providers/game/FloorProvider'
+import { PlayerContext } from '../../providers/global/PlayerProvider'
 import React from 'react'
 import { groupFloorItems } from '../../utils/floor'
 import GroundItem from '../../components/item/GroundItem'
@@ -10,8 +10,10 @@ import styles from './floor.module.css'
 import useKeyboard from '../../hooks/useKeyboard'
 import { useNavigate } from 'react-router'
 import useKeyboardMove from '../../hooks/useKeyboardMove'
+import ProviderGroupLoadingWrapper from '../../components/wrappers/ProviderGroupLoadingWrapper'
+import type { TLoadingWrapperContextState } from '../../components/wrappers/LoadingWrapper'
 
-const FloorScreen = () => {
+const FloorScreenWithContext = () => {
     useBlur(false)
     useMap("floor")
     useKeyboardMove(true)
@@ -41,6 +43,14 @@ const FloorScreen = () => {
                 </div>
             </div>
         </ConditionalDisplay>
+    )
+}
+
+const FloorScreen = () => {
+    return (
+        <ProviderGroupLoadingWrapper providers={[FloorProvider]} contextsToLoad={[FloorContext] as Array<React.Context<TLoadingWrapperContextState>>}>
+            <FloorScreenWithContext />
+        </ProviderGroupLoadingWrapper>
     )
 }
 
