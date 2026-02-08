@@ -37,9 +37,9 @@ builder.Services.AddScoped<IDungeonService, DungeonService>();
 builder.Services.AddScoped<IBuildingService, BuildingService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IBlueprintService, BlueprintService>();
-builder.Services.AddScoped<INavigationService, NavigationService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IMineInteractionService, MineInteractionService>();
-builder.Services.AddSingleton<MapGeneratorService>();
+builder.Services.AddSingleton<IMapGeneratorService, MapGeneratorService>();
 builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
 
 builder.Services.AddHostedService<PlayerCleanupService>();

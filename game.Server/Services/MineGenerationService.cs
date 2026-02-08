@@ -7,7 +7,6 @@ namespace game.Server.Services
     public class MineGenerationService
     {
         private readonly ApplicationDbContext _context;
-        private const int LayerSize = 8;
 
         public MineGenerationService(ApplicationDbContext context)
         {
@@ -61,7 +60,7 @@ namespace game.Server.Services
                             MineBlocks = new List<MineBlock>()
                         };
 
-                        for (int i = 0; i < LayerSize; i++)
+                        for (int i = 0; i < GameConstants.GridSize; i++)
                         {
                             var randomNumber = random.Next(totalWeight);
                             var runningWeight = 0;

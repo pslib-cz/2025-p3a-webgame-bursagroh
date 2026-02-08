@@ -3,7 +3,6 @@ using game.Server.Data;
 using game.Server.DTOs;
 using game.Server.Types;
 using game.Server.Models;
-using game.Server.Requests;
 using game.Server.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -88,7 +87,7 @@ namespace game.Server.Services
                 return _errorService.CreateErrorResponse(404, 7004, "Item not found in your inventory.", "Not Found");
             } 
              
-            bool isWin = inventoryItem.ItemInstance.ItemId == 100 && player.PositionX == 0 && player.PositionY == 0;
+            bool isWin = inventoryItem.ItemInstance.ItemId == 100 && player.PositionX == GameConstants.FountainX && player.PositionY == GameConstants.FountainY;
             if (isWin) player.ScreenType = ScreenTypes.Win;
             else if (player.FloorId == null) return _errorService.CreateErrorResponse(400, 7005, "Can only drop items in a floor or mine.", "Action Denied");
 

@@ -33,27 +33,25 @@ namespace game.Server.Services
                     .Include(p => p.InventoryItems)
                     .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-                if (player == null) {
-                    return _errorService.CreateErrorResponse(404, 5001, "Player not found.", "Not Found");
-                } 
-
-                int playerDamage = 1;
-                string itemName = "Fist";
-                var itemType = ItemTypes.Sword;
-                ItemInstance? activeInstance = player.ActiveInventoryItem?.ItemInstance;
-
-                if (activeInstance?.Item != null)
+                if (player == null)
                 {
-                    playerDamage = activeInstance.Item.Damage;
-                    itemName = activeInstance.Item.Name;
-                    itemType = activeInstance.Item.ItemType;
+                    return _errorService.CreateErrorResponse(404, 5001, "Player not found.", "Not Found");
                 }
 
-                if (itemType == ItemTypes.Sword)
+                ItemInstance? activeInstance = player.ActiveInventoryItem?.ItemInstance;
+                Item? itemData = activeInstance?.Item;
+
+                bool isWeapon = itemData == null ||
+                               itemData.ItemType == ItemTypes.Sword ||
+                               itemData.ItemType == ItemTypes.Axe ||
+                               itemData.ItemType == ItemTypes.Pickaxe;
+
+                if (isWeapon)
                 {
-                    if (player.ScreenType != ScreenTypes.Fight) {
+                    if (player.ScreenType != ScreenTypes.Fight)
+                    {
                         return _errorService.CreateErrorResponse(400, 5002, "You can only attack during a fight.", "Combat Denied");
-                    }  
+                    }
 
                     var floorItem = await _context.FloorItems
                         .Include(fi => fi.Enemy)
@@ -72,6 +70,7 @@ namespace game.Server.Services
                     var enemy = floorItem.Enemy;
                     var rng = new Random();
 
+                    int playerDamage = itemData?.Damage ?? 1;
                     enemy.Health -= playerDamage;
 
                     if (activeInstance != null)
@@ -88,19 +87,20 @@ namespace game.Server.Services
 
                     if (enemy.Health > 0)
                     {
-                        if (rng.NextDouble() < 0.30)
+                        if (rng.NextDouble() < GameConstants.EnemyCounterAttackChance)
                         {
-                            int enemyDamage = rng.Next(1, 3);
+                            int enemyDamage = rng.Next(GameConstants.EnemyMinDamage, GameConstants.EnemyMaxDamage + 1);
                             player.Health -= enemyDamage;
 
                             if (player.Health <= 0)
                             {
                                 player.Health = 0;
                                 player.ScreenType = ScreenTypes.Lose;
-                                var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
-                                if (itemsToRemove.Any()) 
+
+                                if (player.PlayerId.ToString() != GameConstants.ProtectedPlayerId)
                                 {
-                                    _context.InventoryItems.RemoveRange(itemsToRemove);
+                                    var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
+                                    if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
                                 }
 
                                 await _context.SaveChangesAsync();
@@ -115,7 +115,7 @@ namespace game.Server.Services
 
                     if (enemy.EnemyType == EnemyType.Dragon)
                     {
-                        player.Money += 750;
+                        player.Money += GameConstants.DragonReward;
                         var floor = await _context.Floors.Include(f => f.Building).FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
                         if (floor?.Building != null) floor.Building.IsBossDefeated = true;
                     }
@@ -139,36 +139,47 @@ namespace game.Server.Services
                     return new OkObjectResult(new { victory = true, message = "Enemy defeated." });
                 }
 
-                if (player.ActiveInventoryItem != null)
+                var consumableIds = new[] {
+                    GameConstants.ItemIdSmallPotion,
+                    GameConstants.ItemIdHealthUpgrade,
+                    GameConstants.ItemIdCapacityUpgrade
+                };
+
+                if (itemData != null && consumableIds.Contains(itemData.ItemId))
                 {
-                    var itemData = player.ActiveInventoryItem.ItemInstance.Item;
-                    if (new[] { 40, 41, 42 }.Contains(itemData.ItemId))
+                    if (itemData.ItemId == GameConstants.ItemIdSmallPotion)
                     {
-                        if (itemData.ItemId == 40)
-                        {
-                            if (player.Health >= player.MaxHealth) return _errorService.CreateErrorResponse(400, 5004, "Full health.", "Healing Failed");
-                            player.Health = Math.Min(player.MaxHealth, player.Health + 5);
-                        }
-                        else if (itemData.ItemId == 41) player.MaxHealth += 5;
-                        else if (itemData.ItemId == 42) player.Capacity += 5;
+                        if (player.Health >= player.MaxHealth)
+                            return _errorService.CreateErrorResponse(400, 5004, "Full health.", "Healing Failed");
 
-                        var activeItem = player.ActiveInventoryItem;
-                        var instance = activeItem.ItemInstance;
-
-                        player.ActiveInventoryItemId = null;
-                        _context.InventoryItems.Remove(activeItem);
-                        _context.ItemInstances.Remove(instance);
-
-                        await _context.SaveChangesAsync();
-                        await transaction.CommitAsync();
-                        return new OkObjectResult(_mapper.Map<PlayerDto>(player));
+                        player.Health = Math.Min(player.MaxHealth, player.Health + GameConstants.SmallPotionHealAmount);
                     }
+                    else if (itemData.ItemId == GameConstants.ItemIdHealthUpgrade)
+                    {
+                        player.MaxHealth += GameConstants.HealthUpgradeAmount;
+                        player.Health += GameConstants.HealthUpgradeAmount; 
+                    }
+                    else if (itemData.ItemId == GameConstants.ItemIdCapacityUpgrade)
+                    {
+                        player.Capacity += GameConstants.CapacityUpgradeAmount;
+                    }
+
+                    var activeItem = player.ActiveInventoryItem!;
+                    player.ActiveInventoryItemId = null;
+                    _context.InventoryItems.Remove(activeItem);
+                    _context.ItemInstances.Remove(activeInstance!);
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                    return new OkObjectResult(_mapper.Map<PlayerDto>(player));
                 }
 
-                return _errorService.CreateErrorResponse(400, 5005, $"{itemName} is not usable this way.", "Invalid Action");
+                string name = itemData?.Name ?? "Fist";
+                return _errorService.CreateErrorResponse(400, 5005, $"{name} is not usable this way.", "Invalid Action");
             }
             catch (Exception)
             {
+                await transaction.RollbackAsync();
                 throw;
             }
         }
