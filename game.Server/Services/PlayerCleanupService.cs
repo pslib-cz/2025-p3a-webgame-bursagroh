@@ -1,4 +1,5 @@
 ﻿using game.Server.Data;
+using game.Server.Models;
 using Microsoft.EntityFrameworkCore;
 
 public class PlayerCleanupService : BackgroundService
@@ -53,7 +54,7 @@ public class PlayerCleanupService : BackgroundService
         _logger.LogInformation("Starting daily inactive player purge...");
 
         var cutoffDate = DateTime.UtcNow.AddMonths(-3);
-        var protectedPlayerId = Guid.Parse("4b1e8a93-7d92-4f7f-80c1-525c345b85e0");
+        var protectedPlayerId = Guid.Parse(GameConstants.ProtectedPlayerId);
 
         var inactivePlayerIds = await context.Players
             .Where(p => p.LastModified < cutoffDate && p.PlayerId != protectedPlayerId)

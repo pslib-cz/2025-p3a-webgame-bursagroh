@@ -24,16 +24,17 @@ namespace game.Server.Services
 
         public List<Building> GetCoreBuildings(Guid playerId) => new List<Building>
         {
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Fountain, PositionX = 0, PositionY = 0, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Mine, PositionX = 2, PositionY = 0, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Bank, PositionX = -2, PositionY = 0, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Restaurant, PositionX = 0, PositionY = -2, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Blacksmith, PositionX = 0, PositionY = 2, IsBossDefeated = false }
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Fountain, PositionX = GameConstants.FountainX, PositionY = GameConstants.FountainY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Mine, PositionX = GameConstants.MineEntranceX, PositionY = GameConstants.MineEntranceY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Bank, PositionX = GameConstants.BankX, PositionY = GameConstants.BankY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Restaurant, PositionX = GameConstants.RestaurantX, PositionY = GameConstants.RestaurantY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Blacksmith, PositionX = GameConstants.BlacksmithX, PositionY = GameConstants.BlacksmithY, IsBossDefeated = false }
         };
 
         public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildingsAsync(Guid playerId, int top, int left, int width, int height)
         {
-            if (width > 20 || height > 20 || width <= 0 || height <= 0) {
+            if (width > 20 || height > 20 || width <= 0 || height <= 0) 
+            {
                 return _errorService.CreateErrorResponse(400, 3001, "Requested area is too large or invalid. Maximum size is 20x20.", "Invalid Request");
             }
 

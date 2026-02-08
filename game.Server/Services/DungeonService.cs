@@ -23,11 +23,27 @@ public class DungeonService : IDungeonService
 
     public async Task<ActionResult?> HandleInternalLogic(Player player, Mine? playerMine, MovePlayerRequest request)
     {
-        var mineResult = await ProcessMineLogic(player, playerMine, request);
-        if (mineResult != null) 
+        if (player.ScreenType == ScreenTypes.Floor)
         {
-            return mineResult;
-        } 
+            if (request.NewPositionX < 0 || request.NewPositionX > GameConstants.FloorMaxX ||
+                request.NewPositionY < 0 || request.NewPositionY > GameConstants.FloorMaxY)
+            {
+                return _errorService.CreateErrorResponse(400, 6001, "Movement out of bounds.", "Invalid Move");
+            }
+        }
+
+        if (player.ScreenType == ScreenTypes.Mine)
+        {
+            bool isExitTile = request.NewPositionX == GameConstants.MineExitX && request.NewPositionY == GameConstants.MineExitY;
+
+            if (!isExitTile && (request.NewPositionX < 0 || request.NewPositionX > GameConstants.MineMaxX || request.NewPositionY < GameConstants.MineMinY))
+            {
+                return _errorService.CreateErrorResponse(400, 6001, "Movement out of bounds.", "Invalid Move");
+            }
+        }
+
+        var mineResult = await ProcessMineLogic(player, playerMine, request);
+        if (mineResult != null) return mineResult;
 
         player.SubPositionX = request.NewPositionX;
         player.SubPositionY = request.NewPositionY;
@@ -44,23 +60,24 @@ public class DungeonService : IDungeonService
 
             await ProcessStairNavigation(player);
         }
+
         return null;
     }
 
     private async Task<ActionResult?> ProcessMineLogic(Player player, Mine? playerMine, MovePlayerRequest request)
     {
-        if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == 4 && request.NewPositionY == -3)
+        if (player.ScreenType == ScreenTypes.Mine && request.NewPositionX == GameConstants.MineExitX && request.NewPositionY == GameConstants.MineExitY)
         {
             player.ScreenType = ScreenTypes.City;
             player.FloorId = null;
-            player.SubPositionX = 0;
-            player.SubPositionY = 0;
+            player.SubPositionX = GameConstants.MineExitX;
+            player.SubPositionY = GameConstants.MineExitY;
 
-            if (playerMine != null) 
+            if (playerMine != null)
             {
                 _context.Mines.Remove(playerMine);
             }
-            
+
             await _context.SaveChangesAsync();
             return new OkObjectResult(_mapper.Map<PlayerDto>(player));
         }
@@ -72,10 +89,10 @@ public class DungeonService : IDungeonService
                                 mb.MineLayer.Depth == request.NewPositionY &&
                                 mb.Index == request.NewPositionX);
 
-            if (blockAtTarget) 
+            if (blockAtTarget)
             {
-                return _errorService.CreateErrorResponse(400, 6001, "Movement blocked by a mine block.", "Path Blocked");
-            } 
+                return _errorService.CreateErrorResponse(400, 6002, "Movement blocked by a mine block.", "Path Blocked");
+            }
         }
         return null;
     }
@@ -95,13 +112,10 @@ public class DungeonService : IDungeonService
             .ToListAsync();
 
         var enemiesOnFloor = floorItems.Where(fi => fi.FloorItemType == FloorItemType.Enemy).ToList();
-
-        var staticObstacles = floorItems.Where(fi =>
-            fi.FloorItemType != FloorItemType.Enemy &&
-            fi.FloorItemType != FloorItemType.Item).ToList();
+        var staticObstacles = floorItems.Where(fi => fi.FloorItemType != FloorItemType.Enemy && fi.FloorItemType != FloorItemType.Item).ToList();
 
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
-        var stairs = new[] { (2, 2), (5, 2) };
+        var stairs = new[] { (GameConstants.StairAX, GameConstants.StairY), (GameConstants.StairBX, GameConstants.StairY) };
 
         foreach (var enemy in enemiesOnFloor)
         {
@@ -125,7 +139,7 @@ public class DungeonService : IDungeonService
             foreach (var move in movesToTry)
             {
                 if (move.x == enemy.PositionX && move.y == enemy.PositionY) continue;
-                if (move.x < 0 || move.x > 7 || move.y < 0 || move.y > 7) continue;
+                if (move.x < 0 || move.x > GameConstants.FloorMaxX || move.y < 0 || move.y > GameConstants.FloorMaxY) continue;
 
                 bool isPlayer = move.x == player.SubPositionX && move.y == player.SubPositionY;
                 bool isExit = exits.Any(e => e.x == move.x && e.y == move.y);
@@ -154,10 +168,7 @@ public class DungeonService : IDungeonService
                                        fi.PositionX == player.SubPositionX &&
                                        fi.PositionY == player.SubPositionY);
 
-        if (floorItem == null) 
-        {
-            return null;
-        }
+        if (floorItem == null) return null;
 
         if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)
         {
@@ -172,11 +183,12 @@ public class DungeonService : IDungeonService
             {
                 player.Health = 0;
                 player.ScreenType = ScreenTypes.Lose;
+
                 var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
-                if (itemsToRemove.Any()) 
+                if (itemsToRemove.Any())
                 {
                     _context.InventoryItems.RemoveRange(itemsToRemove);
-                } 
+                }
             }
             else player.ScreenType = ScreenTypes.Fight;
 
@@ -191,15 +203,15 @@ public class DungeonService : IDungeonService
     private async Task HandleChestOpening(Player player, FloorItem floorItem)
     {
         var random = new Random();
-        int[] lootIds = { 10, 20, 30, 11, 21, 31, 12, 22, 32, 40, 41, 42 };
+        int[] lootIds = GameConstants.ChestLoot;
         int scatterCount = random.Next(2, 6);
 
         var floor = await _context.Floors.AsNoTracking().FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
         if (floor == null) return;
 
         bool isEven = floor.Level % 2 == 0;
-        var stairsUp = (x: isEven ? 5 : 2, y: 2);
-        var stairsDown = (x: isEven ? 2 : 5, y: 2);
+        var stairsUp = (x: isEven ? GameConstants.StairBX : GameConstants.StairAX, y: GameConstants.StairY);
+        var stairsDown = (x: isEven ? GameConstants.StairAX : GameConstants.StairBX, y: GameConstants.StairY);
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
 
         var emptyTiles = new List<(int x, int y)>();
@@ -207,7 +219,7 @@ public class DungeonService : IDungeonService
         {
             for (int y = floorItem.PositionY - 1; y <= floorItem.PositionY + 1; y++)
             {
-                if (x < 0 || x > 7 || y < 0 || y > 7) continue;
+                if (x < 0 || x > GameConstants.FloorMaxX || y < 0 || y > GameConstants.FloorMaxY) continue;
                 if (exits.Any(e => e.x == x && e.y == y)) continue;
                 if ((x == stairsUp.x && y == stairsUp.y) || (x == stairsDown.x && y == stairsDown.y)) continue;
 
@@ -260,9 +272,9 @@ public class DungeonService : IDungeonService
                 player.FloorId = null;
 
                 if (player.SubPositionX == 0) player.PositionX -= 1;
-                else if (player.SubPositionX == 7) player.PositionX += 1;
+                else if (player.SubPositionX == GameConstants.FloorMaxX) player.PositionX += 1;
                 else if (player.SubPositionY == 0) player.PositionY -= 1;
-                else if (player.SubPositionY == 7) player.PositionY += 1;
+                else if (player.SubPositionY == GameConstants.FloorMaxY) player.PositionY += 1;
 
                 player.SubPositionX = 0;
                 player.SubPositionY = 0;
@@ -277,12 +289,13 @@ public class DungeonService : IDungeonService
     private async Task ProcessStairNavigation(Player player)
     {
         var floor = await _context.Floors.FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
-        if (floor == null) return;
-
-        if (player.ScreenType == ScreenTypes.Mine) { return; }
+        if (floor == null || player.ScreenType == ScreenTypes.Mine) return;
 
         bool isEven = floor.Level % 2 == 0;
-        if (player.SubPositionX == (isEven ? 5 : 2) && player.SubPositionY == 2)
+        int upX = isEven ? GameConstants.StairBX : GameConstants.StairAX;
+        int downX = isEven ? GameConstants.StairAX : GameConstants.StairBX;
+
+        if (player.SubPositionX == upX && player.SubPositionY == GameConstants.StairY)
         {
             int nextLvl = floor.Level + 1;
             var nextF = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == floor.BuildingId && f.Level == nextLvl);
@@ -299,7 +312,7 @@ public class DungeonService : IDungeonService
             }
             if (nextF != null) player.FloorId = nextF.FloorId;
         }
-        else if (player.SubPositionX == (isEven ? 2 : 5) && player.SubPositionY == 2 && floor.Level > 0)
+        else if (player.SubPositionX == downX && player.SubPositionY == GameConstants.StairY && floor.Level > 0)
         {
             var prevF = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == floor.BuildingId && f.Level == floor.Level - 1);
             if (prevF != null) player.FloorId = prevF.FloorId;

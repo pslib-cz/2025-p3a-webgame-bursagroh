@@ -73,8 +73,8 @@ namespace game.Server.Services
             if (player.ScreenType == ScreenTypes.Lose)
             {
                 player.Health = player.MaxHealth;
-                player.PositionX = 0;
-                player.PositionY = 0;
+                player.PositionX = GameConstants.FountainX;
+                player.PositionY = GameConstants.FountainY;
                 player.SubPositionX = 0;
                 player.SubPositionY = 0;
                 player.FloorId = null;
