@@ -48,7 +48,10 @@ namespace game.Server.Services
         {
             var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == id);
 
-            if (player == null) return _errorService.CreateErrorResponse(404, 9001, "Player profile not found.", "Not Found");
+            if (player == null) 
+            {
+                return _errorService.CreateErrorResponse(404, 9001, "Player profile not found.", "Not Found");
+            } 
 
             var dto = _mapper.Map<PlayerDto>(player);
             var mine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
@@ -62,7 +65,10 @@ namespace game.Server.Services
                 .Include(p => p.Floor)
                 .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-            if (player == null) return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
+            if (player == null) 
+            {
+                return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
+            } 
 
             if (player.ScreenType == ScreenTypes.Lose)
             {
@@ -92,16 +98,21 @@ namespace game.Server.Services
                 .Include(p => p.InventoryItems)
                 .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-            if (player == null) return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
+            if (player == null) 
+            {
+                return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
+            }
 
-            player.LastModified = DateTime.UtcNow;
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
 
             int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
             int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
 
-            if ((Math.Abs(request.NewPositionX - currentX) + Math.Abs(request.NewPositionY - currentY)) != 1)
+            if ((Math.Abs(request.NewPositionX - currentX) + Math.Abs(request.NewPositionY - currentY)) != 1) 
+            {
                 return _errorService.CreateErrorResponse(400, 9002, "You can only move one square at a time.", "Movement Error");
+            }
+            
 
             if (player.ScreenType == ScreenTypes.City)
             {

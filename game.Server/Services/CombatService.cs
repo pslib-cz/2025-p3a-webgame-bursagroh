@@ -33,7 +33,9 @@ namespace game.Server.Services
                     .Include(p => p.InventoryItems)
                     .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-                if (player == null) return _errorService.CreateErrorResponse(404, 5001, "Player not found.", "Not Found");
+                if (player == null) {
+                    return _errorService.CreateErrorResponse(404, 5001, "Player not found.", "Not Found");
+                } 
 
                 int playerDamage = 1;
                 string itemName = "Fist";
@@ -49,8 +51,9 @@ namespace game.Server.Services
 
                 if (itemType == ItemTypes.Sword)
                 {
-                    if (player.ScreenType != ScreenTypes.Fight)
+                    if (player.ScreenType != ScreenTypes.Fight) {
                         return _errorService.CreateErrorResponse(400, 5002, "You can only attack during a fight.", "Combat Denied");
+                    }  
 
                     var floorItem = await _context.FloorItems
                         .Include(fi => fi.Enemy)
@@ -95,7 +98,10 @@ namespace game.Server.Services
                                 player.Health = 0;
                                 player.ScreenType = ScreenTypes.Lose;
                                 var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
-                                if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
+                                if (itemsToRemove.Any()) 
+                                {
+                                    _context.InventoryItems.RemoveRange(itemsToRemove);
+                                }
 
                                 await _context.SaveChangesAsync();
                                 await transaction.CommitAsync();

@@ -281,4 +281,58 @@ public class SaveService : ISaveService
         }
         await _context.SaveChangesAsync();
     }
+
+    public async Task<ActionResult> DeletePlayerDataAsync(Guid playerId)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == playerId);
+            if (player == null) return new NotFoundObjectResult("Player not found.");
+
+            player.ActiveInventoryItemId = null;
+            player.FloorId = null;
+            await _context.SaveChangesAsync();
+
+            var inventoryItems = await _context.InventoryItems
+                .Where(ii => ii.PlayerId == playerId)
+                .ToListAsync();
+
+            var inventoryInstanceIds = inventoryItems.Select(ii => ii.ItemInstanceId).ToList();
+
+            var playerFloorIds = await _context.Floors
+                .Where(f => f.Building.PlayerId == playerId)
+                .Select(f => f.FloorId)
+                .ToListAsync();
+
+            var floorItemInstances = await _context.FloorItems
+                .Where(fi => playerFloorIds.Contains(fi.FloorId) && fi.ItemInstanceId != null)
+                .Select(fi => fi.ItemInstanceId!.Value)
+                .ToListAsync();
+
+            _context.InventoryItems.RemoveRange(inventoryItems);
+
+            var allInstanceIds = inventoryInstanceIds.Concat(floorItemInstances).Distinct();
+            var instancesToDelete = await _context.ItemInstances
+                .Where(ii => allInstanceIds.Contains(ii.ItemInstanceId))
+                .ToListAsync();
+            _context.ItemInstances.RemoveRange(instancesToDelete);
+
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM Saves WHERE PlayerId = {0}", playerId);
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM Mines WHERE PlayerId = {0}", playerId);
+            await _context.Database.ExecuteSqlRawAsync("DELETE FROM Buildings WHERE PlayerId = {0}", playerId);
+
+            _context.Players.Remove(player);
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+
+            return new OkObjectResult(new { message = "Purge complete." });
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return new ObjectResult($"Purge Failed: {ex.Message}") { StatusCode = 500 };
+        }
+    }
 }
