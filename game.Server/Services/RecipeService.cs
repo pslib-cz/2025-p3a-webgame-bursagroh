@@ -10,7 +10,7 @@ public class RecipeService : IRecipeService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
-    private readonly IErrorService _errorService; // Added Error Service
+    private readonly IErrorService _errorService;
 
     public RecipeService(ApplicationDbContext context, IMapper mapper, IErrorService errorService)
     {
@@ -50,14 +50,18 @@ public class RecipeService : IRecipeService
             return _errorService.CreateErrorResponse(404, 9001, "Recipe not found.", "Not Found");
         }
 
-        var activeRecipeTime = await _context.RecipeTimes
-            .FirstOrDefaultAsync(rt => rt.RecipeId == recipeId
-                                    && rt.PlayerId == request.PlayerId
-                                    && rt.EndTime == null);
+        var activeSessions = await _context.RecipeTimes
+            .Where(rt => rt.RecipeId == recipeId
+                      && rt.PlayerId == request.PlayerId
+                      && rt.EndTime == null)
+            .ToListAsync();
 
-        if (activeRecipeTime != null)
+        if (activeSessions.Any())
         {
-            return _errorService.CreateErrorResponse(409, 9002, "A session for this recipe is already active.", "Conflict");
+            foreach (var session in activeSessions)
+            {
+                session.EndTime = DateTime.UtcNow;
+            }
         }
 
         var newRecipeTime = new RecipeTime
@@ -143,7 +147,6 @@ public class RecipeService : IRecipeService
             .OrderBy(rt => rt.Duration)
             .ToList();
 
-        // This will now work if the Profile ignores or manually maps 'Player'
         return new OkObjectResult(_mapper.Map<List<LeaderboardDto>>(finalLeaderboard));
     }
 }
