@@ -29,6 +29,6 @@ public class RecipeController : ControllerBase
         => await _recipeService.EndRecipeAsync(recipeId, request);
 
     [HttpGet("Leaderboard")]
-    public async Task<ActionResult<List<RecipeTime>>> GetRecipeLeaderboard()
+    public async Task<ActionResult<List<LeaderboardDto>>> GetRecipeLeaderboard()
         => await _recipeService.GetRecipeLeaderboardAsync();
 }
