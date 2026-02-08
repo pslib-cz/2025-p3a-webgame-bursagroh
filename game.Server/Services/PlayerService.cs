@@ -103,30 +103,23 @@ namespace game.Server.Services
         {
             var player = await _context.Players
                 .Include(p => p.Floor)
-                .Include(p => p.InventoryItems)
+                .Include(p => p.InventoryItems).ThenInclude(ii => ii.ItemInstance)
                 .FirstOrDefaultAsync(p => p.PlayerId == id);
 
-            if (player == null)
-            {
-                return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
-            }
-
-            var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
+            if (player == null) return _errorService.CreateErrorResponse(404, 9001, "Player not found.", "Not Found");
 
             int currentX = (player.ScreenType == ScreenTypes.City) ? player.PositionX : player.SubPositionX;
             int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
 
             if ((Math.Abs(request.NewPositionX - currentX) + Math.Abs(request.NewPositionY - currentY)) != 1)
-            {
-                return _errorService.CreateErrorResponse(400, 9002, "You can only move one square at a time.", "Movement Error");
-            }
+                return _errorService.CreateErrorResponse(400, 9002, "One square at a time.", "Movement Error");
+
+            var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
 
             if (player.ScreenType == ScreenTypes.City)
             {
                 if (!MapGeneratorService.IsWalkable(request.NewPositionX, request.NewPositionY))
-                {
-                    return _errorService.CreateErrorResponse(400, 9006, "You cannot step into the void.", "Movement Error");
-                }
+                    return _errorService.CreateErrorResponse(400, 9006, "Void.", "Movement Error");
 
                 await _cityService.HandleCityMovement(player, request, id);
             }
@@ -135,6 +128,7 @@ namespace game.Server.Services
                 var result = await _dungeonService.HandleInternalLogic(player, playerMine, request);
                 if (result != null) return result;
             }
+
 
             await _context.SaveChangesAsync();
 
