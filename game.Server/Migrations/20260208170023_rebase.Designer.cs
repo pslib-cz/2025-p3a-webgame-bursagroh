@@ -11,13 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-<<<<<<<< HEAD:game.Server/Migrations/20260208143126_rebase.Designer.cs
-    [Migration("20260208143126_rebase")]
+    [Migration("20260208170023_rebase")]
     partial class rebase
-========
-    [Migration("20260208141034_test")]
-    partial class test
->>>>>>>> main:game.Server/Migrations/20260208141034_test.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
