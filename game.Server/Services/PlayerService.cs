@@ -112,7 +112,9 @@ namespace game.Server.Services
             int currentY = (player.ScreenType == ScreenTypes.City) ? player.PositionY : player.SubPositionY;
 
             if ((Math.Abs(request.NewPositionX - currentX) + Math.Abs(request.NewPositionY - currentY)) != 1)
-                return _errorService.CreateErrorResponse(400, 9002, "One square at a time.", "Movement Error");
+            {
+                return _errorService.CreateErrorResponse(400, 9002, "You can only move one square at a time.", "Movement Error");
+            }
 
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
 

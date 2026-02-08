@@ -462,7 +462,19 @@ namespace game.Server.Data
                 new Crafting { CraftingId = 52, BlueprintId = 20, ItemId = 6, Amount = 10 },
                 // Unobtainium Pickaxe: 5 Wood + 10 Unobtainium = 15 (MAX)
                 new Crafting { CraftingId = 26, BlueprintId = 21, ItemId = 1, Amount = 5 },
-                new Crafting { CraftingId = 27, BlueprintId = 21, ItemId = 7, Amount = 10 }
+                new Crafting { CraftingId = 27, BlueprintId = 21, ItemId = 7, Amount = 10 },
+
+                // God Potion: 5 Gold + 2 Unobtainium
+                new Crafting { CraftingId = 62, BlueprintId = 23, ItemId = 6, Amount = 10 },
+                new Crafting { CraftingId = 63, BlueprintId = 23, ItemId = 7, Amount = 2 },
+
+                // Muscle Potion: 5 Silver + 5 Iron
+                new Crafting { CraftingId = 64, BlueprintId = 24, ItemId = 5, Amount = 10 },
+                new Crafting { CraftingId = 65, BlueprintId = 24, ItemId = 4, Amount = 5 },
+
+                // --- END GAME ---
+                // Mythical Sword: 15 Unobtainium
+                new Crafting { CraftingId = 67, BlueprintId = 25, ItemId = 7, Amount = 15 }
             );
 
 
