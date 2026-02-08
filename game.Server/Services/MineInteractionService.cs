@@ -25,51 +25,6 @@ namespace game.Server.Services
             _errorService = errorService;
         }
 
-        public async Task<ActionResult> RegenerateMineAsync(GenerateMineRequest request)
-        {
-            var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == request.PlayerId);
-
-            if (player == null)
-            {
-                return _errorService.CreateErrorResponse(404, 8001, "Player not found.", "Not Found");
-            }
-            if (player.ScreenType != ScreenTypes.Mine)
-            {
-                return _errorService.CreateErrorResponse(400, 8002, "Must be on Mine screen to regenerate.", "Action Denied");
-            }
-
-            var building = await _context.Buildings.FirstOrDefaultAsync(b =>
-                b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.BuildingType == BuildingTypes.Mine);
-
-            if (building == null)
-            {
-                return _errorService.CreateErrorResponse(400, 8003, "No Mine building found at these coordinates.", "Invalid Location");
-            }
-
-            var existingMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == request.PlayerId);
-            if (existingMine != null) _context.Mines.Remove(existingMine);
-
-            var mine = new Mine { MineId = new Random().Next(), PlayerId = request.PlayerId };
-            var mineFloor = new Floor { BuildingId = building.BuildingId, Level = 0, FloorItems = new List<FloorItem>() };
-
-            _context.Mines.Add(mine);
-            _context.Floors.Add(mineFloor);
-            await _context.SaveChangesAsync();
-
-            await _generationService.GetOrGenerateLayersBlocksAsync(
-                mine.MineId,
-                GameConstants.InitialMineGenerationDepth,
-                GameConstants.InitialMineGenerationRange);
-
-            player.FloorId = mineFloor.FloorId;
-            player.MineId = mine.MineId;
-            player.SubPositionX = GameConstants.MineExitX;
-            player.SubPositionY = GameConstants.MineExitY;
-
-            await _context.SaveChangesAsync();
-            return new OkObjectResult(new { mine.MineId, Message = "Mine regenerated." });
-        }
-
         public async Task<ActionResult<List<MineBlockDto>>> GetLayerBlocksAsync(int mineId, int layer)
         {
             if (mineId <= 0 || layer < 0)
