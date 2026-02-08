@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router'
 import styles from './lose.module.css'
 import Button from '../../components/Button'
 import useNotification from '../../hooks/useNotification'
+import useKeyboard from '../../hooks/useKeyboard'
 
 const LoseScreen = () => {
     useBlur(true)
@@ -23,6 +24,10 @@ const LoseScreen = () => {
 
         navigate("/game/city")
     }
+
+    useKeyboard("Escape", () => {
+        navigate("/")
+    })
 
     return (
         <div className={styles.container}>

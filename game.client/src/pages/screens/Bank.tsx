@@ -17,6 +17,7 @@ import BankItem from "../../components/item/BankItem"
 import useBlur from "../../hooks/useBlur"
 import SendIcon from "../../assets/icons/SendIcon"
 import useNotification from "../../hooks/useNotification"
+import useKeyboard from "../../hooks/useKeyboard"
 
 // const InventoryItem = ({ playerId, item }: { playerId: string, item: InventoryItemType }) => {
 //     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, item.inventoryItemId))
@@ -65,7 +66,7 @@ const BankScreen = () => {
     const [toBankAmount, setToBankAmount] = React.useState(0)
     const [toPlayerAmount, setToPlayerAmount] = React.useState(0)
 
-    const handleClick = async () => {
+    const handleEscape = async () => {
         await updatePlayerScreenAsync()
 
         navigate("/game/city")
@@ -83,6 +84,8 @@ const BankScreen = () => {
 
     const inventoryItems = groupInventoryItems(inventory)
     const bankItems = groupInventoryItems(bank)
+
+    useKeyboard("Escape", handleEscape)
 
     return (
         <div className={styles.container}>
@@ -115,7 +118,7 @@ const BankScreen = () => {
                         <BankItem key={itemString} items={bank.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
                     ))}
                 </div>
-                <CloseIcon width={24} height={24} className={styles.close} onClick={handleClick} />
+                <CloseIcon width={24} height={24} className={styles.close} onClick={handleEscape} />
             </div>
         </div>
     )

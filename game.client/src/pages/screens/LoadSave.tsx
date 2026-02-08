@@ -13,6 +13,7 @@ import { screenTypeToURL } from '../layouts/Game';
 import { getPlayerQuery } from '../../api/player';
 import { queryClient } from '../../api';
 import useNotification from '../../hooks/useNotification';
+import useKeyboard from '../../hooks/useKeyboard';
 
 const LoadSaveScreen = () => {
     const navigate = useNavigate()
@@ -56,6 +57,10 @@ const LoadSaveScreen = () => {
         const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
         navigate(screenTypeToURL(player.screenType))
     }
+
+    useKeyboard("Escape", () => {
+        navigate("/load")
+    })
 
     return (
         <Layer layer={1}>

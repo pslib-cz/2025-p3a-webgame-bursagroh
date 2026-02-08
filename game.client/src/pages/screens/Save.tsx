@@ -5,11 +5,19 @@ import Link from '../../components/Link'
 import SaveString from '../../components/SaveString'
 import useBlur from '../../hooks/useBlur'
 import styles from './save.module.css'
+import { useNavigate } from 'react-router'
+import useKeyboard from '../../hooks/useKeyboard'
 
 const SaveScreen = () => {
     useBlur(true)
+
+    const navigate = useNavigate()
     
     const saveString = React.useContext(SaveContext)!.saveString!
+
+    useKeyboard("Escape", () => {
+        navigate("/")
+    })
 
     return (
         <Layer layer={1}>

@@ -10,6 +10,7 @@ import Crafting from "../../components/Crafting"
 import useBlur from "../../hooks/useBlur"
 import CloseIcon from "../../assets/icons/CloseIcon"
 import useNotification from "../../hooks/useNotification"
+import useKeyboard from "../../hooks/useKeyboard"
 
 const BlacksmithScreen = () => {
     useBlur(true)
@@ -24,11 +25,13 @@ const BlacksmithScreen = () => {
     const blueprints = useQuery(getBlueprintsQuery())
     const playerBlueprints = useQuery(getPlayerBlueprintsQuery(playerId))
 
-    const handleClick = async () => {
+    const handleEscape = async () => {
         await updatePlayerScreenAsync()
 
         navigate("/game/city")
     }
+
+    useKeyboard("Escape", handleEscape)
 
     if (blueprints.isLoading || playerBlueprints.isLoading) {
         return <div>Loading...</div>
@@ -56,7 +59,7 @@ const BlacksmithScreen = () => {
                             <BlueprintItem blueprint={blueprint} key={blueprint.blueprintId} />
                         ))}
                     </div>
-                    <CloseIcon className={styles.close} onClick={handleClick} width={24} height={24} />
+                    <CloseIcon className={styles.close} onClick={handleEscape} width={24} height={24} />
                 </div>
             </div>
         )

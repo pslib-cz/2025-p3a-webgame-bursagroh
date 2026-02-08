@@ -7,9 +7,13 @@ import Input from '../../components/Input'
 import styles from './settings.module.css'
 import { DEFAULT_AUTOSAVE_INTERVAL, DEFAULT_MAX_AUTOSAVE } from '../../constants/settings'
 import { AutosaveContext } from '../../providers/AutosaveProvider'
+import { useNavigate } from 'react-router'
+import useKeyboard from '../../hooks/useKeyboard'
 
 const SettingsScreen = () => {
     useBlur(true)
+
+    const navigate = useNavigate()
 
     const autosave = React.useContext(AutosaveContext)!
 
@@ -27,6 +31,10 @@ const SettingsScreen = () => {
         setAutosaveInterval(DEFAULT_AUTOSAVE_INTERVAL)
         setMaxAutosave(DEFAULT_MAX_AUTOSAVE)
     }
+
+    useKeyboard("Escape", () => {
+        navigate("/")
+    })
     
     return (
         <Layer layer={1} >

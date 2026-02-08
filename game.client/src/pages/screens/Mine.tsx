@@ -10,6 +10,9 @@ import { getMineItemsQuery } from "../../api/mine"
 import { useQuery } from "@tanstack/react-query"
 import type { Player } from "../../types/api/models/player"
 import RentItem from "../../components/item/RentItem"
+import useKeyboard from "../../hooks/useKeyboard"
+import { useNavigate } from "react-router"
+import useKeyboardMove from "../../hooks/useKeyboardMove"
 
 const isPlayerNextToTable = (player: Player) => {
     const nextToTablePositions = [
@@ -23,10 +26,17 @@ const isPlayerNextToTable = (player: Player) => {
 const MineScreen = () => {
     useBlur(false)
     useMap("mine")
+    useKeyboardMove(true)
+
+    const navigate = useNavigate()
 
     const player = React.useContext(PlayerContext)!.player!
 
     const { data: mineItems, isError, isPending, isSuccess } = useQuery(getMineItemsQuery(player.playerId, player.mineId))
+
+    useKeyboard("Escape", () => {
+        navigate("/")
+    })
 
     if (isError) {
         return <div>Error loading mine items.</div>
