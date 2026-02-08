@@ -17,7 +17,7 @@ namespace game.Server.Models
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public BuildingTypes BuildingType { get; set; }
         public int? Height { get; set; }
-        public int? ReachedHeight { get; set; }
+        public int? ReachedHeight { get; set; } = null;
         public bool? IsBossDefeated { get; set; } = false;
 
         public ICollection<Floor>? Floors { get; set; }

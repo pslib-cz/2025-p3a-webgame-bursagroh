@@ -2,7 +2,6 @@
 using game.Server.Models;
 using game.Server.Requests;
 using game.Server.Types;
-using game.Server.Interfaces; // Assuming your interface lives here
 using Microsoft.EntityFrameworkCore;
 
 namespace game.Server.Services
@@ -22,6 +21,21 @@ namespace game.Server.Services
 
         public async Task HandleCityMovement(Player player, MovePlayerRequest request, Guid id)
         {
+            var rentedPickaxe = await _context.InventoryItems
+                .FirstOrDefaultAsync(ii => ii.PlayerId == player.PlayerId &&
+                                           ii.ItemInstance!.ItemId == 39);
+
+            if (rentedPickaxe != null)
+            {
+                _context.InventoryItems.Remove(rentedPickaxe);
+                if (player.ActiveInventoryItemId == rentedPickaxe.InventoryItemId)
+                {
+                    player.ActiveInventoryItemId = null;
+                }
+                await _context.SaveChangesAsync();
+
+            }
+
             int previousX = player.PositionX;
             int previousY = player.PositionY;
 
@@ -30,9 +44,13 @@ namespace game.Server.Services
 
             if (targetX == GameConstants.FountainX && targetY == GameConstants.FountainY)
             {
+                player.PositionX = targetX;
+                player.PositionY = targetY;
+
                 player.ScreenType = ScreenTypes.Fountain;
                 return;
             }
+
 
             player.PositionX = targetX;
             player.PositionY = targetY;
