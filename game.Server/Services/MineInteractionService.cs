@@ -29,13 +29,22 @@ namespace game.Server.Services
         {
             var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == request.PlayerId);
 
-            if (player == null) return _errorService.CreateErrorResponse(404, 8001, "Player not found.", "Not Found");
-            if (player.ScreenType != ScreenTypes.Mine) return _errorService.CreateErrorResponse(400, 8002, "Must be on Mine screen to regenerate.", "Action Denied");
+            if (player == null) 
+            {
+                return _errorService.CreateErrorResponse(404, 8001, "Player not found.", "Not Found");
+            }
+            if (player.ScreenType != ScreenTypes.Mine) 
+            {
+                return _errorService.CreateErrorResponse(400, 8002, "Must be on Mine screen to regenerate.", "Action Denied");
+            } 
 
             var building = await _context.Buildings.FirstOrDefaultAsync(b =>
                 b.PositionX == player.PositionX && b.PositionY == player.PositionY && b.BuildingType == BuildingTypes.Mine);
 
-            if (building == null) return _errorService.CreateErrorResponse(400, 8003, "No Mine building found at these coordinates.", "Invalid Location");
+            if (building == null) 
+            {
+                return _errorService.CreateErrorResponse(400, 8003, "No Mine building found at these coordinates.", "Invalid Location");
+            }
 
             var existingMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == request.PlayerId);
             if (existingMine != null) _context.Mines.Remove(existingMine);
@@ -60,7 +69,10 @@ namespace game.Server.Services
 
         public async Task<ActionResult<List<MineBlockDto>>> GetLayerBlocksAsync(int mineId, int layer)
         {
-            if (mineId <= 0 || layer < 0) return _errorService.CreateErrorResponse(400, 8004, "Invalid Mine ID or Layer depth.", "Bad Request");
+            if (mineId <= 0 || layer < 0) 
+            {
+                return _errorService.CreateErrorResponse(400, 8004, "Invalid Mine ID or Layer depth.", "Bad Request");
+            } 
 
             var blocks = await _generationService.GetOrGenerateLayersBlocksAsync(mineId, layer);
             return new OkObjectResult(_mapper.Map<List<MineBlockDto>>(blocks));
@@ -68,7 +80,10 @@ namespace game.Server.Services
 
         public async Task<ActionResult<List<MineLayerDto>>> GetLayerBlocksRangeAsync(int mineId, int startLayer, int endLayer)
         {
-            if (mineId <= 0 || startLayer > endLayer) return _errorService.CreateErrorResponse(400, 8005, "Invalid layer range requested.", "Bad Request");
+            if (mineId <= 0 || startLayer > endLayer) 
+            {
+                return _errorService.CreateErrorResponse(400, 8005, "Invalid layer range requested.", "Bad Request");
+            } 
 
             var layers = await _generationService.GetOrGenerateLayersBlocksAsync(mineId, startLayer, endLayer);
             return new OkObjectResult(_mapper.Map<List<MineLayerDto>>(layers));
@@ -77,10 +92,16 @@ namespace game.Server.Services
         public async Task<ActionResult<List<MineItemDto>>> GetMineItemsAsync(int mineId)
         {
             var mine = await _context.Mines.FirstOrDefaultAsync(m => m.MineId == mineId);
-            if (mine == null) return _errorService.CreateErrorResponse(404, 8006, "Mine not found.", "Not Found");
+            if (mine == null) 
+            {
+                return _errorService.CreateErrorResponse(404, 8006, "Mine not found.", "Not Found");
+            }
 
             var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == mine.PlayerId);
-            if (player?.FloorId == null) return _errorService.CreateErrorResponse(400, 8007, "Player is not currently inside a mine floor.", "Action Denied");
+            if (player?.FloorId == null) 
+            {
+                return _errorService.CreateErrorResponse(400, 8007, "Player is not currently inside a mine floor.", "Action Denied");
+            } 
 
             var items = await _context.FloorItems
                 .Include(fi => fi.ItemInstance).ThenInclude(ii => ii!.Item)
@@ -95,21 +116,34 @@ namespace game.Server.Services
                 .Include(p => p.InventoryItems).ThenInclude(ii => ii.ItemInstance).ThenInclude(ins => ins.Item)
                 .FirstOrDefaultAsync(p => p.PlayerId == playerId);
 
-            if (player == null) return _errorService.CreateErrorResponse(404, 8001, "Player not found.", "Not Found");
-            if (player.ScreenType != ScreenTypes.Mine) return _errorService.CreateErrorResponse(400, 8008, "Must be at the Mine to use the shop.", "Action Denied");
+            if (player == null) 
+            {
+                return _errorService.CreateErrorResponse(404, 8001, "Player not found.", "Not Found");
+            }
+            if (player.ScreenType != ScreenTypes.Mine) 
+            {
+                return _errorService.CreateErrorResponse(400, 8008, "Must be at the Mine to use the shop.", "Action Denied");
+            }
 
-            if (!((player.SubPositionX == 1 || player.SubPositionX == 2) && player.SubPositionY == -2))
+            if (!((player.SubPositionX == 1 || player.SubPositionX == 2) && player.SubPositionY == -2)) 
+            {
                 return _errorService.CreateErrorResponse(400, 8009, "You are not standing at the pickaxe shop.", "Invalid Location");
+            }
 
-            if (player.InventoryItems.Any(ii => ii.ItemInstance?.ItemId == 39))
+            if (player.InventoryItems.Any(ii => ii.ItemInstance?.ItemId == 39)) 
+            {
                 return _errorService.CreateErrorResponse(400, 8010, "You already own a Wooden Pickaxe.", "Purchase Denied");
+            }
 
-            if (player.Money < 5) return _errorService.CreateErrorResponse(400, 8011, "Not enough money for the upgrade.", "Insufficient Funds");
+            if (player.Money < 5) 
+            {
+                return _errorService.CreateErrorResponse(400, 8011, "Not enough money for the upgrade.", "Insufficient Funds");
+            } 
 
             var item = await _context.Items.FirstOrDefaultAsync(i => i.ItemId == 39);
             player.Money -= 5;
 
-            var instance = new ItemInstance { ItemId = 39, Durability = item.MaxDurability };
+            var instance = new ItemInstance { ItemId = 39, Durability = item!.MaxDurability };
             _context.ItemInstances.Add(instance);
             await _context.SaveChangesAsync();
 
@@ -139,8 +173,9 @@ namespace game.Server.Services
                         .Include(p => p.ActiveInventoryItem).ThenInclude(ai => ai.ItemInstance).ThenInclude(ins => ins.Item)
                         .FirstOrDefaultAsync(p => p.PlayerId == mine.PlayerId);
 
-                    if (player?.ActiveInventoryItem?.ItemInstance?.Item == null || !player.ActiveInventoryItem.ItemInstance.Item.Name.Contains("Pickaxe"))
-                        return _errorService.CreateErrorResponse(400, 8012, "No pickaxe active.", "Equipment Required");
+                    var activeItem = player?.ActiveInventoryItem?.ItemInstance?.Item;
+                    if (activeItem == null)
+                        return _errorService.CreateErrorResponse(400, 8012, "No tool active.", "Equipment Required");
 
                     if (Math.Abs(player.SubPositionX - request.TargetX) + Math.Abs(player.SubPositionY - request.TargetY) != 1)
                         return _errorService.CreateErrorResponse(400, 8013, "Target too far.", "Range Error");
@@ -150,11 +185,31 @@ namespace game.Server.Services
 
                     if (targetBlock == null) return _errorService.CreateErrorResponse(404, 8014, "No block found.", "Invalid Target");
 
-                    targetBlock.Health -= player.ActiveInventoryItem.ItemInstance.Item.Damage;
-                    player.ActiveInventoryItem.ItemInstance.Durability--;
+                    int finalDamage = activeItem.Damage;
+                    bool isAxe = activeItem.Name.Contains("Axe");
+                    bool isWood = targetBlock.Block.ItemId == 1;
 
-                    if (player.ActiveInventoryItem.ItemInstance.Durability <= 0)
-                        _context.InventoryItems.Remove(player.ActiveInventoryItem);
+                    if (isAxe)
+                    {
+                        if (!isWood)
+                        {
+                            return _errorService.CreateErrorResponse(400, 8015, "Axes can only be used on wood.", "Wrong Tool");
+                        }
+
+                        finalDamage *= 2;
+                    }
+
+                    targetBlock.Health -= finalDamage;
+
+                    if (player?.ActiveInventoryItem?.ItemInstance != null)
+                    {
+                        player.ActiveInventoryItem.ItemInstance.Durability--;
+
+                        if (player.ActiveInventoryItem.ItemInstance.Durability <= 0)
+                        {
+                            _context.InventoryItems.Remove(player.ActiveInventoryItem);
+                        }
+                    }
 
                     if (targetBlock.Health <= 0)
                     {
@@ -164,7 +219,7 @@ namespace game.Server.Services
                         {
                             _context.FloorItems.Add(new FloorItem
                             {
-                                FloorId = player.FloorId!.Value,
+                                FloorId = player!.FloorId!.Value,
                                 PositionX = request.TargetX,
                                 PositionY = request.TargetY,
                                 ItemInstance = new ItemInstance { ItemId = targetBlock.Block.ItemId }

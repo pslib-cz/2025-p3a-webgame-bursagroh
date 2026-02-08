@@ -62,16 +62,21 @@ namespace game.Server.Services
         {
             switch (building.BuildingType)
             {
-                case BuildingTypes.Abandoned:
-                case BuildingTypes.AbandonedTrap:
+                case BuildingTypes.Abandoned: case BuildingTypes.AbandonedTrap:
                     await SetupDungeonEntry(player, building, previousX, previousY);
                     break;
                 case BuildingTypes.Mine:
                     await SetupMineEntry(player, building, id);
                     break;
-                case BuildingTypes.Bank: player.ScreenType = ScreenTypes.Bank; break;
-                case BuildingTypes.Restaurant: player.ScreenType = ScreenTypes.Restaurant; break;
-                case BuildingTypes.Blacksmith: player.ScreenType = ScreenTypes.Blacksmith; break;
+                case BuildingTypes.Bank: 
+                    player.ScreenType = ScreenTypes.Bank; 
+                    break;
+                case BuildingTypes.Restaurant: 
+                    player.ScreenType = ScreenTypes.Restaurant; 
+                    break;
+                case BuildingTypes.Blacksmith: 
+                    player.ScreenType = ScreenTypes.Blacksmith; 
+                    break;
             }
         }
 
@@ -110,7 +115,9 @@ namespace game.Server.Services
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
             player.ScreenType = ScreenTypes.Mine;
 
-            if (playerMine != null) _context.Mines.Remove(playerMine);
+            if (playerMine != null) {
+                _context.Mines.Remove(playerMine);
+            } 
 
             playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
             _context.Mines.Add(playerMine);

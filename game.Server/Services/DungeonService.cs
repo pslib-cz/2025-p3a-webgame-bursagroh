@@ -24,7 +24,10 @@ public class DungeonService : IDungeonService
     public async Task<ActionResult?> HandleInternalLogic(Player player, Mine? playerMine, MovePlayerRequest request)
     {
         var mineResult = await ProcessMineLogic(player, playerMine, request);
-        if (mineResult != null) return mineResult;
+        if (mineResult != null) 
+        {
+            return mineResult;
+        } 
 
         player.SubPositionX = request.NewPositionX;
         player.SubPositionY = request.NewPositionY;
@@ -52,7 +55,12 @@ public class DungeonService : IDungeonService
             player.FloorId = null;
             player.SubPositionX = 0;
             player.SubPositionY = 0;
-            if (playerMine != null) _context.Mines.Remove(playerMine);
+
+            if (playerMine != null) 
+            {
+                _context.Mines.Remove(playerMine);
+            }
+            
             await _context.SaveChangesAsync();
             return new OkObjectResult(_mapper.Map<PlayerDto>(player));
         }
@@ -60,11 +68,14 @@ public class DungeonService : IDungeonService
         if (player.ScreenType == ScreenTypes.Mine && playerMine != null)
         {
             var blockAtTarget = await _context.MineBlocks
-                .AnyAsync(mb => mb.MineLayer.MineId == playerMine.MineId &&
+                .AnyAsync(mb => mb.MineLayer!.MineId == playerMine.MineId &&
                                 mb.MineLayer.Depth == request.NewPositionY &&
                                 mb.Index == request.NewPositionX);
 
-            if (blockAtTarget) return _errorService.CreateErrorResponse(400, 6001, "Movement blocked by a mine block.", "Path Blocked");
+            if (blockAtTarget) 
+            {
+                return _errorService.CreateErrorResponse(400, 6001, "Movement blocked by a mine block.", "Path Blocked");
+            } 
         }
         return null;
     }
@@ -79,14 +90,15 @@ public class DungeonService : IDungeonService
         bool isAbandonedTrap = currentFloor?.Building?.BuildingType == BuildingTypes.AbandonedTrap;
         bool canEnemiesStepOnExits = isAbandonedTrap && !isBossDefeated;
 
-        var enemiesOnFloor = await _context.FloorItems
-            .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType == FloorItemType.Enemy)
+        var floorItems = await _context.FloorItems
+            .Where(fi => fi.FloorId == player.FloorId)
             .ToListAsync();
 
-        var obstacles = await _context.FloorItems
-            .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType != FloorItemType.Enemy)
-            .Select(fi => new { fi.PositionX, fi.PositionY })
-            .ToListAsync();
+        var enemiesOnFloor = floorItems.Where(fi => fi.FloorItemType == FloorItemType.Enemy).ToList();
+
+        var staticObstacles = floorItems.Where(fi =>
+            fi.FloorItemType != FloorItemType.Enemy &&
+            fi.FloorItemType != FloorItemType.Item).ToList();
 
         var exits = MapGeneratorService.GetExitCoordinates(player.PositionX, player.PositionY);
         var stairs = new[] { (2, 2), (5, 2) };
@@ -118,7 +130,7 @@ public class DungeonService : IDungeonService
                 bool isPlayer = move.x == player.SubPositionX && move.y == player.SubPositionY;
                 bool isExit = exits.Any(e => e.x == move.x && e.y == move.y);
                 bool isStairs = stairs.Any(s => s.Item1 == move.x && s.Item2 == move.y);
-                bool isObstacle = obstacles.Any(o => o.PositionX == move.x && o.PositionY == move.y);
+                bool isObstacle = staticObstacles.Any(o => o.PositionX == move.x && o.PositionY == move.y);
                 bool isOtherEnemy = enemiesOnFloor.Any(e => e.FloorItemId != enemy.FloorItemId && e.PositionX == move.x && e.PositionY == move.y);
                 bool isMovementBlocked = isPlayer || isStairs || isObstacle || isOtherEnemy || (isExit && !canEnemiesStepOnExits);
 
@@ -142,7 +154,10 @@ public class DungeonService : IDungeonService
                                        fi.PositionX == player.SubPositionX &&
                                        fi.PositionY == player.SubPositionY);
 
-        if (floorItem == null) return null;
+        if (floorItem == null) 
+        {
+            return null;
+        }
 
         if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)
         {
@@ -158,7 +173,10 @@ public class DungeonService : IDungeonService
                 player.Health = 0;
                 player.ScreenType = ScreenTypes.Lose;
                 var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
-                if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
+                if (itemsToRemove.Any()) 
+                {
+                    _context.InventoryItems.RemoveRange(itemsToRemove);
+                } 
             }
             else player.ScreenType = ScreenTypes.Fight;
 
