@@ -21,60 +21,38 @@ namespace game.Server.Services
 
         public async Task HandleCityMovement(Player player, MovePlayerRequest request, Guid id)
         {
-            // --- CLEANUP: Remove rented pickaxe (ID 39) if in City ---
-            var rentedPickaxe = await _context.InventoryItems
-                .Include(ii => ii.ItemInstance)
-                .FirstOrDefaultAsync(ii => ii.PlayerId == player.PlayerId &&
-                                           ii.ItemInstance!.ItemId == 39);
+            var rentedPickaxe = player.InventoryItems
+                .FirstOrDefault(ii => ii.ItemInstance?.ItemId == 39);
 
             if (rentedPickaxe != null)
             {
                 _context.InventoryItems.Remove(rentedPickaxe);
                 if (player.ActiveInventoryItemId == rentedPickaxe.InventoryItemId)
-                {
                     player.ActiveInventoryItemId = null;
-                }
-                await _context.SaveChangesAsync();
             }
 
             int previousX = player.PositionX;
             int previousY = player.PositionY;
+            player.PositionX = request.NewPositionX;
+            player.PositionY = request.NewPositionY;
 
-            int targetX = request.NewPositionX;
-            int targetY = request.NewPositionY;
-
-            if (targetX == GameConstants.FountainX && targetY == GameConstants.FountainY)
+            if (player.PositionX == GameConstants.FountainX && player.PositionY == GameConstants.FountainY)
             {
-                player.PositionX = targetX;
-                player.PositionY = targetY;
                 player.ScreenType = ScreenTypes.Fountain;
                 return;
             }
 
-            player.PositionX = targetX;
-            player.PositionY = targetY;
-
             var building = await GetOrGenerateBuilding(player, id);
-
             if (building != null)
             {
-                var externalEntryTypes = new[]
-                {
-            BuildingTypes.Mine,
-            BuildingTypes.Bank,
-            BuildingTypes.Restaurant,
-            BuildingTypes.Blacksmith
-        };
+                var externalTypes = new[] { BuildingTypes.Mine, BuildingTypes.Bank, BuildingTypes.Restaurant, BuildingTypes.Blacksmith };
 
-                if (externalEntryTypes.Contains(building.BuildingType))
+                await ProcessBuildingEntry(player, building, previousX, previousY, id);
+
+                if (externalTypes.Contains(building.BuildingType))
                 {
-                    await ProcessBuildingEntry(player, building, previousX, previousY, id);
                     player.PositionX = previousX;
                     player.PositionY = previousY;
-                }
-                else
-                {
-                    await ProcessBuildingEntry(player, building, previousX, previousY, id);
                 }
             }
             else
@@ -163,19 +141,27 @@ namespace game.Server.Services
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
             player.ScreenType = ScreenTypes.Mine;
 
-            if (playerMine != null)
+            if (playerMine == null)
             {
-                _context.Mines.Remove(playerMine);
+                playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
+                _context.Mines.Add(playerMine);
+                await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
             }
 
-            playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
-            _context.Mines.Add(playerMine);
+            var mineFloor = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == building.BuildingId && f.Level == 0);
 
-            Floor mineFloor = new Floor { BuildingId = building.BuildingId, Level = 0, FloorItems = new List<FloorItem>() };
-            _context.Floors.Add(mineFloor);
+            if (mineFloor == null)
+            {
+                mineFloor = new Floor
+                {
+                    BuildingId = building.BuildingId,
+                    Level = 0,
+                    FloorItems = new List<FloorItem>()
+                };
+                _context.Floors.Add(mineFloor);
+            }
+
             await _context.SaveChangesAsync();
-
-            await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
             player.FloorId = mineFloor.FloorId;
             player.SubPositionX = GameConstants.MineExitX;
