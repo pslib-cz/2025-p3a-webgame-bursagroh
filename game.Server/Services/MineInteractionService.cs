@@ -14,10 +14,10 @@ namespace game.Server.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly MineGenerationService _generationService;
+        private readonly IMineGenerationService _generationService;
         private readonly IErrorService _errorService;
 
-        public MineInteractionService(ApplicationDbContext context, IMapper mapper, MineGenerationService generationService, IErrorService errorService)
+        public MineInteractionService(ApplicationDbContext context, IMapper mapper, IMineGenerationService generationService, IErrorService errorService)
         {
             _context = context;
             _mapper = mapper;
