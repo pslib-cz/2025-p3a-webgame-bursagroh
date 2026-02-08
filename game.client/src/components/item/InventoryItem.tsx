@@ -13,7 +13,7 @@ type InventoryItemProps = {
 
 const InventoryItem: React.FC<InventoryItemProps> = ({ items }) => {
     const handleOnDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-        event.dataTransfer.setData("text/plain", items[0].inventoryItemId.toString())
+        event.dataTransfer.setData("text/plain", `inv_${items[0].inventoryItemId.toString()}`)
     }
 
     return (

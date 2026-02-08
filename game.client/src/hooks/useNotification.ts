@@ -1,5 +1,5 @@
 import React from 'react'
-import { NotificationContext } from '../providers/NotificationProvider'
+import { NotificationContext } from '../providers/global/NotificationProvider'
 import type { APIError } from '../types/api'
 
 const useNotification = () => {

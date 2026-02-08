@@ -1,5 +1,5 @@
 import React from 'react'
-import { PlayerContext } from '../providers/game/PlayerProvider'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 import { useItemMutation } from '../api/player'
 import { useMutation } from '@tanstack/react-query'
 import useNotification from './useNotification'

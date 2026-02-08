@@ -5,7 +5,7 @@ import WeightIcon from '../assets/icons/WeightIcon'
 import styles from './playerUI.module.css'
 import React from 'react'
 import { calcInventoryWeight } from '../utils/inventory'
-import { PlayerContext } from '../providers/game/PlayerProvider'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 import { InventoryContext } from '../providers/game/InventoryProvider'
 import { equipItemMutation } from '../api/player'
 import { useMutation } from '@tanstack/react-query'
@@ -25,8 +25,11 @@ const PlayerUI = () => {
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
-        const inventoryItemId = Number(event.dataTransfer.getData("text/plain"))
-        equipItemAsync(inventoryItemId)
+        const data = event.dataTransfer.getData("text/plain")
+        if (data.startsWith("inv_")) {
+            const inventoryItemId = Number(data.substring(4))
+            equipItemAsync(inventoryItemId)
+        }
     }
 
     const handleOpenInventory = () => {

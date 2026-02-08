@@ -1,6 +1,6 @@
 import React from 'react'
 import useMove from './useMove'
-import { PlayerContext } from '../providers/game/PlayerProvider'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 import useKeyboard from './useKeyboard'
 
 type Direction = "up" | "down" | "left" | "right"
@@ -25,9 +25,7 @@ const useKeyboardMove = (isSubMove: boolean) => {
 
     const handleMove = async (direction: Direction) => {
         const targetPosition = getTargetPosition(direction, isSubMove ? player.subPositionX : player.positionX, isSubMove ? player.subPositionY : player.positionY)
-        console.log(`Moving ${direction} to (${targetPosition.x}, ${targetPosition.y})`)
         await move(targetPosition.x, targetPosition.y, isSubMove)
-        console.log(`Moved ${direction} to (${targetPosition.x}, ${targetPosition.y})`)
     }
 
     useKeyboard("ArrowUp", async () => {

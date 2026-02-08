@@ -1,14 +1,16 @@
 import React from "react"
 import useBlur from "../../hooks/useBlur"
 import Asset from "../../components/SVG/Asset"
-import { PlayerContext } from "../../providers/game/PlayerProvider"
-import { FloorContext } from "../../providers/FloorProvider"
+import { PlayerContext } from "../../providers/global/PlayerProvider"
+import FloorProvider, { FloorContext } from "../../providers/game/FloorProvider"
 import type { EnemyType } from "../../types/api/models/building"
 import type { AssetType } from "../../types/asset"
 import styles from "./fight.module.css"
 import useUse from "../../hooks/useUse"
 import useKeyboard from "../../hooks/useKeyboard"
 import { useNavigate } from "react-router"
+import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
+import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
 
 const mapEnemyTypeToAssetType = (enemyType: EnemyType | undefined): AssetType => {
     switch (enemyType) {
@@ -23,7 +25,7 @@ const mapEnemyTypeToAssetType = (enemyType: EnemyType | undefined): AssetType =>
     }
 }
 
-const FightScreen = () => {
+const FightScreenWithContext = () => {
     useBlur(true)
 
     const handleUse = useUse()
@@ -72,6 +74,14 @@ const FightScreen = () => {
                 <span className={styles.entityText}>{enemy.enemy?.health} / {enemy.enemy?.maxHealth}</span>
             </div>
         </div>
+    )
+}
+
+const FightScreen = () => {
+    return (
+        <ProviderGroupLoadingWrapper providers={[FloorProvider]} contextsToLoad={[FloorContext] as Array<React.Context<TLoadingWrapperContextState>>}>
+            <FightScreenWithContext />
+        </ProviderGroupLoadingWrapper>
     )
 }
 

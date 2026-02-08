@@ -1,6 +1,6 @@
 import React from 'react'
 import Layer from './wrappers/layer/Layer'
-import { TooltipContext } from '../providers/TooltipProvider'
+import { TooltipContext } from '../providers/global/TooltipProvider'
 import styles from './tooltipLayer.module.css'
 
 const TooltipLayer = () => {

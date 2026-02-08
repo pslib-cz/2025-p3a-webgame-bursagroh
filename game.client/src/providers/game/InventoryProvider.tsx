@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import React from "react"
 import { getPlayerInventoryQuery } from "../../api/player"
-import { PlayerIdContext } from "../PlayerIdProvider"
+import { PlayerIdContext } from "../global/PlayerIdProvider"
 import type { InventoryItem } from "../../types/api/models/player"
 
 type InventoryContextType = {

@@ -1,7 +1,7 @@
 import React from 'react'
 import { dropItemMutation, updatePlayerScreenMutation } from '../../api/player'
 import { useMutation } from '@tanstack/react-query'
-import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useNavigate } from 'react-router'
 import CloseIcon from '../../assets/icons/CloseIcon'
 import styles from './fountain.module.css'
@@ -28,8 +28,14 @@ const FountainScreen = () => {
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
-        const inventoryItemId = Number(event.dataTransfer.getData("text/plain"))
-        dropItemAsync(inventoryItemId)
+        const data = event.dataTransfer.getData("text/plain")
+        if (data.startsWith("inv_")) {
+            const inventoryItemId = Number(data.substring(4))
+            dropItemAsync(inventoryItemId)
+        } else if (data.startsWith("hand_")) {
+            const inventoryItemId = Number(data.substring(5))
+            dropItemAsync(inventoryItemId)
+        }
     }
 
     useKeyboard("Escape", handleEscape)

@@ -1,16 +1,18 @@
 import React from "react"
-import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import { Outlet, useLocation, useNavigate } from "react-router"
-import { useQuery } from "@tanstack/react-query"
-import { getPlayerQuery } from "../../api/player"
 import type { ScreenType } from "../../types/api/models/player"
 import styles from "./game.module.css"
 import NavBar from "../../components/NavBar"
 import Inventory from "../../components/Inventory"
 import PlayerUI from "../../components/PlayerUI"
-import GameProviders from "../../providers/game"
 import Layer from "../../components/wrappers/layer/Layer"
 import WrongScreen from "../WrongScreen"
+import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
+import IsOpenInventoryProvider from "../../providers/game/IsOpenInventoryProvider"
+import InventoryProvider, { InventoryContext } from "../../providers/game/InventoryProvider"
+import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import { PlayerContext } from "../../providers/global/PlayerProvider"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const screenTypeToURL = (screenType: ScreenType) => {
@@ -39,42 +41,30 @@ export const screenTypeToURL = (screenType: ScreenType) => {
 }
 
 const ProperScreenChecker = () => {
-    const navigate = useNavigate()
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const { data, isError, isPending, isSuccess } = useQuery(getPlayerQuery(playerId))
+    const player = React.useContext(PlayerContext)!.player!
+
     const location = useLocation()
 
-    if (isError) {
-        return <div>Error</div>
+    if (screenTypeToURL(player.screenType) != location.pathname) {
+        return <WrongScreen />
     }
 
-    if (isPending) {
-        return <div>Loading...</div>
-    }
-
-    if (isSuccess) {
-        if (screenTypeToURL(data.screenType) != location.pathname) {
-            navigate(screenTypeToURL(data.screenType)!)
-            return <WrongScreen />
-        }
-
-        return <Outlet />
-    }
+    return <Outlet />
 }
 
 const Game = () => {
-    const { playerId } = React.useContext(PlayerIdContext)!
+    const navigate = useNavigate()
 
-    if (playerId === null) {
-        return (
-            <Layer layer={1}>
-                <div>Loading...</div>
-            </Layer>
-        )
-    }
+    const playerId = React.useContext(PlayerIdContext)!.playerId
+
+    React.useEffect(() => {
+        if (!playerId) {
+            navigate("/")
+        }
+    }, [playerId, navigate])
 
     return (
-        <GameProviders>
+        <ProviderGroupLoadingWrapper providers={[InventoryProvider, IsOpenInventoryProvider]} contextsToLoad={[InventoryContext] as Array<React.Context<TLoadingWrapperContextState>>}>
             <Layer layer={1}>
                 <NavBar />
                 <ProperScreenChecker />
@@ -85,7 +75,7 @@ const Game = () => {
                     <Inventory />
                 </div>
             </Layer>
-        </GameProviders>
+        </ProviderGroupLoadingWrapper>
     )
 }
 

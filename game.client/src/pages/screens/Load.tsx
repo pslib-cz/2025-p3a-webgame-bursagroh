@@ -2,14 +2,17 @@ import React from 'react'
 import Layer from '../../components/wrappers/layer/Layer'
 import Link from '../../components/Link'
 import Input from '../../components/Input'
-import { SaveContext } from '../../providers/SaveProvider'
+import { SaveContext } from '../../providers/global/SaveProvider'
 import { parseSave } from '../../utils/save'
 import styles from './load.module.css'
 import SendIcon from '../../assets/icons/SendIcon'
 import useKeyboard from '../../hooks/useKeyboard'
 import { useNavigate } from 'react-router'
+import useBlur from '../../hooks/useBlur'
 
 const LoadScreen = () => {
+    useBlur(true)
+
     const navigate = useNavigate()
 
     const [userSaveString, setUserSaveString] = React.useState("")

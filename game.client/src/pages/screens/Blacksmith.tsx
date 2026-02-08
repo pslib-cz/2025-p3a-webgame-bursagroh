@@ -1,5 +1,5 @@
 import React from "react"
-import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { updatePlayerScreenMutation } from "../../api/player"
 import { getBlueprintsQuery, getPlayerBlueprintsQuery } from "../../api/blueprint"
