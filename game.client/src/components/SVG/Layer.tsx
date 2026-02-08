@@ -2,7 +2,7 @@ import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getMineLayersQuery } from "../../api/mine"
 import type { BlockType, MineLayer } from "../../types/api/models/mine"
-import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import Block from "./tiles/mine/Block"
 import MineTile from "./tiles/mine/MineTile"
 

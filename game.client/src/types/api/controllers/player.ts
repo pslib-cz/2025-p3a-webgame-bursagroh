@@ -83,7 +83,7 @@ export interface APIPlayerItemEquip extends GenericPATCH {
         playerId: string
     }
     body: {
-        inventoryItemId: number
+        inventoryItemId: number | null
     }
     res: {
         200: object

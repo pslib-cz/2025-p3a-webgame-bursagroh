@@ -6,7 +6,7 @@ import Link from '../../components/Link'
 import Input from '../../components/Input'
 import styles from './settings.module.css'
 import { DEFAULT_AUTOSAVE_INTERVAL, DEFAULT_MAX_AUTOSAVE } from '../../constants/settings'
-import { AutosaveContext } from '../../providers/AutosaveProvider'
+import { SettingsContext } from '../../providers/global/SettingsProvider'
 import { useNavigate } from 'react-router'
 import useKeyboard from '../../hooks/useKeyboard'
 
@@ -15,7 +15,7 @@ const SettingsScreen = () => {
 
     const navigate = useNavigate()
 
-    const autosave = React.useContext(AutosaveContext)!
+    const autosave = React.useContext(SettingsContext)!
 
     const [autosaveInterval, setAutosaveInterval] = React.useState(autosave.autosaveInterval)
     const [maxAutosave, setMaxAutosave] = React.useState(autosave.maxAutosave)

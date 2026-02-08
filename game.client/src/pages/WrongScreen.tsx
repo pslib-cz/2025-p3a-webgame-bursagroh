@@ -1,30 +1,23 @@
 import React from 'react'
-import { PlayerIdContext } from '../providers/PlayerIdProvider'
-import { useQuery } from '@tanstack/react-query'
-import { getPlayerQuery } from '../api/player'
-import { NavLink } from 'react-router'
+import { NavLink, useNavigate } from 'react-router'
 import { screenTypeToURL } from './layouts/Game'
+import { PlayerContext } from '../providers/global/PlayerProvider'
 
 const WrongScreen = () => {
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const { data, isError, isPending, isSuccess } = useQuery(getPlayerQuery(playerId))
+    const navigate = useNavigate()
 
-     if (isError) {
-        return <div>Error</div>
-    }
+    const player = React.useContext(PlayerContext)!.player!
 
-    if (isPending) {
-        return <div>Loading...</div>
-    }
-
-    if (isSuccess) {
-        return (
-            <>
-                <div>Wrong Screen</div>
-                <NavLink to={screenTypeToURL(data.screenType)}>change</NavLink>
-            </>
-        )
-    }
+    React.useEffect(() => {
+        navigate(screenTypeToURL(player.screenType)!)
+    }, [player.screenType, navigate])
+    
+    return (
+        <>
+            <div>Wrong Screen</div>
+            <NavLink to={screenTypeToURL(player.screenType)}>change</NavLink>
+        </>
+    )
 }
 
 export default WrongScreen

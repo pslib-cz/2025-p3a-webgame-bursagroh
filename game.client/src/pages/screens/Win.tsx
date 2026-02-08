@@ -1,5 +1,5 @@
 import React from 'react'
-import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import useBlur from '../../hooks/useBlur'
 import styles from './win.module.css'
 import Link from '../../components/Link'

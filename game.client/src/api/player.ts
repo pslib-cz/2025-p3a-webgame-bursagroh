@@ -72,7 +72,7 @@ export const dropItemMutation = (playerId: string, onError?: (error: Error) => v
 
 export const equipItemMutation = (playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({
-        mutationFn: (inventoryItemId: number) => api.patch("/api/Player/{playerId}/Action/set-active-item", { playerId }, {}, { inventoryItemId }),
+        mutationFn: (inventoryItemId: number | null) => api.patch("/api/Player/{playerId}/Action/set-active-item", { playerId }, {}, { inventoryItemId }),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: [playerId, "player"], refetchType: "active" })
         },

@@ -1,6 +1,7 @@
 import React from "react"
-import { generatePlayerMutation } from "../api/player"
 import { useMutation } from "@tanstack/react-query"
+import { queryClient } from "../../api"
+import { generatePlayerMutation, getPlayerQuery } from "../../api/player"
 
 const PLAYER_ID_STORAGE_KEY = "playerId"
 const ONE_HOUR_MS = 60 * 60 * 1000
@@ -16,39 +17,65 @@ export const PlayerIdContext = React.createContext<PlayerIdContextType | null>(n
 
 const PlayerIdProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     const [playerId, setPlayerId] = React.useState<string | null>(null)
+    const [isRestoring, setIsRestoring] = React.useState(true)
     const { mutateAsync: generatePlayerAsync, isPending, isError } = useMutation(generatePlayerMutation())
 
     React.useEffect(() => {
-        const restorePlayerId = () => {
+        let isMounted = true
+
+        const restorePlayerId = async () => {
             try {
                 const raw = localStorage.getItem(PLAYER_ID_STORAGE_KEY)
                 if (!raw) return
+
                 const parsed = JSON.parse(raw) as { id: string; exp: number }
-                if (parsed.exp > Date.now()) {
-                    setPlayerId(parsed.id)
-                } else {
+                if (parsed.exp <= Date.now()) {
                     localStorage.removeItem(PLAYER_ID_STORAGE_KEY)
+                    return
+                }
+
+                await queryClient.fetchQuery(getPlayerQuery(parsed.id))
+                if (isMounted) {
+                    setPlayerId(parsed.id)
+                    const payload = { id: parsed.id, exp: Date.now() + ONE_HOUR_MS }
+                    localStorage.setItem(PLAYER_ID_STORAGE_KEY, JSON.stringify(payload))
                 }
             } catch {
                 localStorage.removeItem(PLAYER_ID_STORAGE_KEY)
+            } finally {
+                if (isMounted) {
+                    setIsRestoring(false)
+                }
             }
         }
+
         restorePlayerId()
+
+        return () => {
+            isMounted = false
+        }
     }, [])
 
     React.useEffect(() => {
+        if (isRestoring) return
+
         if (playerId == null) {
             localStorage.removeItem(PLAYER_ID_STORAGE_KEY)
             return
         }
+
         const payload = { id: playerId, exp: Date.now() + ONE_HOUR_MS }
         localStorage.setItem(PLAYER_ID_STORAGE_KEY, JSON.stringify(payload))
-    }, [playerId])
+    }, [isRestoring, playerId])
 
     const generatePlayerIdAsync = React.useCallback(async () => {
         const data = await generatePlayerAsync()
         setPlayerId(data.playerId)
     }, [generatePlayerAsync])
+
+    if (isRestoring) {
+        return <div>Restoring player...</div>
+    }
 
     if (isError) {
         return <div>ERROR: Generating player</div>

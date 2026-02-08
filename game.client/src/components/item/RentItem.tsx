@@ -1,6 +1,6 @@
 import React from 'react'
 import Asset from '../SVG/Asset'
-import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
 import styles from './blueprintItem.module.css'
 import Tooltip from '../Tooltip'

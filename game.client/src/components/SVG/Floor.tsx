@@ -3,7 +3,7 @@ import FloorTile from './tiles/floor/FloorTile'
 import { getBuildingsQuery } from '../../api/building'
 import React from 'react'
 import { getChunkCoords } from '../../utils/map'
-import { PlayerIdContext } from '../../providers/PlayerIdProvider'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { buildingToChunkPosition, mapBuildingTypeToTileType } from './Chunk'
 import type { Building, BuildingType } from '../../types/api/models/building'
 

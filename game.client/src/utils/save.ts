@@ -1,4 +1,4 @@
-import type { Save } from "../providers/SaveProvider"
+import type { Save } from "../providers/global/SaveProvider"
 
 export const parseSave = (save: Save, isAutosave: boolean = false): string => {
     const date = new Date(save.timestamp)

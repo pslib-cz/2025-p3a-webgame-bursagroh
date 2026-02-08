@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query"
 import React, { type JSX } from "react"
 import { getBuildingsQuery } from "../../api/building"
 import type { BuildingType, Building } from "../../types/api/models/building"
-import { PlayerIdContext } from "../../providers/PlayerIdProvider"
+import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import Asset from "./Asset"
 import Road from "./tiles/city/Road"
 import BuildingTile from "./tiles/city/Building"
@@ -181,10 +181,10 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
                         }
 
                         return (
-                            <>
-                                <BuildingTile key={`x:${building.positionX};y:${building.positionY}`} width={1} height={1} x={building.positionX} y={building.positionY} buildingType={tileType} />
+                            <React.Fragment key={`x:${building.positionX};y:${building.positionY}`}>
+                                <BuildingTile width={1} height={1} x={building.positionX} y={building.positionY} buildingType={tileType} />
                                 {text}
-                            </>
+                            </React.Fragment>
                         )
                     })
                 })}

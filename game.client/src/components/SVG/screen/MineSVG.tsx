@@ -2,15 +2,15 @@ import React from 'react'
 import SVGDisplay from '../../SVGDisplay'
 import Asset from '../Asset'
 import Layer from '../Layer'
-import { PlayerIdContext } from '../../../providers/PlayerIdProvider'
-import { getMineItemsQuery, rentPickMutation } from '../../../api/mine'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { PlayerContext } from '../../../providers/game/PlayerProvider'
+import { PlayerIdContext } from '../../../providers/global/PlayerIdProvider'
+import { getMineItemsQuery } from '../../../api/mine'
+import { useQuery } from '@tanstack/react-query'
+import { PlayerContext } from '../../../providers/global/PlayerProvider'
 import styles from './mineSVG.module.css'
 import MineTile from '../tiles/mine/MineTile'
 import { itemIdToAssetType } from '../../../utils/item'
 import Minecard from '../tiles/mine/Minecard'
-import useNotification from '../../../hooks/useNotification'
+import Tooltip from '../../Tooltip'
 
 const chunkSize = 8
 const viewDistanceInChunks = 2
@@ -110,7 +110,9 @@ const MineSVG = () => {
 
             <DisplayMineItems mineId={player.mineId} />
 
-            <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
+            <Tooltip heading='Player' text={`Player is located at x: ${player.subPositionX} y: ${player.subPositionY}`}>
+                <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />
+            </Tooltip>
         </SVGDisplay>
     )
 }
