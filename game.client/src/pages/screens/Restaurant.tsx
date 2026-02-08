@@ -14,6 +14,7 @@ import CloseIcon from "../../assets/icons/CloseIcon"
 import Button from "../../components/Button"
 import { LeaderboardContext } from "../../providers/game/LeaderboardProvider"
 import useNotification from "../../hooks/useNotification"
+import useKeyboard from "../../hooks/useKeyboard"
 
 const RestaurantScreen = () => {
     useBlur(true)
@@ -34,7 +35,7 @@ const RestaurantScreen = () => {
     const [currentBurgerStack, setCurrentBurgerStack] = React.useState<Array<IngredienceType>>([])
     const [currentBurger, setCurrentBurger] = React.useState<Recipe>()
 
-    const handleClose = async () => {
+    const handleEscape = async () => {
         await updatePlayerScreenAsync()
 
         navigate("/game/city")
@@ -60,6 +61,8 @@ const RestaurantScreen = () => {
     const addIngredience = (ingredienceType: IngredienceType) => {
         setCurrentBurgerStack(prev => [ingredienceType, ...prev])
     }
+
+    useKeyboard("Escape", handleEscape)
 
     let cookingSection: JSX.Element | null = null
     if (isMaking) {
@@ -141,7 +144,7 @@ const RestaurantScreen = () => {
             </div>
             <div className={styles.cookingContainer}>
                 <span className={styles.cookingHeading}>Cooking</span>
-                <CloseIcon className={styles.close} onClick={handleClose} width={24} height={24} />
+                <CloseIcon className={styles.close} onClick={handleEscape} width={24} height={24} />
                 {cookingSection}
             </div>
         </div>

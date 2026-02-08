@@ -7,9 +7,13 @@ import useBlur from "../hooks/useBlur"
 import { SaveContext } from "../providers/SaveProvider"
 import { PlayerContext } from "../providers/game/PlayerProvider"
 import { screenTypeToURL } from "./layouts/Game"
+import { useNavigate } from "react-router"
+import useKeyboard from "../hooks/useKeyboard"
 
 const Root = () => {
     useBlur(true)
+
+    const navigate = useNavigate()
 
     const playerId = React.useContext(PlayerIdContext)!
     const player = React.useContext(PlayerContext)!
@@ -22,6 +26,12 @@ const Root = () => {
     const handleSave = async () => {
         await save()
     }
+
+    useKeyboard("Escape", () => {
+        if (playerId.playerId === null) return
+        
+        navigate(screenTypeToURL(player.player?.screenType ?? "City"))
+    })
 
     return (
         <Layer layer={1}>
