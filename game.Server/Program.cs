@@ -63,8 +63,11 @@ app.UseForwardedHeaders();
 app.UseDefaultFiles();
 app.MapStaticAssets();
 
-app.MapOpenApi();
-app.MapScalarApiReference();
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.UseRouting();
 
