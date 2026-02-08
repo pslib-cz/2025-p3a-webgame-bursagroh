@@ -55,6 +55,7 @@
     top: 0.25rem;
     right: 0.25rem;
     fill: var(--light);
+    cursor: pointer;
 }
 
 .money {
@@ -72,11 +73,13 @@
 
 .sendIcon {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .sendIconFlipped {
     fill: var(--light);
     transform: rotate(180deg);
+    cursor: pointer;
 }
 
 .text {

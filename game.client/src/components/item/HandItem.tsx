@@ -6,6 +6,10 @@ import ConditionalDisplay from '../wrappers/ConditionalDisplay'
 import styles from './handItem.module.css'
 import useUse from '../../hooks/useUse'
 import Tooltip from '../Tooltip'
+import { useMutation } from '@tanstack/react-query'
+import { equipItemMutation } from '../../api/player'
+import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
+import useNotification from '../../hooks/useNotification'
 
 type HandItemProps = {
     item: InventoryItem
@@ -13,15 +17,23 @@ type HandItemProps = {
 
 const HandItem: React.FC<HandItemProps> = ({ item }) => {
     const handleUse = useUse()
+    const {genericError} = useNotification()
+
+    const playerId = React.useContext(PlayerIdContext)!.playerId!
+
+    const {mutateAsync: equipItemAsync} = useMutation(equipItemMutation(playerId, genericError))
 
     const handleOnDragStart = (event: React.DragEvent<HTMLDivElement>) => {
         event.dataTransfer.setData("text/plain", `hand_${item.inventoryItemId.toString()}`)
     }
 
     const handleClick = async () => {
-        if (item.itemInstance.item.itemType !== "Potion") return
+        if (item.itemInstance.item.itemType === "Potion") {
+            await handleUse()
+            return
+        }
 
-        await handleUse()
+        await equipItemAsync(null)
     }
 
     return (

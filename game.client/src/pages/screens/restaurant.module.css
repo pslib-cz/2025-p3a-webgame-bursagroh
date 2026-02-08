@@ -61,6 +61,7 @@
     top: 0.25rem;
     right: 0.25rem;
     fill: var(--light);
+    cursor: pointer;
 }
 
 .ingrediencesList {
@@ -124,6 +125,10 @@
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 1rem;
+}
+
+.button {
+    cursor: pointer;
 }
 
 .buttonContainer {

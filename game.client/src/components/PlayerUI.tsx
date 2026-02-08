@@ -40,7 +40,7 @@ const PlayerUI = () => {
         <div className={styles.container}>
             <div className={styles.header}>
                 <span className={styles.heading}>Player</span>
-                <OpenIcon width={24} height={24} onClick={handleOpenInventory} />
+                <OpenIcon className={styles.open} width={24} height={24} onClick={handleOpenInventory} />
             </div>
             <div className={styles.statContainer}>
                 <div className={styles.stat}>

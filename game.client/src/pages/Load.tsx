@@ -19,6 +19,10 @@ const LoadScreen = () => {
 
     const saves = React.useContext(SaveContext)!.saves
 
+    const handleLoad = () => {
+        navigate(`/load/${encodeURIComponent(userSaveString)}`)
+    }
+
     useKeyboard("Escape", () => {
         navigate("/")
     })
@@ -39,9 +43,7 @@ const LoadScreen = () => {
                         </div>
                         <div className={styles.inputContainer}>
                             <Input placeholder="SaveString" value={userSaveString} onChange={e => setUserSaveString(e.target.value)} />
-                            <Link to={`/load/${encodeURIComponent(userSaveString)}`}>
-                                <SendIcon className={styles.send} width={48} height={48} />
-                            </Link>
+                            <SendIcon className={styles.send} width={48} height={48} onClick={handleLoad} />
                         </div>
                     </div>
                 </div>

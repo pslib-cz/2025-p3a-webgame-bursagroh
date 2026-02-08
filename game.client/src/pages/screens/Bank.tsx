@@ -5,7 +5,6 @@ import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import { moveBankMoneyMutation } from "../../api/bank"
 import { useNavigate } from "react-router"
 import Input from "../../components/Input"
-import MoneyIcon from "../../assets/icons/MoneyIcon"
 import { PlayerContext } from "../../providers/global/PlayerProvider"
 import { InventoryContext } from "../../providers/game/InventoryProvider"
 import BankProvider, { BankContext } from "../../providers/game/BankProvider"
@@ -74,8 +73,7 @@ const BankScreenWithContext = () => {
                 <div className={styles.transferContainer}>
                     <Input type="number" placeholder="Amount" value={toBankAmount} onChange={(e) => setToBankAmount(Number.parseInt(e.target.value))} />
                     <div className={styles.transferSubContainer}>
-                        <span className={styles.balance}>/ {player.money}</span>
-                        <MoneyIcon className={styles.money} width={32} height={32} />
+                        <span className={styles.balance}>/ {player.money} $</span>
                     </div>
                     <SendIcon className={styles.sendIcon} width={32} height={32} onClick={handleTransferToBank} />
                 </div>
@@ -83,8 +81,7 @@ const BankScreenWithContext = () => {
                     <SendIcon className={styles.sendIconFlipped} width={32} height={32} onClick={handleTransferToPlayer} />
                     <Input type="number" placeholder="Amount" value={toPlayerAmount} onChange={(e) => setToPlayerAmount(Number.parseInt(e.target.value))} />
                     <div className={styles.transferSubContainer}>
-                        <span className={styles.balance}>/ {player.bankBalance}</span>
-                        <MoneyIcon className={styles.money} width={32} height={32} />
+                        <span className={styles.balance}>/ {player.bankBalance} $</span>
                     </div>
                 </div>
                 <div className={styles.itemContainer}>
