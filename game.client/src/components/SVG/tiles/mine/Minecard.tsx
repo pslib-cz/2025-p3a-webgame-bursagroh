@@ -9,12 +9,12 @@ import { useNavigate } from 'react-router'
 import type { AssetProps } from '../../../../types'
 
 const Minecard: React.FC<AssetProps> = ({x, y, width, height}) => {
-    const notify = useNotification()
+    const { notify, genericError } = useNotification()
     const navigate = useNavigate()
 
     const player = React.useContext(PlayerContext)!.player!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(player.playerId, "City"))
+    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(player.playerId, "City", genericError))
 
     const handleLeave = async () => {
         if (!validMove(player.subPositionX, player.subPositionY, x, y)) {

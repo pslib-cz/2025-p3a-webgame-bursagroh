@@ -1,8 +1,8 @@
 import type { ChunkCoords } from "../types"
 
 export const getChunkList = (playerPositionX: number, playerPositionY: number, horizontalViewDistanceInChunks: number, verticalViewDistanceInChunks: number, chunkSize: number): Array<ChunkCoords> => {
-    const playerChunkX = playerPositionX - (playerPositionX % chunkSize)
-    const playerChunkY = playerPositionY - (playerPositionY % chunkSize)
+    const playerChunkX = Math.floor(playerPositionX / chunkSize) * chunkSize
+    const playerChunkY = Math.floor(playerPositionY / chunkSize) * chunkSize
     const horizontalViewDistance = horizontalViewDistanceInChunks * chunkSize
     const verticalViewDistance = verticalViewDistanceInChunks * chunkSize
 
@@ -17,7 +17,7 @@ export const getChunkList = (playerPositionX: number, playerPositionY: number, h
 
 export const getChunkCoords = (positionX: number, positionY: number, chunkSize: number): ChunkCoords => {
     return {
-        x: positionX - (positionX % chunkSize),
-        y: positionY - (positionY % chunkSize)
+        x: Math.floor(positionX / chunkSize) * chunkSize,
+        y: Math.floor(positionY / chunkSize) * chunkSize
     }
 }

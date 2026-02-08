@@ -9,13 +9,17 @@ import BlueprintItem from "../../components/item/BlueprintItem"
 import Crafting from "../../components/Crafting"
 import useBlur from "../../hooks/useBlur"
 import CloseIcon from "../../assets/icons/CloseIcon"
+import useNotification from "../../hooks/useNotification"
 
 const BlacksmithScreen = () => {
     useBlur(true)
     
     const navigate = useNavigate()
+    const {genericError} = useNotification()
+    
     const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
+
+    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
 
     const blueprints = useQuery(getBlueprintsQuery())
     const playerBlueprints = useQuery(getPlayerBlueprintsQuery(playerId))

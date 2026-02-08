@@ -145,14 +145,19 @@ const Floor: React.FC<FloorProps> = ({ positionX, positionY, level }) => {
             })
         })
 
-        const building = buildings.data.filter(building => building.positionX === positionX && building.positionY === positionY)[0]
+        const playerRelativeX = positionX - x
+        const playerRelativeY = positionY - y
+
+        console.log(playerRelativeX, playerRelativeY, x, y)
+
+        const building = chunkBuildingMap[playerRelativeY][playerRelativeX]!
 
         const tileType = mapBuildingTypeToTileType(
             building.buildingType,
-            buildingsMap[positionY][positionX + 1],
-            buildingsMap[positionY + 1][positionX + 2],
-            buildingsMap[positionY + 2][positionX + 1],
-            buildingsMap[positionY + 1][positionX]
+            buildingsMap[playerRelativeY][playerRelativeX + 1],
+            buildingsMap[playerRelativeY + 1][playerRelativeX + 2],
+            buildingsMap[playerRelativeY + 2][playerRelativeX + 1],
+            buildingsMap[playerRelativeY + 1][playerRelativeX]
         )
 
         return (

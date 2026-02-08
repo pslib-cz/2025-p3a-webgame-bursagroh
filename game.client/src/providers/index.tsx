@@ -14,8 +14,9 @@ import type { TLoadingWrapperContextState } from "../components/wrappers/Loading
 import AutosaveProvider from "./AutosaveProvider"
 import SaveProvider from "./SaveProvider"
 import NotificationProvider from "./NotificationProvider"
+import TooltipProvider from "./TooltipProvider"
 
-const providers = [PlayerIdProvider, PlayerProvider, MineIdProvider, BuildingIdProvider, LayerProvider, ActiveItemProvider, IsBluredProvider, MapProvider, AutosaveProvider, NotificationProvider]
+const providers = [PlayerIdProvider, PlayerProvider, MineIdProvider, BuildingIdProvider, LayerProvider, ActiveItemProvider, IsBluredProvider, MapProvider, AutosaveProvider, NotificationProvider, TooltipProvider]
 const contextsToLoad = [PlayerContext] as Array<React.Context<TLoadingWrapperContextState>>
 
 const Providers: React.FC<React.PropsWithChildren> = ({ children }) => {

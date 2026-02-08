@@ -12,15 +12,17 @@ import styles from './loadSave.module.css'
 import { screenTypeToURL } from '../layouts/Game';
 import { getPlayerQuery } from '../../api/player';
 import { queryClient } from '../../api';
+import useNotification from '../../hooks/useNotification';
 
 const LoadSaveScreen = () => {
     const navigate = useNavigate()
+    const {genericError} = useNotification()
     const saveString = useParams().saveString!
 
     const { saves, save } = React.useContext(SaveContext)!
     const playerId = React.useContext(PlayerIdContext)!
 
-    const { mutateAsync: loadAsync } = useMutation(loadMutation(playerId.playerId!, saveString))
+    const { mutateAsync: loadAsync } = useMutation(loadMutation(playerId.playerId!, saveString, genericError))
 
     const isAutosave = saves.autosaves.some(save => save.saveString === saveString)
     const isSave = saves.saves.some(save => save.saveString === saveString)

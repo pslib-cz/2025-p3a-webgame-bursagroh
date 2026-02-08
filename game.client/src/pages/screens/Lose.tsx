@@ -6,15 +6,17 @@ import { PlayerIdContext } from '../../providers/PlayerIdProvider'
 import { useNavigate } from 'react-router'
 import styles from './lose.module.css'
 import Button from '../../components/Button'
+import useNotification from '../../hooks/useNotification'
 
 const LoseScreen = () => {
     useBlur(true)
 
     const navigate = useNavigate()
+    const {genericError} = useNotification()
     
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City"))
+    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
 
     const handleClick = async () => {
         await updatePlayerScreenAsync()

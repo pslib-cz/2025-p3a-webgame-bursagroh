@@ -25,9 +25,9 @@ export const getMineItemsQuery = (playerId: string, mineId: number) =>
         queryFn: () => api.get("/api/Mine/{mineId}/Items", { mineId }, {}),
     })
 
-export const mineMineBlockMutation = (playerId: string, mineId: number, targetX: number, targetY: number, onError?: (error: Error) => void) =>
+export const mineMineBlockMutation = (playerId: string, mineId: number, onError?: (error: Error) => void) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Mine/{mineId}/Action/mine", { mineId }, {}, { targetX, targetY }),
+        mutationFn: ({ targetX, targetY }: { targetX: number, targetY: number }) => api.patch("/api/Mine/{mineId}/Action/mine", { mineId }, {}, { targetX, targetY }),
         onSuccess: async () => {
             await Promise.all([
                 queryClient.invalidateQueries({ queryKey: [playerId, "mine", mineId], refetchType: "active" }),
