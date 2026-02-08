@@ -35,8 +35,10 @@ namespace game.Server.Services
         public async Task<ActionResult<IEnumerable<BlueprintDto>>> GetPlayerBlueprintsAsync(Guid playerId)
         {
             var playerExists = await _context.Players.AnyAsync(p => p.PlayerId == playerId);
-            if (!playerExists)
+            if (!playerExists) 
+            {
                 return _errorService.CreateErrorResponse(404, 2001, "Player not found.", "Data Error");
+            } 
 
             var ownedBlueprints = await _context.BlueprintPlayers
                 .Where(bp => bp.PlayerId == playerId)
@@ -60,10 +62,6 @@ namespace game.Server.Services
                 return _errorService.CreateErrorResponse(400, 2002, "You must be at the Blacksmith to buy blueprints.", "Location Restriction");
             }
 
-
-
-
-
             if (blueprint == null) {
                 return _errorService.CreateErrorResponse(404, 2003, "Blueprint not found.", "Not Found");
             } 
@@ -74,13 +72,10 @@ namespace game.Server.Services
                 return _errorService.CreateErrorResponse(400, 2004, "You already own this blueprint.", "Purchase Denied");
             }
 
-
-
             if (player.Money < blueprint.Price) {
                 return _errorService.CreateErrorResponse(400, 2005, $"Insufficient funds. Costs {blueprint.Price}, you have {player.Money}.", "Insufficient Gold");
             }
             
-
             player.Money -= blueprint.Price;
             _context.BlueprintPlayers.Add(new BlueprintPlayer { PlayerId = playerId, BlueprintId = blueprintId });
 
@@ -114,7 +109,6 @@ namespace game.Server.Services
                 return _errorService.CreateErrorResponse(404, 2003, "Required data not found.", "Not Found");
             }
            
-
             var isOwned = await _context.BlueprintPlayers
                 .AnyAsync(bp => bp.PlayerId == playerId && bp.BlueprintId == blueprintId);
 
@@ -122,7 +116,6 @@ namespace game.Server.Services
                 return _errorService.CreateErrorResponse(400, 2006, "You do not own this blueprint.", "Crafting Denied");
             }
                 
-
             var inventoryGroups = player.InventoryItems
                 .GroupBy(ii => ii.ItemInstance.ItemId)
                 .ToDictionary(g => g.Key, g => g.Count());

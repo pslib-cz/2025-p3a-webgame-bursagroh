@@ -25,6 +25,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+
 builder.Services.AddScoped<IErrorService, ErrorService>();
 builder.Services.AddScoped<MineGenerationService>();
 builder.Services.AddScoped<ISaveService, SaveService>();
@@ -36,10 +37,12 @@ builder.Services.AddScoped<IDungeonService, DungeonService>();
 builder.Services.AddScoped<IBuildingService, BuildingService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IBlueprintService, BlueprintService>();
-builder.Services.AddScoped<INavigationService, NavigationService>();
+builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IMineInteractionService, MineInteractionService>();
-builder.Services.AddSingleton<MapGeneratorService>();
+builder.Services.AddSingleton<IMapGeneratorService, MapGeneratorService>();
 builder.Services.AddSingleton<CrypticWizard.RandomWordGenerator.WordGenerator>();
+
+builder.Services.AddHostedService<PlayerCleanupService>();
 
 builder.Services.AddCors(options => {
     options.AddPolicy("AllowFrontend",

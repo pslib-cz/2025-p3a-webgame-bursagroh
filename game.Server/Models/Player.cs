@@ -13,7 +13,7 @@ public class Player
     public int BankBalance { get; set; } = 0;
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ScreenTypes ScreenType { get; set; } = ScreenTypes.City;
+    public ScreenTypes ScreenType { get; set; } = ScreenTypes.Fountain;
     public int PositionX { get; set; } = 0;
     public int PositionY { get; set; } = 0;
     public int SubPositionX { get; set; } = 0;
@@ -25,7 +25,7 @@ public class Player
     public Floor? Floor { get; set; }
     public int Capacity { get; set; } = 10;
     public int Seed { get; set; } = new Random().Next();
-    public int Health { get; set; } = 2;
+    public int Health { get; set; } = 20;
     public int MaxHealth { get; set; } = 20;
 
     public int MineId { get; set; }

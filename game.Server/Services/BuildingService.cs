@@ -24,19 +24,25 @@ namespace game.Server.Services
 
         public List<Building> GetCoreBuildings(Guid playerId) => new List<Building>
         {
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Fountain, PositionX = 0, PositionY = 0, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Mine, PositionX = 2, PositionY = 0, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Bank, PositionX = -2, PositionY = 0, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Restaurant, PositionX = 0, PositionY = -2, IsBossDefeated = false },
-            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Blacksmith, PositionX = 0, PositionY = 2, IsBossDefeated = false }
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Fountain, PositionX = GameConstants.FountainX, PositionY = GameConstants.FountainY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Mine, PositionX = GameConstants.MineEntranceX, PositionY = GameConstants.MineEntranceY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Bank, PositionX = GameConstants.BankX, PositionY = GameConstants.BankY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Restaurant, PositionX = GameConstants.RestaurantX, PositionY = GameConstants.RestaurantY, IsBossDefeated = false },
+            new Building { PlayerId = playerId, BuildingType = BuildingTypes.Blacksmith, PositionX = GameConstants.BlacksmithX, PositionY = GameConstants.BlacksmithY, IsBossDefeated = false }
         };
 
         public async Task<ActionResult<IEnumerable<BuildingDto>>> GetPlayerBuildingsAsync(Guid playerId, int top, int left, int width, int height)
         {
-            if (width > 20 || height > 20 || width <= 0 || height <= 0) return _errorService.CreateErrorResponse(400, 3001, "Requested area is too large or invalid. Maximum size is 20x20.", "Invalid Request");
+            if (width > 20 || height > 20 || width <= 0 || height <= 0) 
+            {
+                return _errorService.CreateErrorResponse(400, 3001, "Requested area is too large or invalid. Maximum size is 20x20.", "Invalid Request");
+            }
 
             var player = await _context.Players.AsNoTracking().FirstOrDefaultAsync(p => p.PlayerId == playerId);
-            if (player == null) return _errorService.CreateErrorResponse(404, 3002, "Player record not found.", "Not Found");
+            if (player == null) 
+            {
+                return _errorService.CreateErrorResponse(404, 3002, "Player record not found.", "Not Found");
+            } 
 
             int minX = left;
             int maxX = left + width - 1;
@@ -80,22 +86,6 @@ namespace game.Server.Services
 
             var buildingDtos = _mapper.Map<IEnumerable<BuildingDto>>(finalMap.Values);
             return new OkObjectResult(buildingDtos);
-        }
-
-        public async Task<ActionResult<IEnumerable<BuildingDto>>> GetAllMaterializedBuildingsAsync(int page, int pageSize)
-        {
-            if (page < 1) page = 1;
-            if (pageSize > 200) pageSize = 200;
-
-            var buildings = await _context.Buildings
-                .AsNoTracking()
-                .OrderBy(b => b.PlayerId)
-                .ThenBy(b => b.PositionX)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new OkObjectResult(_mapper.Map<IEnumerable<BuildingDto>>(buildings));
         }
 
         public async Task<ActionResult<FloorDto>> GetFloorByIdAsync(int floorId)

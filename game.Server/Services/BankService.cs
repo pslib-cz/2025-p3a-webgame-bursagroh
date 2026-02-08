@@ -51,16 +51,19 @@ namespace game.Server.Services
             if (isToBank)
             {
                 if (player.Money < transferAmount)
+                {
                     return _errorService.CreateErrorResponse(400, 1003, "Insufficient wallet funds.", "Transaction Denied");
-
+                }
+                    
                 player.Money -= transferAmount;
                 player.BankBalance += transferAmount;
             }
             else
             {
-                if (player.BankBalance < transferAmount)
+                if (player.BankBalance < transferAmount) {
                     return _errorService.CreateErrorResponse(400, 1004, "Insufficient bank balance.", "Transaction Denied");
-
+                }
+                
                 player.BankBalance -= transferAmount;
                 player.Money += transferAmount;
             }
@@ -71,16 +74,17 @@ namespace game.Server.Services
 
         public async Task<ActionResult> MoveInventoryItemsAsync(Guid playerId, MoveInventoryItemRequest request)
         {
-            if (request.InventoryItemIds == null || !request.InventoryItemIds.Any())
+            if (request.InventoryItemIds == null || !request.InventoryItemIds.Any()) 
+            {
                 return _errorService.CreateErrorResponse(400, 1005, "No item IDs provided.", "Missing Data");
-
+            }
+            
             var player = await _context.Players.FirstOrDefaultAsync(p => p.PlayerId == playerId);
-            var items = await _context.InventoryItems
-                .Where(i => i.PlayerId == playerId && request.InventoryItemIds.Contains(i.InventoryItemId))
-                .ToListAsync();
+            var items = await _context.InventoryItems.Where(i => i.PlayerId == playerId && request.InventoryItemIds.Contains(i.InventoryItemId)).ToListAsync();
 
-            if (player == null || !items.Any())
+            if (player == null || !items.Any()) {
                 return _errorService.CreateErrorResponse(404, 1006, "No matching items or player found.", "Not Found");
+            } 
 
             foreach (var item in items)
             {
