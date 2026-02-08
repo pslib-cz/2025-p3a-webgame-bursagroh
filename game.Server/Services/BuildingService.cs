@@ -82,22 +82,6 @@ namespace game.Server.Services
             return new OkObjectResult(buildingDtos);
         }
 
-        public async Task<ActionResult<IEnumerable<BuildingDto>>> GetAllMaterializedBuildingsAsync(int page, int pageSize)
-        {
-            if (page < 1) page = 1;
-            if (pageSize > 200) pageSize = 200;
-
-            var buildings = await _context.Buildings
-                .AsNoTracking()
-                .OrderBy(b => b.PlayerId)
-                .ThenBy(b => b.PositionX)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            return new OkObjectResult(_mapper.Map<IEnumerable<BuildingDto>>(buildings));
-        }
-
         public async Task<ActionResult<FloorDto>> GetFloorByIdAsync(int floorId)
         {
             var floor = await _context.Floors

@@ -71,6 +71,14 @@ public class DungeonService : IDungeonService
 
     private async Task MoveEnemiesAsync(Player player)
     {
+        var currentFloor = await _context.Floors
+            .Include(f => f.Building)
+            .FirstOrDefaultAsync(f => f.FloorId == player.FloorId);
+
+        bool isBossDefeated = currentFloor?.Building?.IsBossDefeated ?? false;
+        bool isAbandonedTrap = currentFloor?.Building?.BuildingType == BuildingTypes.AbandonedTrap;
+        bool canEnemiesStepOnExits = isAbandonedTrap && !isBossDefeated;
+
         var enemiesOnFloor = await _context.FloorItems
             .Where(fi => fi.FloorId == player.FloorId && fi.FloorItemType == FloorItemType.Enemy)
             .ToListAsync();
@@ -112,8 +120,9 @@ public class DungeonService : IDungeonService
                 bool isStairs = stairs.Any(s => s.Item1 == move.x && s.Item2 == move.y);
                 bool isObstacle = obstacles.Any(o => o.PositionX == move.x && o.PositionY == move.y);
                 bool isOtherEnemy = enemiesOnFloor.Any(e => e.FloorItemId != enemy.FloorItemId && e.PositionX == move.x && e.PositionY == move.y);
+                bool isMovementBlocked = isPlayer || isStairs || isObstacle || isOtherEnemy || (isExit && !canEnemiesStepOnExits);
 
-                if (!isPlayer && !isExit && !isStairs && !isObstacle && !isOtherEnemy)
+                if (!isMovementBlocked)
                 {
                     enemy.PositionX = move.x;
                     enemy.PositionY = move.y;
@@ -226,7 +235,7 @@ public class DungeonService : IDungeonService
             {
                 if (floor.Building?.BuildingType == BuildingTypes.AbandonedTrap && floor.Building.IsBossDefeated != true)
                 {
-                    return _errorService.CreateErrorResponse(400, 6002, "Defeat the Dragon to escape.", "Locked Exit");
+                    return null;
                 }
 
                 player.ScreenType = ScreenTypes.City;
