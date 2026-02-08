@@ -16,10 +16,6 @@ public class MineController : ControllerBase
         _mineService = mineService;
     }
 
-    [HttpPost("Regenerate")]
-    public async Task<IActionResult> GetMine([FromBody] GenerateMineRequest request)
-        => await _mineService.RegenerateMineAsync(request);
-
     [HttpGet("{mineId}/Layer/{layer}")]
     public async Task<ActionResult<List<MineBlockDto>>> GetLayerBlocks(int mineId, int layer)
         => await _mineService.GetLayerBlocksAsync(mineId, layer);

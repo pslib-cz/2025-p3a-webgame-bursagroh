@@ -33,6 +33,18 @@ public class DungeonService : IDungeonService
 
             if (isExitTile)
             {
+                var itemsToRemove = player.InventoryItems
+                    .Where(ii => ii.ItemInstance.ItemId == 39)
+                    .ToList();
+
+                if (itemsToRemove.Any())
+                {
+                    var instancesToRemove = itemsToRemove.Select(ii => ii.ItemInstance).ToList();
+
+                    _context.InventoryItems.RemoveRange(itemsToRemove);
+                    _context.ItemInstances.RemoveRange(instancesToRemove);
+                }
+
                 player.ScreenType = ScreenTypes.City;
                 player.FloorId = null;
                 player.SubPositionX = GameConstants.MineExitX;
