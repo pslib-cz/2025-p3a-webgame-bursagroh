@@ -5,7 +5,7 @@ import PlayerProvider, { PlayerContext } from "./global/PlayerProvider"
 import IsBluredProvider from "./global/IsBluredProvider"
 import MapProvider from "./global/MapProvider"
 import ProviderGroupLoadingWrapper from "../components/wrappers/ProviderGroupLoadingWrapper"
-import type { TLoadingWrapperContextState } from "../components/wrappers/LoadingWrapper"
+import type { TLoadingWrapperContextState } from '../types/context'
 import SettingsProvider from "./global/SettingsProvider"
 import SaveProvider from "./global/SaveProvider"
 import NotificationProvider from "./global/NotificationProvider"

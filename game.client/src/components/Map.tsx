@@ -10,7 +10,7 @@ import { PlayerIdContext } from '../providers/global/PlayerIdProvider'
 import useNotification from '../hooks/useNotification'
 import ProviderGroupLoadingWrapper from './wrappers/ProviderGroupLoadingWrapper'
 import FloorProvider, { FloorContext } from '../providers/game/FloorProvider'
-import type { TLoadingWrapperContextState } from './wrappers/LoadingWrapper'
+import type { TLoadingWrapperContextState } from '../types/context'
 import MineItemsProvider, { MineItemsContext } from '../providers/game/MineItemsProvider'
 
 type MapProps = {

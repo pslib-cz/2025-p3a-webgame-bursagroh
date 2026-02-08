@@ -5,7 +5,7 @@ export type Blueprint = {
         itemId: number
         name: string
         description: string
-        itemType: "Sword"
+        itemType: string
         weight: number
         damage: number
         maxDurability: number

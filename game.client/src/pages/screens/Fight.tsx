@@ -3,27 +3,13 @@ import useBlur from "../../hooks/useBlur"
 import Asset from "../../components/SVG/Asset"
 import { PlayerContext } from "../../providers/global/PlayerProvider"
 import FloorProvider, { FloorContext } from "../../providers/game/FloorProvider"
-import type { EnemyType } from "../../types/api/models/building"
-import type { AssetType } from "../../types/asset"
 import styles from "./fight.module.css"
 import useUse from "../../hooks/useUse"
 import useKeyboard from "../../hooks/useKeyboard"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
-import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from "../../hooks/useLink"
-
-const mapEnemyTypeToAssetType = (enemyType: EnemyType | undefined): AssetType => {
-    switch (enemyType) {
-        case 'Zombie':
-            return 'zombie'
-        case 'Skeleton':
-            return 'skeleton'
-        case 'Dragon':
-            return 'dragon'
-        default:
-            return "empty"
-    }
-}
+import { mapEnemyType } from "../../utils/enemy"
 
 const FightScreenWithContext = () => {
     useBlur(true)
@@ -69,9 +55,9 @@ const FightScreenWithContext = () => {
             </div>
             <div className={styles.entityContainer} onClick={handleClick}>
                 <svg width={512} height={512} viewBox="0 0 512 512">
-                    <Asset assetType={mapEnemyTypeToAssetType(enemy.enemy?.enemyType)} x={0} y={0} width={512} height={512} />
+                    <Asset assetType={mapEnemyType(enemy.enemy!.enemyType)} x={0} y={0} width={512} height={512} />
                 </svg>
-                <span className={styles.entityText}>{enemy.enemy?.health} / {enemy.enemy?.maxHealth}</span>
+                <span className={styles.entityText}>{enemy.enemy!.health} / {enemy.enemy!.maxHealth}</span>
             </div>
         </div>
     )

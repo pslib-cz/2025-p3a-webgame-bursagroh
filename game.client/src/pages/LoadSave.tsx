@@ -14,7 +14,8 @@ import { queryClient } from '../api';
 import useNotification from '../hooks/useNotification';
 import useKeyboard from '../hooks/useKeyboard';
 import useBlur from '../hooks/useBlur';
-import useLink, { screenTypeToPageType } from '../hooks/useLink';
+import useLink from '../hooks/useLink';
+import { screenTypeToPageType } from '../utils/page';
 
 const LoadSaveScreen = () => {
     useBlur(true)

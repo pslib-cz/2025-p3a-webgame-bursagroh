@@ -1,7 +1,7 @@
 import React from 'react'
-import TileSelector from '../../TileSelector'
-import type { AssetProps } from '../../../../types'
+import type { AssetProps } from "../../../../types/asset"
 import useMove from '../../../../hooks/useMove'
+import Asset from '../../Asset'
 
 type RoadProps = {
     roadType: "road-vertical" | "road-horizontal" | "road"
@@ -11,7 +11,7 @@ const Road: React.FC<RoadProps> = ({ roadType, x, y, width, height }) => {
     const handleMove = useMove()
 
     return (
-        <TileSelector width={width} height={height} x={x} y={y} tileType={roadType} onClick={() => handleMove(x, y)} />
+        <Asset width={width} height={height} x={x} y={y} assetType={roadType} onClick={() => handleMove(x, y)} />
     )
 }
 

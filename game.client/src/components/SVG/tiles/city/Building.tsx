@@ -1,8 +1,8 @@
 import React from 'react'
-import type { AssetProps } from '../../../../types'
-import TileSelector from '../../TileSelector'
+import type { AssetProps } from "../../../../types/asset"
 import useMove from '../../../../hooks/useMove'
 import useLink from '../../../../hooks/useLink'
+import Asset from '../../Asset'
 
 type BuildingProps = {
     buildingType: | "bank"
@@ -73,7 +73,7 @@ const Building: React.FC<BuildingProps> = ({x, y, width, height, buildingType}) 
     }
 
     return (
-        <TileSelector width={width} height={height} x={x} y={y} tileType={buildingType} onClick={handleClick} />
+        <Asset width={width} height={height} x={x} y={y} assetType={buildingType} onClick={handleClick} />
     )
 }
 

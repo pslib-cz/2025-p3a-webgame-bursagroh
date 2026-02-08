@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './link.module.css'
-import useLink, { type PageType } from '../hooks/useLink'
+import useLink from '../hooks/useLink'
+import { type PageType } from '../types/page'
 
 type LinkProps = {
     to: PageType

@@ -6,23 +6,14 @@ import { PlayerContext } from "../../providers/global/PlayerProvider"
 import GroundItem from "../../components/item/GroundItem"
 import { groupFloorItems } from "../../utils/floor"
 import ConditionalDisplay from "../../components/wrappers/ConditionalDisplay"
-import type { Player } from "../../types/api/models/player"
 import RentItem from "../../components/item/RentItem"
 import useKeyboard from "../../hooks/useKeyboard"
 import useKeyboardMove from "../../hooks/useKeyboardMove"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import MineItemsProvider, { MineItemsContext } from "../../providers/game/MineItemsProvider"
-import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from "../../hooks/useLink"
-
-const isPlayerNextToTable = (player: Player) => {
-    const nextToTablePositions = [
-        { x: 1, y: -2 },
-        { x: 2, y: -2 }
-    ]
-
-    return nextToTablePositions.some(pos => pos.x === player.subPositionX && pos.y === player.subPositionY)
-}
+import { isPlayerNextToTable } from "../../utils/mine"
 
 const MineScreenWithContext = () => {
     useBlur(false)

@@ -3,13 +3,13 @@ import styles from "./blacksmith.module.css"
 import BlueprintItem from "../../components/item/BlueprintItem"
 import Crafting from "../../components/Crafting"
 import useBlur from "../../hooks/useBlur"
-import CloseIcon from "../../assets/icons/CloseIcon"
+import CloseIcon from "../../icons/CloseIcon"
 import useKeyboard from "../../hooks/useKeyboard"
 import ArrayDisplay from "../../components/wrappers/ArrayDisplay"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import BlueprintProvider, { BlueprintContext } from "../../providers/game/BlueprintProvider"
 import PlayerBlueprintsProvider, { PlayerBlueprintsContext } from "../../providers/game/PlayerBlueprintsProvider"
-import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from "../../hooks/useLink"
 
 const BlacksmithScreenWithContext = () => {

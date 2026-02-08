@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from "./inventory.module.css"
-import CloseIcon from '../assets/icons/CloseIcon'
+import CloseIcon from '../icons/CloseIcon'
 import InventoryItem from './item/InventoryItem'
 import { groupInventoryItems, removeEquippedItemFromInventory } from '../utils/inventory'
 import { PlayerContext } from '../providers/global/PlayerProvider'

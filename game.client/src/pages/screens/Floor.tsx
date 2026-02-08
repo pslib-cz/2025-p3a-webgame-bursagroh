@@ -10,7 +10,7 @@ import styles from './floor.module.css'
 import useKeyboard from '../../hooks/useKeyboard'
 import useKeyboardMove from '../../hooks/useKeyboardMove'
 import ProviderGroupLoadingWrapper from '../../components/wrappers/ProviderGroupLoadingWrapper'
-import type { TLoadingWrapperContextState } from '../../components/wrappers/LoadingWrapper'
+import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from '../../hooks/useLink'
 
 const FloorScreenWithContext = () => {

@@ -1,30 +1,12 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getMineLayersQuery } from "../../api/mine"
-import type { BlockType, MineLayer } from "../../types/api/models/mine"
+import type { MineLayer } from "../../types/api/models/mine"
 import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import Block from "./tiles/mine/Block"
 import MineTile from "./tiles/mine/MineTile"
 import useNotification from "../../hooks/useNotification"
-
-const mapBlockTypeToTileType = (buildingType: BlockType) => {
-    switch (buildingType) {
-        case "Wooden_Frame":
-            return "wooden_frame"
-        case "Rock":
-            return "rock"
-        case "Copper_Ore":
-            return "copper_ore"
-        case "Iron_Ore":
-            return "iron_ore"
-        case "Gold_Ore":
-            return "gold_ore"
-        case "Silver_Ore":
-            return "silver_ore"
-        case "Unobtanium_Ore":
-            return "unobtainium_ore"
-    }
-}
+import { mapBlockTypeToTileType } from "../../utils/mine"
 
 type LayerProps = {
     depth: number

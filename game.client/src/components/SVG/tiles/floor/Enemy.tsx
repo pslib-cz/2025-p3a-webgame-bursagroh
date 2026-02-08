@@ -1,8 +1,9 @@
 import React from 'react'
-import TileSelector from '../../TileSelector'
-import type { AssetProps, EnemyType } from '../../../../types'
+import type { AssetProps } from "../../../../types/asset"
 import useMove from '../../../../hooks/useMove'
 import useLink from '../../../../hooks/useLink'
+import Asset from '../../Asset'
+import type { EnemyType } from '../../../../types/enemy'
 
 type EnemyProps = {
     enemyType: EnemyType
@@ -18,7 +19,7 @@ const Enemy: React.FC<EnemyProps> = ({ width, height, x, y, enemyType }) => {
     }
 
     return (
-        <TileSelector width={width} height={height} x={x} y={y} tileType={enemyType} onClick={handleClick} />
+        <Asset width={width} height={height} x={x} y={y} assetType={enemyType} onClick={handleClick} />
     )
 }
 

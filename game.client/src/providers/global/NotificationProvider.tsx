@@ -1,10 +1,5 @@
 import React from "react"
-
-export type Notification = {
-    id: number
-    heading: string
-    text: string
-}
+import type { Notification } from "../../types/notification"
 
 type NotificationContextType = {
     notify: (heading: string, text: string, timer?: number) => void

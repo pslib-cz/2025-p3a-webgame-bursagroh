@@ -1,11 +1,6 @@
 import React from 'react'
 import styles from './loadingWrapper.module.css'
-
-export type TLoadingWrapperContextState = {
-    isPending: boolean
-    isError: boolean
-    isSuccess: boolean
-} | null
+import type { TLoadingWrapperContextState } from '../../types/context'
 
 type LoadingWrapperProps<T> = {
     context: React.Context<T>

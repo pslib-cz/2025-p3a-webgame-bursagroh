@@ -1,6 +1,6 @@
 import React from 'react'
 import Asset from '../../Asset'
-import type { AssetProps } from '../../../../types'
+import type { AssetProps } from "../../../../types/asset"
 import useLink from '../../../../hooks/useLink'
 
 const Minecard: React.FC<AssetProps> = ({x, y, width, height}) => {

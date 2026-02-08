@@ -5,37 +5,11 @@ import Layer from '../Layer'
 import { PlayerContext } from '../../../providers/global/PlayerProvider'
 import styles from './mineSVG.module.css'
 import MineTile from '../tiles/mine/MineTile'
-import { itemIdToAssetType } from '../../../utils/item'
 import Minecard from '../tiles/mine/Minecard'
 import Tooltip from '../../Tooltip'
-import { MineItemsContext } from '../../../providers/game/MineItemsProvider'
 import { LAYER_CHUNK_SIZE, LAYER_VIEW_DISTANCE } from '../../../constants/mine'
-
-const getLayerList = (playerPositionY: number, viewDistanceInChunks: number, chunkSize: number): Array<number> => {
-    const playerChunkY = playerPositionY - (playerPositionY % chunkSize)
-    const viewDistance = viewDistanceInChunks * chunkSize
-
-    const yFrom = playerChunkY - viewDistance
-
-    const height = viewDistanceInChunks * 2 + 1
-
-    return new Array(height)
-        .fill(0)
-        .map((_, yIndex) => yFrom + yIndex * chunkSize)
-        .filter((value) => value >= 0)
-}
-
-const DisplayMineItems = () => {
-    const mineItems = React.useContext(MineItemsContext)!.mineItems!
-
-    return (
-        <>
-            {mineItems.map((item) => (
-                <Asset key={`mineItem:${item.floorItemId}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} pointerEvents="none" />
-            ))}
-        </>
-    )
-}
+import { getLayerList } from '../../../utils/mine'
+import MineItems from '../MineItems'
 
 const MineSVG = () => {
     const player = React.useContext(PlayerContext)!.player!
@@ -93,7 +67,7 @@ const MineSVG = () => {
                 <Layer key={`depth:${depth}`} mineId={player.mineId} depth={depth} size={LAYER_CHUNK_SIZE} />
             ))}
 
-            <DisplayMineItems />
+            <MineItems />
 
             <Tooltip heading='Player' text={`Player is located at x: ${player.subPositionX} y: ${player.subPositionY}`}>
                 <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />

@@ -1,5 +1,5 @@
 import React from 'react'
-import CopyIcon from '../assets/icons/CopyIcon'
+import CopyIcon from '../icons/CopyIcon'
 import styles from './saveString.module.css'
 
 type SaveStringProps = {

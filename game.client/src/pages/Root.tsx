@@ -7,7 +7,8 @@ import { SaveContext } from "../providers/global/SaveProvider"
 import { PlayerContext } from "../providers/global/PlayerProvider"
 import useKeyboard from "../hooks/useKeyboard"
 import Button from "../components/Button"
-import useLink, { screenTypeToPageType } from "../hooks/useLink"
+import useLink from "../hooks/useLink"
+import { screenTypeToPageType } from '../utils/page'
 import useBlur from "../hooks/useBlur"
 
 const Root = () => {

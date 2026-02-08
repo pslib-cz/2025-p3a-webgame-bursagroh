@@ -1,10 +1,10 @@
 import React from 'react'
-import HomeIcon from '../assets/icons/HomeIcon'
+import HomeIcon from '../icons/HomeIcon'
 import styles from './navbar.module.css'
 import { PlayerContext } from '../providers/global/PlayerProvider'
 import { SaveContext } from '../providers/global/SaveProvider'
 import SaveString from './SaveString'
-import SaveIcon from '../assets/icons/SaveIcon'
+import SaveIcon from '../icons/SaveIcon'
 import useLink from '../hooks/useLink'
 
 const NavBar = () => {
