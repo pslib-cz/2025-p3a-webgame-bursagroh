@@ -123,7 +123,10 @@ namespace game.Server.Services
 
             if (player.ScreenType == ScreenTypes.City)
             {
-              
+                if (!MapGeneratorService.IsWalkable(request.NewPositionX, request.NewPositionY))
+                {
+                    return _errorService.CreateErrorResponse(400, 9006, "You cannot step into the void.", "Movement Error");
+                }
 
                 await _cityService.HandleCityMovement(player, request, id);
             }
