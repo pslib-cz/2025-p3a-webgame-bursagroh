@@ -15,7 +15,7 @@ const HandItem: React.FC<HandItemProps> = ({ item }) => {
     const handleUse = useUse()
 
     const handleOnDragStart = (event: React.DragEvent<HTMLDivElement>) => {
-        event.dataTransfer.setData("text/plain", item.inventoryItemId.toString())
+        event.dataTransfer.setData("text/plain", `hand_${item.inventoryItemId.toString()}`)
     }
 
     const handleClick = async () => {

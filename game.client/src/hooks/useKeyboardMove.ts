@@ -25,9 +25,7 @@ const useKeyboardMove = (isSubMove: boolean) => {
 
     const handleMove = async (direction: Direction) => {
         const targetPosition = getTargetPosition(direction, isSubMove ? player.subPositionX : player.positionX, isSubMove ? player.subPositionY : player.positionY)
-        console.log(`Moving ${direction} to (${targetPosition.x}, ${targetPosition.y})`)
         await move(targetPosition.x, targetPosition.y, isSubMove)
-        console.log(`Moved ${direction} to (${targetPosition.x}, ${targetPosition.y})`)
     }
 
     useKeyboard("ArrowUp", async () => {

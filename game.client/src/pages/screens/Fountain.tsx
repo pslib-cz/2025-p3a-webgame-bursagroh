@@ -28,8 +28,14 @@ const FountainScreen = () => {
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
-        const inventoryItemId = Number(event.dataTransfer.getData("text/plain"))
-        dropItemAsync(inventoryItemId)
+        const data = event.dataTransfer.getData("text/plain")
+        if (data.startsWith("inv_")) {
+            const inventoryItemId = Number(data.substring(4))
+            dropItemAsync(inventoryItemId)
+        } else if (data.startsWith("hand_")) {
+            const inventoryItemId = Number(data.substring(5))
+            dropItemAsync(inventoryItemId)
+        }
     }
 
     useKeyboard("Escape", handleEscape)

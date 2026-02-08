@@ -25,8 +25,11 @@ const PlayerUI = () => {
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault()
-        const inventoryItemId = Number(event.dataTransfer.getData("text/plain"))
-        equipItemAsync(inventoryItemId)
+        const data = event.dataTransfer.getData("text/plain")
+        if (data.startsWith("inv_")) {
+            const inventoryItemId = Number(data.substring(4))
+            equipItemAsync(inventoryItemId)
+        }
     }
 
     const handleOpenInventory = () => {
