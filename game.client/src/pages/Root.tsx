@@ -9,6 +9,7 @@ import { PlayerContext } from "../providers/global/PlayerProvider"
 import { screenTypeToURL } from "./layouts/Game"
 import { useNavigate } from "react-router"
 import useKeyboard from "../hooks/useKeyboard"
+import Button from "../components/Button"
 
 const Root = () => {
     useBlur(true)
@@ -19,12 +20,14 @@ const Root = () => {
     const player = React.useContext(PlayerContext)
     const save = React.useContext(SaveContext)!.save
 
-    const handleClick = () => {
-        playerId.generatePlayerIdAsync()
+    const handleClick = async () => {
+        await playerId.generatePlayerIdAsync()
+        navigate("/game/city")
     }
 
     const handleSave = async () => {
         await save()
+        navigate("/save")
     }
 
     useKeyboard("Escape", () => {
@@ -39,8 +42,8 @@ const Root = () => {
                 <h1 className={styles.heading}>Urban Relic</h1>
                 <div className={styles.linkContainer}>
                     <Link to={screenTypeToURL(player?.player?.screenType ?? "City")} disabled={playerId.playerId === null}>Continue</Link>
-                    <Link to="/game/city" onClick={handleClick}>New Game</Link>
-                    <Link to="/save" onClick={handleSave} disabled={playerId.playerId === null}>Save</Link>
+                    <Button onClick={handleClick}>New Game</Button>
+                    <Button onClick={handleSave} disabled={playerId.playerId === null}>Save</Button>
                     <Link to="/load">Load</Link>
                     <Link to="/settings">Settings</Link>
                 </div>

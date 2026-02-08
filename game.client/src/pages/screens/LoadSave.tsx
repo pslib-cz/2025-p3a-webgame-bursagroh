@@ -41,10 +41,11 @@ const LoadSaveScreen = () => {
     }
 
     const handleSaveAndLoad = async () => {
+        if (!playerId.playerId) return
+
         await save()
         await loadAsync()
 
-        await queryClient.refetchQueries({ queryKey: [playerId.playerId, "player"] })
         const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
         navigate(screenTypeToURL(player.screenType))
     }
@@ -56,7 +57,6 @@ const LoadSaveScreen = () => {
 
         await loadAsync()
         
-        await queryClient.refetchQueries({ queryKey: [playerId.playerId, "player"] })
         const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
         navigate(screenTypeToURL(player.screenType))
     }
