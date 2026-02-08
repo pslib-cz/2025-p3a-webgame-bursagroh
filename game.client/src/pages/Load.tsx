@@ -7,24 +7,24 @@ import { parseSave } from '../utils/save'
 import styles from './load.module.css'
 import SendIcon from '../assets/icons/SendIcon'
 import useKeyboard from '../hooks/useKeyboard'
-import { useNavigate } from 'react-router'
 import useBlur from '../hooks/useBlur'
+import useLink from '../hooks/useLink'
 
 const LoadScreen = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const [userSaveString, setUserSaveString] = React.useState("")
 
     const saves = React.useContext(SaveContext)!.saves
 
-    const handleLoad = () => {
-        navigate(`/load/${encodeURIComponent(userSaveString)}`)
+    const handleLoad = async () => {
+        await moveToPage("loadSave", false, userSaveString)
     }
 
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
 
     return (
@@ -35,10 +35,10 @@ const LoadScreen = () => {
                     <div className={styles.savesContainer}>
                         <div className={styles.savesLinkContainer}>
                             {saves.autosaves.map((save, index) => (
-                                <Link key={`autosave_${index}`} to={`/load/${encodeURIComponent(save.saveString)}`}>{parseSave(save, true)}</Link>
+                                <Link key={`autosave_${index}`} to="loadSave" saveString={save.saveString}>{parseSave(save, true)}</Link>
                             ))}
                             {saves.saves.map((save, index) => (
-                                <Link key={`save_${index}`} to={`/load/${encodeURIComponent(save.saveString)}`}>{parseSave(save)}</Link>
+                                <Link key={`save_${index}`} to="loadSave" saveString={save.saveString}>{parseSave(save)}</Link>
                             ))}
                         </div>
                         <div className={styles.inputContainer}>
@@ -47,7 +47,7 @@ const LoadScreen = () => {
                         </div>
                     </div>
                 </div>
-                <Link to="/">Back</Link>
+                <Link to="root">Back</Link>
             </div>
         </Layer>
     )

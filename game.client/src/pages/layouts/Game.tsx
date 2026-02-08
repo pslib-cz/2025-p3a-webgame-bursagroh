@@ -1,6 +1,6 @@
 import React from "react"
 import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
-import { Outlet, useLocation, useNavigate } from "react-router"
+import { Outlet, useLocation } from "react-router"
 import type { ScreenType } from "../../types/api/models/player"
 import styles from "./game.module.css"
 import NavBar from "../../components/NavBar"
@@ -12,6 +12,7 @@ import IsOpenInventoryProvider from "../../providers/game/IsOpenInventoryProvide
 import InventoryProvider, { InventoryContext } from "../../providers/game/InventoryProvider"
 import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
 import { PlayerContext } from "../../providers/global/PlayerProvider"
+import useLink, { screenTypeToPageType } from "../../hooks/useLink"
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const screenTypeToURL = (screenType: ScreenType) => {
@@ -40,17 +41,16 @@ export const screenTypeToURL = (screenType: ScreenType) => {
 }
 
 const ProperScreenChecker = () => {
-    const navigate = useNavigate()
+    const moveToPage = useLink()
     const location = useLocation()
 
     const player = React.useContext(PlayerContext)!.player!
-    
 
     React.useEffect(() => {
         if (screenTypeToURL(player.screenType) != location.pathname) {
-            navigate(screenTypeToURL(player.screenType)!)
+            moveToPage(screenTypeToPageType(player.screenType)!)
         }
-    }, [player.screenType, navigate, location.pathname])
+    }, [player.screenType, moveToPage, location.pathname])
 
     if (screenTypeToURL(player.screenType) != location.pathname) {
         return null
@@ -60,15 +60,15 @@ const ProperScreenChecker = () => {
 }
 
 const Game = () => {
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId
 
     React.useEffect(() => {
         if (!playerId) {
-            navigate("/")
+            moveToPage("root")
         }
-    }, [playerId, navigate])
+    }, [playerId, moveToPage])
 
     return (
         <ProviderGroupLoadingWrapper providers={[InventoryProvider, IsOpenInventoryProvider]} contextsToLoad={[InventoryContext] as Array<React.Context<TLoadingWrapperContextState>>}>

@@ -9,9 +9,7 @@ import { itemIdToAssetType } from '../../../utils/item'
 import Minecard from '../tiles/mine/Minecard'
 import Tooltip from '../../Tooltip'
 import { MineItemsContext } from '../../../providers/game/MineItemsProvider'
-
-const chunkSize = 8
-const viewDistanceInChunks = 2
+import { LAYER_CHUNK_SIZE, LAYER_VIEW_DISTANCE } from '../../../constants/mine'
 
 const getLayerList = (playerPositionY: number, viewDistanceInChunks: number, chunkSize: number): Array<number> => {
     const playerChunkY = playerPositionY - (playerPositionY % chunkSize)
@@ -19,7 +17,7 @@ const getLayerList = (playerPositionY: number, viewDistanceInChunks: number, chu
 
     const yFrom = playerChunkY - viewDistance
 
-    const height = viewDistanceInChunks * 2
+    const height = viewDistanceInChunks * 2 + 1
 
     return new Array(height)
         .fill(0)
@@ -42,7 +40,7 @@ const DisplayMineItems = () => {
 const MineSVG = () => {
     const player = React.useContext(PlayerContext)!.player!
 
-    const layers = getLayerList(player.subPositionY, viewDistanceInChunks, chunkSize)
+    const layers = getLayerList(player.subPositionY, LAYER_VIEW_DISTANCE, LAYER_CHUNK_SIZE)
 
     return (
         <SVGDisplay className={styles.mine} centerX={player.subPositionX} centerY={player.subPositionY}>
@@ -92,7 +90,7 @@ const MineSVG = () => {
             <MineTile x={7} y={-2} width={1} height={1} mineTileType="empty" />
 
             {layers.map((depth) => (
-                <Layer key={`depth:${depth}`} mineId={player.mineId} depth={depth} size={chunkSize} />
+                <Layer key={`depth:${depth}`} mineId={player.mineId} depth={depth} size={LAYER_CHUNK_SIZE} />
             ))}
 
             <DisplayMineItems />

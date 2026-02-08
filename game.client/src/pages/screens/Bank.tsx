@@ -1,9 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
-import { updatePlayerScreenMutation } from "../../api/player"
 import React from "react"
 import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import { moveBankMoneyMutation } from "../../api/bank"
-import { useNavigate } from "react-router"
 import Input from "../../components/Input"
 import { PlayerContext } from "../../providers/global/PlayerProvider"
 import { InventoryContext } from "../../providers/game/InventoryProvider"
@@ -21,11 +19,12 @@ import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroup
 import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
 import ArrayDisplay from "../../components/wrappers/ArrayDisplay"
 import useLock from "../../hooks/useLock"
+import useLink from "../../hooks/useLink"
 
 const BankScreenWithContext = () => {
     useBlur(true)
     
-    const navigate = useNavigate()
+    const moveToPage = useLink()
     const {genericError} = useNotification()
     const handleLock = useLock()
 
@@ -34,16 +33,13 @@ const BankScreenWithContext = () => {
     const inventory = React.useContext(InventoryContext)!.inventory!
     const bank = React.useContext(BankContext)!.bank!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
     const { mutateAsync: moveBankMoneyAsync } = useMutation(moveBankMoneyMutation(playerId, genericError))
 
     const [toBankAmount, setToBankAmount] = React.useState(0)
     const [toPlayerAmount, setToPlayerAmount] = React.useState(0)
 
     const handleEscape = async () => {
-        await updatePlayerScreenAsync()
-
-        navigate("/game/city")
+        await moveToPage("city", true)
     }
 
     const handleTransferToBank = async () => {

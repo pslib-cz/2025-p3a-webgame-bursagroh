@@ -1,21 +1,20 @@
 import React from 'react'
 import TileSelector from '../../TileSelector'
 import type { AssetProps, EnemyType } from '../../../../types'
-import { useNavigate } from 'react-router'
 import useMove from '../../../../hooks/useMove'
+import useLink from '../../../../hooks/useLink'
 
 type EnemyProps = {
     enemyType: EnemyType
 } & AssetProps
 
 const Enemy: React.FC<EnemyProps> = ({ width, height, x, y, enemyType }) => {
-    const navigate = useNavigate()
+    const moveToPage = useLink()
     const handleMove = useMove()
 
     const handleClick = async () => {
         await handleMove(x, y)
-
-        navigate("/game/fight")
+        await moveToPage("fight")
     }
 
     return (

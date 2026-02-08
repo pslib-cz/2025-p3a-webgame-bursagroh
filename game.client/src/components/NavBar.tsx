@@ -2,19 +2,19 @@ import React from 'react'
 import HomeIcon from '../assets/icons/HomeIcon'
 import styles from './navbar.module.css'
 import { PlayerContext } from '../providers/global/PlayerProvider'
-import { useNavigate } from 'react-router'
 import { SaveContext } from '../providers/global/SaveProvider'
 import SaveString from './SaveString'
 import SaveIcon from '../assets/icons/SaveIcon'
+import useLink from '../hooks/useLink'
 
 const NavBar = () => {
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const player = React.useContext(PlayerContext)!.player!
     const {save, saveState, saveString} = React.useContext(SaveContext)!
 
-    const handleClick = () => {
-        navigate("/")
+    const handleClick = async () => {
+        await moveToPage("root")
     }
 
     return (

@@ -1,37 +1,27 @@
 import React from "react"
-import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
-import { useMutation } from "@tanstack/react-query"
-import { updatePlayerScreenMutation } from "../../api/player"
-import { useNavigate } from "react-router"
 import styles from "./blacksmith.module.css"
 import BlueprintItem from "../../components/item/BlueprintItem"
 import Crafting from "../../components/Crafting"
 import useBlur from "../../hooks/useBlur"
 import CloseIcon from "../../assets/icons/CloseIcon"
-import useNotification from "../../hooks/useNotification"
 import useKeyboard from "../../hooks/useKeyboard"
 import ArrayDisplay from "../../components/wrappers/ArrayDisplay"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import BlueprintProvider, { BlueprintContext } from "../../providers/game/BlueprintProvider"
 import PlayerBlueprintsProvider, { PlayerBlueprintsContext } from "../../providers/game/PlayerBlueprintsProvider"
 import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import useLink from "../../hooks/useLink"
 
 const BlacksmithScreenWithContext = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
-    const { genericError } = useNotification()
+    const moveToPage = useLink()
 
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
     const blueprints = React.useContext(BlueprintContext)!.blueprints!
     const playerBlueprints = React.useContext(PlayerBlueprintsContext)!.blueprints!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
-
     const handleEscape = async () => {
-        await updatePlayerScreenAsync()
-
-        navigate("/game/city")
+        await moveToPage("city", true)
     }
 
     useKeyboard("Escape", handleEscape)

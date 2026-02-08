@@ -774,6 +774,41 @@ namespace game.Server.Migrations
                             Amount = 10,
                             BlueprintId = 21,
                             ItemId = 7
+                        },
+                        new
+                        {
+                            CraftingId = 62,
+                            Amount = 10,
+                            BlueprintId = 23,
+                            ItemId = 6
+                        },
+                        new
+                        {
+                            CraftingId = 63,
+                            Amount = 2,
+                            BlueprintId = 23,
+                            ItemId = 7
+                        },
+                        new
+                        {
+                            CraftingId = 64,
+                            Amount = 10,
+                            BlueprintId = 24,
+                            ItemId = 5
+                        },
+                        new
+                        {
+                            CraftingId = 65,
+                            Amount = 5,
+                            BlueprintId = 24,
+                            ItemId = 4
+                        },
+                        new
+                        {
+                            CraftingId = 67,
+                            Amount = 15,
+                            BlueprintId = 25,
+                            ItemId = 7
                         });
                 });
 

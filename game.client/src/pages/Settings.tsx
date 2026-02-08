@@ -7,13 +7,13 @@ import Input from '../components/Input'
 import styles from './settings.module.css'
 import { DEFAULT_AUTOSAVE_INTERVAL, DEFAULT_MAX_AUTOSAVE } from '../constants/settings'
 import { SettingsContext } from '../providers/global/SettingsProvider'
-import { useNavigate } from 'react-router'
 import useKeyboard from '../hooks/useKeyboard'
+import useLink from '../hooks/useLink'
 
 const SettingsScreen = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const autosave = React.useContext(SettingsContext)!
 
@@ -32,8 +32,8 @@ const SettingsScreen = () => {
         setMaxAutosave(DEFAULT_MAX_AUTOSAVE)
     }
 
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
     
     return (
@@ -49,7 +49,7 @@ const SettingsScreen = () => {
                 </div>
                 <div className={styles.buttonContainer}>
                     <Button isDangerous onClick={handleDelete}>Delete Stored Info</Button>
-                    <Link to="/">Back</Link>
+                    <Link to="root">Back</Link>
                 </div>
             </div>
         </Layer>

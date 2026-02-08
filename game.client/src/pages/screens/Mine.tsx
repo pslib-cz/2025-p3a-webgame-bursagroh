@@ -9,11 +9,11 @@ import ConditionalDisplay from "../../components/wrappers/ConditionalDisplay"
 import type { Player } from "../../types/api/models/player"
 import RentItem from "../../components/item/RentItem"
 import useKeyboard from "../../hooks/useKeyboard"
-import { useNavigate } from "react-router"
 import useKeyboardMove from "../../hooks/useKeyboardMove"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import MineItemsProvider, { MineItemsContext } from "../../providers/game/MineItemsProvider"
 import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import useLink from "../../hooks/useLink"
 
 const isPlayerNextToTable = (player: Player) => {
     const nextToTablePositions = [
@@ -29,13 +29,13 @@ const MineScreenWithContext = () => {
     useMap("mine")
     useKeyboardMove(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const player = React.useContext(PlayerContext)!.player!
     const mineItems = React.useContext(MineItemsContext)!.mineItems!
 
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
 
     const items = mineItems.filter(item => item.positionX === player.subPositionX && item.positionY === player.subPositionY).map(item => ({ floorItemId: item.floorItemId, item: item.itemInstance }))

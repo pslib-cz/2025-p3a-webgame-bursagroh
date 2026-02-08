@@ -8,17 +8,17 @@ import { groupFloorItems } from '../../utils/floor'
 import GroundItem from '../../components/item/GroundItem'
 import styles from './floor.module.css'
 import useKeyboard from '../../hooks/useKeyboard'
-import { useNavigate } from 'react-router'
 import useKeyboardMove from '../../hooks/useKeyboardMove'
 import ProviderGroupLoadingWrapper from '../../components/wrappers/ProviderGroupLoadingWrapper'
 import type { TLoadingWrapperContextState } from '../../components/wrappers/LoadingWrapper'
+import useLink from '../../hooks/useLink'
 
 const FloorScreenWithContext = () => {
     useBlur(false)
     useMap("floor")
     useKeyboardMove(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
   
     const player = React.useContext(PlayerContext)!.player!
     const floor = React.useContext(FloorContext)!.floor!
@@ -26,8 +26,8 @@ const FloorScreenWithContext = () => {
     const items = floor.floorItems.filter(item => item.floorItemType === "Item").filter(item => item.positionX === player.subPositionX && item.positionY === player.subPositionY).map(item => ({ floorItemId: item.floorItemId, item: item.itemInstance! }))
     const groupedItems = groupFloorItems(items)
 
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
 
     return (

@@ -1,8 +1,8 @@
 import React from 'react'
 import type { AssetProps } from '../../../../types'
-import { useNavigate } from 'react-router'
 import TileSelector from '../../TileSelector'
 import useMove from '../../../../hooks/useMove'
+import useLink from '../../../../hooks/useLink'
 
 type BuildingProps = {
     buildingType: | "bank"
@@ -30,26 +30,26 @@ type BuildingProps = {
 
 const Building: React.FC<BuildingProps> = ({x, y, width, height, buildingType}) => {
     const handleMove = useMove()
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const handleClick = async () => {
         await handleMove(x, y)
 
         switch (buildingType) {
             case 'bank':
-                navigate("/game/bank")
+                await moveToPage("bank")
                 break
             case 'blacksmith':
-                navigate("/game/blacksmith")
+                await moveToPage("blacksmith")
                 break
             case 'fountain':
-                navigate("/game/fountain")
+                await moveToPage("fountain")
                 break
             case 'mine':
-                navigate("/game/mine")
+                await moveToPage("mine")
                 break
             case 'restaurant':
-                navigate("/game/restaurant")
+                await moveToPage("restaurant")
                 break
             case 'abandoned-straight-top':
             case 'abandoned-straight-right':
@@ -67,7 +67,7 @@ const Building: React.FC<BuildingProps> = ({x, y, width, height, buildingType}) 
             case 'abandoned-trap-corner-top-right':
             case 'abandoned-trap-corner-bottom-left':
             case 'abandoned-trap-corner-bottom-right':
-                navigate("/game/floor")
+                await moveToPage("floor")
                 break
         }
     }

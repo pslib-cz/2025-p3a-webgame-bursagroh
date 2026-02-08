@@ -8,9 +8,9 @@ import type { AssetType } from "../../types/asset"
 import styles from "./fight.module.css"
 import useUse from "../../hooks/useUse"
 import useKeyboard from "../../hooks/useKeyboard"
-import { useNavigate } from "react-router"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import useLink from "../../hooks/useLink"
 
 const mapEnemyTypeToAssetType = (enemyType: EnemyType | undefined): AssetType => {
     switch (enemyType) {
@@ -29,7 +29,7 @@ const FightScreenWithContext = () => {
     useBlur(true)
 
     const handleUse = useUse()
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const player = React.useContext(PlayerContext)!.player!
     const floor = React.useContext(FloorContext)!.floor!
@@ -41,8 +41,8 @@ const FightScreenWithContext = () => {
         await handleUse()
     }
 
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
 
     if (!enemy) {

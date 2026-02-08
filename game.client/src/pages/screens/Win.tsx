@@ -2,24 +2,24 @@ import React from 'react'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import useBlur from '../../hooks/useBlur'
 import styles from './win.module.css'
-import { useNavigate } from 'react-router'
 import useKeyboard from '../../hooks/useKeyboard'
 import Button from '../../components/Button'
+import useLink from '../../hooks/useLink'
 
 const WinScreen = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const playerId = React.useContext(PlayerIdContext)!
 
     const handleClick = async () => {
         await playerId.generatePlayerIdAsync()
-        navigate("/game/fountain")
+        await moveToPage("fountain")
     }
 
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
 
     return (
