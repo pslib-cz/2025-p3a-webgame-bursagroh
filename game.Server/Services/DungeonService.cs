@@ -173,6 +173,8 @@ public class DungeonService : IDungeonService
                                        fi.PositionX == player.SubPositionX &&
                                        fi.PositionY == player.SubPositionY);
 
+        
+
         if (floorItem == null) return null;
 
         if (floorItem.FloorItemType == FloorItemType.Chest && floorItem.Chest != null)

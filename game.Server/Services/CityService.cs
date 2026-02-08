@@ -21,7 +21,9 @@ namespace game.Server.Services
 
         public async Task HandleCityMovement(Player player, MovePlayerRequest request, Guid id)
         {
+            // --- CLEANUP: Remove rented pickaxe (ID 39) if in City ---
             var rentedPickaxe = await _context.InventoryItems
+                .Include(ii => ii.ItemInstance)
                 .FirstOrDefaultAsync(ii => ii.PlayerId == player.PlayerId &&
                                            ii.ItemInstance!.ItemId == 39);
 
@@ -33,7 +35,6 @@ namespace game.Server.Services
                     player.ActiveInventoryItemId = null;
                 }
                 await _context.SaveChangesAsync();
-
             }
 
             int previousX = player.PositionX;
@@ -46,11 +47,9 @@ namespace game.Server.Services
             {
                 player.PositionX = targetX;
                 player.PositionY = targetY;
-
                 player.ScreenType = ScreenTypes.Fountain;
                 return;
             }
-
 
             player.PositionX = targetX;
             player.PositionY = targetY;
@@ -61,11 +60,11 @@ namespace game.Server.Services
             {
                 var externalEntryTypes = new[]
                 {
-                    BuildingTypes.Mine,
-                    BuildingTypes.Bank,
-                    BuildingTypes.Restaurant,
-                    BuildingTypes.Blacksmith
-                };
+            BuildingTypes.Mine,
+            BuildingTypes.Bank,
+            BuildingTypes.Restaurant,
+            BuildingTypes.Blacksmith
+        };
 
                 if (externalEntryTypes.Contains(building.BuildingType))
                 {
@@ -129,6 +128,8 @@ namespace game.Server.Services
 
         private async Task SetupDungeonEntry(Player player, Building building, int previousX, int previousY)
         {
+            building.ReachedHeight = 1;
+
             var floor0 = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == building.BuildingId && f.Level == 0);
 
             if (floor0 == null)
@@ -136,8 +137,9 @@ namespace game.Server.Services
                 var generated = _mapGen.GenerateInterior(building.BuildingId, player.Seed, 1, building.Height ?? 5, building.PositionX, building.PositionY);
                 floor0 = generated.First(f => f.Level == 0);
                 _context.Floors.Add(floor0);
-                await _context.SaveChangesAsync();
             }
+
+            await _context.SaveChangesAsync();
 
             int spawnX = 0, spawnY = 0;
             if (previousX < building.PositionX) { spawnX = 0; spawnY = 3; }
