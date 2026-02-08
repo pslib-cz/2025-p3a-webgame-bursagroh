@@ -78,3 +78,12 @@
     fill: var(--light);
     transform: rotate(180deg);
 }
+
+.text {
+    font-size: var(--h4);
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    margin: 0;
+    color: var(--light);
+}

@@ -2,7 +2,6 @@ export type ScreenType = "City" | "Bank" | "Mine" | "Restaurant" | "Blacksmith" 
 
 export type Player = {
     playerId: string
-    name: string
     money: number
     bankBalance: number
     screenType: ScreenType

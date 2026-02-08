@@ -11,6 +11,7 @@ import useBlur from "../../hooks/useBlur"
 import CloseIcon from "../../assets/icons/CloseIcon"
 import useNotification from "../../hooks/useNotification"
 import useKeyboard from "../../hooks/useKeyboard"
+import ArrayDisplay from "../../components/wrappers/ArrayDisplay"
 
 const BlacksmithScreen = () => {
     useBlur(true)
@@ -50,14 +51,14 @@ const BlacksmithScreen = () => {
                     <span className={styles.heading}>Crafting</span>
                     <span className={styles.heading}>Blueprint</span>
                     <div className={styles.craftingContainer} >
-                        {playerBlueprints.data.map((blueprint) => (
+                        <ArrayDisplay elements={playerBlueprints.data.map((blueprint) => (
                             <Crafting blueprint={blueprint} key={blueprint.blueprintId} />
-                        ))}
+                        ))} ifEmpty={<span className={styles.text}>No blueprints available</span>} />
                     </div>
                     <div className={styles.blueprintContainer}>
-                        {blueprintsToBuy.map((blueprint) => (
+                        <ArrayDisplay elements={blueprintsToBuy.map((blueprint) => (
                             <BlueprintItem blueprint={blueprint} key={blueprint.blueprintId} />
-                        ))}
+                        ))} ifEmpty={<span className={styles.text}>No blueprints available</span>} />
                     </div>
                     <CloseIcon className={styles.close} onClick={handleEscape} width={24} height={24} />
                 </div>

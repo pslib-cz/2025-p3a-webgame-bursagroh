@@ -3,26 +3,18 @@ import { PlayerContext } from '../providers/global/PlayerProvider'
 import { useItemMutation } from '../api/player'
 import { useMutation } from '@tanstack/react-query'
 import useNotification from './useNotification'
+import useLock from './useLock'
 
 const useUse = () => {
     const {genericError} = useNotification()
+    const handleLock = useLock()
     
     const player = React.useContext(PlayerContext)!.player!
-
-    const lock = React.useRef(false)
 
     const { mutateAsync: useItemAsync } = useMutation(useItemMutation(player.playerId, genericError))
 
     const handleUse = async () => {
-        if (lock.current) return
-
-        lock.current = true
-        try {
-            // eslint-disable-next-line react-hooks/rules-of-hooks
-            await useItemAsync()
-        } finally {
-            lock.current = false
-        }
+        await handleLock(useItemAsync)
     }
 
     return handleUse

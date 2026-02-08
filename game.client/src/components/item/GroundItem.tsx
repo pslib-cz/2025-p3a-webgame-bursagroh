@@ -10,6 +10,7 @@ import WeightIcon from '../../assets/icons/WeightIcon'
 import styles from './groundItem.module.css'
 import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
+import useLock from '../../hooks/useLock'
 
 type GroundItemProps = {
     items: {floorItemId: number, item: FloorItemInstance}[]
@@ -17,13 +18,16 @@ type GroundItemProps = {
 
 const GroundItem: React.FC<GroundItemProps> = ({ items }) => {
     const {genericError} = useNotification()
+    const handleLock = useLock()
     
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     
     const {mutateAsync: pickItemAsync} = useMutation(pickItemMutation(playerId, genericError))
 
-    const handleClick = () => {
-        pickItemAsync(items[0].floorItemId)
+    const handleClick = async () => {
+        await handleLock(async () => {
+            await pickItemAsync(items[0].floorItemId)
+        })
     }
 
     return (
