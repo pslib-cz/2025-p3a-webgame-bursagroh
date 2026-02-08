@@ -219,4 +219,14 @@ public class MapGeneratorService : IMapGeneratorService
     }
 
     private bool IsHostileBuilding(BuildingTypes type) => type == BuildingTypes.Abandoned || type == BuildingTypes.AbandonedTrap;
+
+    public static bool IsWalkable(int x, int y)
+    {
+        if (Math.Abs(x) % GameConstants.RoadFrequency == GameConstants.VoidTileMod &&
+            Math.Abs(y) % GameConstants.RoadFrequency == GameConstants.VoidTileMod)
+        {
+            return false;
+        }
+        return true;
+    }
 }

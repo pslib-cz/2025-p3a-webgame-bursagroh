@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using game.Server.Data;
 using game.Server.DTOs;
-using game.Server.Models;
-using game.Server.Types;
+using game.Server.Interfaces;
 using game.Server.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +10,13 @@ public class RecipeService : IRecipeService
 {
     private readonly ApplicationDbContext _context;
     private readonly IMapper _mapper;
+    private readonly IErrorService _errorService; // Added Error Service
 
-    public RecipeService(ApplicationDbContext context, IMapper mapper)
+    public RecipeService(ApplicationDbContext context, IMapper mapper, IErrorService errorService)
     {
         _context = context;
         _mapper = mapper;
+        _errorService = errorService;
     }
 
     public async Task<ActionResult<List<RecipeDto>>> GetAllRecipesAsync()
@@ -26,8 +27,7 @@ public class RecipeService : IRecipeService
 
         if (recipes == null || !recipes.Any()) return new NoContentResult();
 
-        var recipeDtos = _mapper.Map<List<RecipeDto>>(recipes);
-        return new OkObjectResult(recipeDtos);
+        return new OkObjectResult(_mapper.Map<List<RecipeDto>>(recipes));
     }
 
     public async Task<ActionResult<RecipeDto>> GetRandomRecipeAsync()
@@ -39,25 +39,28 @@ public class RecipeService : IRecipeService
         if (recipes == null || !recipes.Any()) return new NoContentResult();
 
         var randomRecipe = recipes.OrderBy(r => Guid.NewGuid()).FirstOrDefault();
-        var recipeDto = _mapper.Map<RecipeDto>(randomRecipe);
-
-        return new OkObjectResult(recipeDto);
+        return new OkObjectResult(_mapper.Map<RecipeDto>(randomRecipe));
     }
 
     public async Task<ActionResult> StartRecipeAsync(int recipeId, StartRecipeRequest request)
     {
         var recipeExists = await _context.Recipes.AnyAsync(r => r.RecipeId == recipeId);
-
-        if (!recipeExists) return new NotFoundObjectResult("Recept nenalezen.");
+        if (!recipeExists)
+        {
+            return _errorService.CreateErrorResponse(404, 9001, "Recipe not found.", "Not Found");
+        }
 
         var activeRecipeTime = await _context.RecipeTimes
             .FirstOrDefaultAsync(rt => rt.RecipeId == recipeId
                                     && rt.PlayerId == request.PlayerId
                                     && rt.EndTime == null);
 
-        if (activeRecipeTime != null) return new ConflictObjectResult("uz to bezi");
+        if (activeRecipeTime != null)
+        {
+            return _errorService.CreateErrorResponse(409, 9002, "A session for this recipe is already active.", "Conflict");
+        }
 
-        RecipeTime newRecipeTime = new RecipeTime
+        var newRecipeTime = new RecipeTime
         {
             RecipeId = recipeId,
             PlayerId = request.PlayerId,
@@ -73,54 +76,51 @@ public class RecipeService : IRecipeService
 
     public async Task<ActionResult> EndRecipeAsync(int recipeId, EndRecipeRequest request)
     {
-        Recipe? recipe = await _context.Recipes
+        var recipe = await _context.Recipes
             .Include(r => r.Ingrediences)
             .FirstOrDefaultAsync(r => r.RecipeId == recipeId);
 
-        if (recipe == null) return new NotFoundObjectResult("spatny rId");
+        if (recipe == null)
+        {
+            return _errorService.CreateErrorResponse(404, 9001, "Recipe not found.", "Not Found");
+        }
 
-        List<IngredienceTypes> correctOrder = recipe.Ingrediences
-            .OrderBy(i => i.Order)
-            .Select(i => i.IngredienceType)
-            .ToList();
+        var correctOrder = recipe.Ingrediences.OrderBy(i => i.Order).Select(i => i.IngredienceType).ToList();
+        var playerOrder = request.PlayerAssembly.Select(a => a.Type).ToList();
 
-        List<IngredienceTypes> playerOrder = request.PlayerAssembly
-            .Select(a => a.Type)
-            .ToList();
+        if (correctOrder.Count != playerOrder.Count || !correctOrder.SequenceEqual(playerOrder))
+        {
+            return _errorService.CreateErrorResponse(400, 9003, "Incorrect ingredient sequence.", "Validation Failed");
+        }
 
-        bool orderIsCorrect = correctOrder.Count == playerOrder.Count &&
-                              correctOrder.SequenceEqual(playerOrder);
-
-        if (!orderIsCorrect) return new BadRequestObjectResult("mas to spatne");
-
-        RecipeTime? activeRecipeTime = await _context.RecipeTimes
+        var activeRecipeTime = await _context.RecipeTimes
             .Where(rt => rt.RecipeId == recipeId && rt.PlayerId == request.PlayerId)
             .OrderByDescending(rt => rt.StartTime)
             .FirstOrDefaultAsync(rt => rt.EndTime == null);
 
-        if (activeRecipeTime == null) return new NotFoundObjectResult("nemuzes dat end bez startu");
+        if (activeRecipeTime == null)
+        {
+            return _errorService.CreateErrorResponse(400, 9004, "No active recipe session found to end.", "Action Denied");
+        }
 
-        DateTime endTime = DateTime.UtcNow;
-        activeRecipeTime.EndTime = endTime;
-        await _context.SaveChangesAsync();
+        activeRecipeTime.EndTime = DateTime.UtcNow;
 
-        TimeSpan? duration = activeRecipeTime.EndTime - activeRecipeTime.StartTime;
-
-        Player? player = await _context.Players.FindAsync(request.PlayerId);
+        var player = await _context.Players.FindAsync(request.PlayerId);
         if (player != null)
         {
             player.Money += 20;
-            await _context.SaveChangesAsync();
         }
+
+        await _context.SaveChangesAsync();
 
         return new OkObjectResult(new
         {
-            Duration = duration,
+            Duration = activeRecipeTime.EndTime - activeRecipeTime.StartTime,
             player?.Money
         });
     }
 
-    public async Task<ActionResult<List<RecipeTime>>> GetRecipeLeaderboardAsync()
+    public async Task<ActionResult<List<LeaderboardDto>>> GetRecipeLeaderboardAsync()
     {
         List<RecipeTime> completedTimes = await _context.RecipeTimes
             .Where(rt => rt.EndTime > rt.StartTime)
@@ -143,6 +143,7 @@ public class RecipeService : IRecipeService
             .OrderBy(rt => rt.Duration)
             .ToList();
 
-        return new OkObjectResult(finalLeaderboard);
+        // This will now work if the Profile ignores or manually maps 'Player'
+        return new OkObjectResult(_mapper.Map<List<LeaderboardDto>>(finalLeaderboard));
     }
 }
