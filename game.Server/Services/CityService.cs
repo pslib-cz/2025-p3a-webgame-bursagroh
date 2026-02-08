@@ -141,19 +141,27 @@ namespace game.Server.Services
             var playerMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == id);
             player.ScreenType = ScreenTypes.Mine;
 
-            if (playerMine != null)
+            if (playerMine == null)
             {
-                _context.Mines.Remove(playerMine);
+                playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
+                _context.Mines.Add(playerMine);
+                await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
             }
 
-            playerMine = new Mine { MineId = new Random().Next(), PlayerId = id };
-            _context.Mines.Add(playerMine);
+            var mineFloor = await _context.Floors.FirstOrDefaultAsync(f => f.BuildingId == building.BuildingId && f.Level == 0);
 
-            Floor mineFloor = new Floor { BuildingId = building.BuildingId, Level = 0, FloorItems = new List<FloorItem>() };
-            _context.Floors.Add(mineFloor);
+            if (mineFloor == null)
+            {
+                mineFloor = new Floor
+                {
+                    BuildingId = building.BuildingId,
+                    Level = 0,
+                    FloorItems = new List<FloorItem>()
+                };
+                _context.Floors.Add(mineFloor);
+            }
+
             await _context.SaveChangesAsync();
-
-            await _mineService.GetOrGenerateLayersBlocksAsync(playerMine.MineId, 1, 5);
 
             player.FloorId = mineFloor.FloorId;
             player.SubPositionX = GameConstants.MineExitX;

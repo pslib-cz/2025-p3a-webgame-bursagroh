@@ -78,11 +78,6 @@ public class DungeonService : IDungeonService
             player.SubPositionX = GameConstants.MineExitX;
             player.SubPositionY = GameConstants.MineExitY;
 
-            if (playerMine != null)
-            {
-                _context.Mines.Remove(playerMine);
-            }
-
             await _context.SaveChangesAsync();
             return new OkObjectResult(_mapper.Map<PlayerDto>(player));
         }
