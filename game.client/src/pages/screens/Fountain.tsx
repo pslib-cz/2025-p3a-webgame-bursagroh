@@ -7,6 +7,7 @@ import CloseIcon from '../../assets/icons/CloseIcon'
 import styles from './fountain.module.css'
 import useBlur from '../../hooks/useBlur'
 import useNotification from '../../hooks/useNotification'
+import useKeyboard from '../../hooks/useKeyboard'
 
 const FountainScreen = () => {
     useBlur(true)
@@ -19,7 +20,7 @@ const FountainScreen = () => {
     const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
     const { mutateAsync: dropItemAsync } = useMutation(dropItemMutation(playerId, genericError))
 
-    const handleClick = async () => {
+    const handleEscape = async () => {
         await updatePlayerScreenAsync()
 
         navigate("/game/city")
@@ -30,6 +31,8 @@ const FountainScreen = () => {
         const inventoryItemId = Number(event.dataTransfer.getData("text/plain"))
         dropItemAsync(inventoryItemId)
     }
+
+    useKeyboard("Escape", handleEscape)
 
     return (
         <div className={styles.container}>
@@ -42,7 +45,7 @@ const FountainScreen = () => {
             <div className={styles.fountainContainer}>
                 <div className={styles.header}>
                     <span className={styles.heading}>Fountain of Sacrifice</span>
-                    <CloseIcon width={24} height={24} className={styles.close} onClick={handleClick} />
+                    <CloseIcon width={24} height={24} className={styles.close} onClick={handleEscape} />
                 </div>
                 <div className={styles.transferContainer} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
                     <span className={styles.transferText}>Throw here the mythical sword</span>

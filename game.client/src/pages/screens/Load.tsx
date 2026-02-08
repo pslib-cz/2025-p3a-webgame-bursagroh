@@ -6,11 +6,19 @@ import { SaveContext } from '../../providers/SaveProvider'
 import { parseSave } from '../../utils/save'
 import styles from './load.module.css'
 import SendIcon from '../../assets/icons/SendIcon'
+import useKeyboard from '../../hooks/useKeyboard'
+import { useNavigate } from 'react-router'
 
 const LoadScreen = () => {
+    const navigate = useNavigate()
+
     const [userSaveString, setUserSaveString] = React.useState("")
 
     const saves = React.useContext(SaveContext)!.saves
+
+    useKeyboard("Escape", () => {
+        navigate("/")
+    })
 
     return (
         <Layer layer={1}>

@@ -7,6 +7,8 @@ import type { EnemyType } from "../../types/api/models/building"
 import type { AssetType } from "../../types/asset"
 import styles from "./fight.module.css"
 import useUse from "../../hooks/useUse"
+import useKeyboard from "../../hooks/useKeyboard"
+import { useNavigate } from "react-router"
 
 const mapEnemyTypeToAssetType = (enemyType: EnemyType | undefined): AssetType => {
     switch (enemyType) {
@@ -25,6 +27,7 @@ const FightScreen = () => {
     useBlur(true)
 
     const handleUse = useUse()
+    const navigate = useNavigate()
 
     const player = React.useContext(PlayerContext)!.player!
     const floor = React.useContext(FloorContext)!.floor!
@@ -35,6 +38,10 @@ const FightScreen = () => {
     const handleClick = async () => {
         await handleUse()
     }
+
+    useKeyboard("Escape", () => {
+        navigate("/")
+    })
 
     if (!enemy) {
         return (
