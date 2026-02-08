@@ -11,7 +11,7 @@ const Road: React.FC<RoadProps> = ({ roadType, x, y, width, height }) => {
     const handleMove = useMove()
 
     return (
-        <TileSelector width={width} height={height} x={x} y={y} tileType={roadType} onClick={() => handleMove(x, y, false)} />
+        <TileSelector width={width} height={height} x={x} y={y} tileType={roadType} onClick={() => handleMove(x, y)} />
     )
 }
 

@@ -1,14 +1,14 @@
 import React from 'react'
-import useBlur from '../../hooks/useBlur'
-import Layer from '../../components/wrappers/layer/Layer'
-import Button from '../../components/Button'
-import Link from '../../components/Link'
-import Input from '../../components/Input'
+import useBlur from '../hooks/useBlur'
+import Layer from '../components/wrappers/layer/Layer'
+import Button from '../components/Button'
+import Link from '../components/Link'
+import Input from '../components/Input'
 import styles from './settings.module.css'
-import { DEFAULT_AUTOSAVE_INTERVAL, DEFAULT_MAX_AUTOSAVE } from '../../constants/settings'
-import { SettingsContext } from '../../providers/global/SettingsProvider'
+import { DEFAULT_AUTOSAVE_INTERVAL, DEFAULT_MAX_AUTOSAVE } from '../constants/settings'
+import { SettingsContext } from '../providers/global/SettingsProvider'
 import { useNavigate } from 'react-router'
-import useKeyboard from '../../hooks/useKeyboard'
+import useKeyboard from '../hooks/useKeyboard'
 
 const SettingsScreen = () => {
     useBlur(true)
@@ -42,9 +42,9 @@ const SettingsScreen = () => {
                 <span className={styles.heading}>Settings</span>
                 <div className={styles.settingsContainer}>
                     <span className={styles.settingsText}>Autosave interval</span>
-                    <Input type="number" min={1} max={10} value={autosaveInterval} onChange={e => setAutosaveInterval(Number(e.target.value))} />
+                    <Input type="number" value={autosaveInterval} onChange={e => setAutosaveInterval(Number(e.target.value))} />
                     <span className={styles.settingsText}>Max autosave</span>
-                    <Input type="number" min={0} max={10} value={maxAutosave} onChange={e => setMaxAutosave(Number(e.target.value))} />
+                    <Input type="number" value={maxAutosave} onChange={e => setMaxAutosave(Number(e.target.value))} />
                     <Button disabled={autosaveInterval === autosave.autosaveInterval && maxAutosave === autosave.maxAutosave} onClick={handleSave}>Save</Button>
                 </div>
                 <div className={styles.buttonContainer}>

@@ -1,13 +1,13 @@
 import React from 'react'
-import Layer from '../../components/wrappers/layer/Layer'
-import { SaveContext } from '../../providers/global/SaveProvider'
-import Link from '../../components/Link'
-import SaveString from '../../components/SaveString'
-import useBlur from '../../hooks/useBlur'
+import Layer from '../components/wrappers/layer/Layer'
+import { SaveContext } from '../providers/global/SaveProvider'
+import Link from '../components/Link'
+import SaveString from '../components/SaveString'
+import useBlur from '../hooks/useBlur'
 import styles from './save.module.css'
 import { useNavigate } from 'react-router'
-import useKeyboard from '../../hooks/useKeyboard'
-import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
+import useKeyboard from '../hooks/useKeyboard'
+import { PlayerIdContext } from '../providers/global/PlayerIdProvider'
 
 const SaveScreen = () => {
     useBlur(true)

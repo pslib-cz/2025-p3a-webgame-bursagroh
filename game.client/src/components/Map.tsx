@@ -11,6 +11,7 @@ import useNotification from '../hooks/useNotification'
 import ProviderGroupLoadingWrapper from './wrappers/ProviderGroupLoadingWrapper'
 import FloorProvider, { FloorContext } from '../providers/game/FloorProvider'
 import type { TLoadingWrapperContextState } from './wrappers/LoadingWrapper'
+import MineItemsProvider, { MineItemsContext } from '../providers/game/MineItemsProvider'
 
 type MapProps = {
     pointerEvents?: 'auto' | 'none'
@@ -45,9 +46,11 @@ const Map: React.FC<MapProps> = ({ pointerEvents = 'auto' }) => {
             )
         case 'mine':
             return (
-                <div className={styles.container} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} style={{ pointerEvents }}>
-                    <MineSVG />
-                </div>
+                <ProviderGroupLoadingWrapper providers={[MineItemsProvider]} contextsToLoad={[MineItemsContext] as Array<React.Context<TLoadingWrapperContextState>>}>
+                    <div className={styles.container} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} style={{ pointerEvents }}>
+                        <MineSVG />
+                    </div>
+                </ProviderGroupLoadingWrapper>
             )
         case 'floor':
             return (

@@ -2,15 +2,13 @@ import React from 'react'
 import SVGDisplay from '../../SVGDisplay'
 import Asset from '../Asset'
 import Layer from '../Layer'
-import { PlayerIdContext } from '../../../providers/global/PlayerIdProvider'
-import { getMineItemsQuery } from '../../../api/mine'
-import { useQuery } from '@tanstack/react-query'
 import { PlayerContext } from '../../../providers/global/PlayerProvider'
 import styles from './mineSVG.module.css'
 import MineTile from '../tiles/mine/MineTile'
 import { itemIdToAssetType } from '../../../utils/item'
 import Minecard from '../tiles/mine/Minecard'
 import Tooltip from '../../Tooltip'
+import { MineItemsContext } from '../../../providers/game/MineItemsProvider'
 
 const chunkSize = 8
 const viewDistanceInChunks = 2
@@ -29,30 +27,19 @@ const getLayerList = (playerPositionY: number, viewDistanceInChunks: number, chu
         .filter((value) => value >= 0)
 }
 
-const DisplayMineItems = ({ mineId }: { mineId: number }) => {
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const mineItems = useQuery(getMineItemsQuery(playerId, mineId))
+const DisplayMineItems = () => {
+    const mineItems = React.useContext(MineItemsContext)!.mineItems!
 
-    if (mineItems.isError) {
-        return <div>Error loading mine items.</div>
-    }
-
-    if (mineItems.isPending) {
-        return <div>Loading mine items...</div>
-    }
-
-    if (mineItems.isSuccess) {
-        return (
-            <>
-                {mineItems.data.map((item) => (
-                    <Asset key={`mineItem:${item.floorItemId}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} pointerEvents="none" />
-                ))}
-            </>
-        )
-    }
+    return (
+        <>
+            {mineItems.map((item) => (
+                <Asset key={`mineItem:${item.floorItemId}`} x={item.positionX} y={item.positionY} width={0.5} height={0.5} assetType={itemIdToAssetType(item.itemInstance.item.itemId)} pointerEvents="none" />
+            ))}
+        </>
+    )
 }
 
-const MineSVG = () => {   
+const MineSVG = () => {
     const player = React.useContext(PlayerContext)!.player!
 
     const layers = getLayerList(player.subPositionY, viewDistanceInChunks, chunkSize)
@@ -108,7 +95,7 @@ const MineSVG = () => {
                 <Layer key={`depth:${depth}`} mineId={player.mineId} depth={depth} size={chunkSize} />
             ))}
 
-            <DisplayMineItems mineId={player.mineId} />
+            <DisplayMineItems />
 
             <Tooltip heading='Player' text={`Player is located at x: ${player.subPositionX} y: ${player.subPositionY}`}>
                 <Asset assetType='player' x={player.subPositionX} y={player.subPositionY} width={1} height={1} />

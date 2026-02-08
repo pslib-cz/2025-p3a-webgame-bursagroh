@@ -11,7 +11,7 @@ const MineTile: React.FC<MineTileProps> = ({x, y, width, height, mineTileType}) 
     const handleMove = useMove()
 
     return (
-        <TileSelector width={width} height={height} x={x} y={y} tileType={mineTileType} onClick={() => handleMove(x, y, true)} />
+        <TileSelector width={width} height={height} x={x} y={y} tileType={mineTileType} onClick={() => handleMove(x, y)} />
     )
 }
 

@@ -6,6 +6,7 @@ import { getChunkCoords } from '../../utils/map'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { buildingToChunkPosition, mapBuildingTypeToTileType } from './Chunk'
 import type { Building, BuildingType } from '../../types/api/models/building'
+import useNotification from '../../hooks/useNotification'
 
 const mapPositionToTileType = (x: number, y: number, buildingType: "fountain" | "bank" | "restaurant" | "mine" | "blacksmith" | "abandoned-corner-bottom-left" | "abandoned-corner-top-left" | "abandoned-corner-top-right" | "abandoned-corner-bottom-right" | "abandoned-straight-bottom" | "abandoned-straight-left" | "abandoned-straight-top" | "abandoned-straight-right" | "abandoned-trap-corner-bottom-left" | "abandoned-trap-corner-top-left" | "abandoned-trap-corner-top-right" | "abandoned-trap-corner-bottom-right" | "abandoned-trap-straight-bottom" | "abandoned-trap-straight-left" | "abandoned-trap-straight-top" | "abandoned-trap-straight-right" | "road" | "road-vertical" | "road-horizontal", isGroundFloor: boolean) => {
     if (x === 0 && y === 0) return "wall-top-left"
@@ -72,6 +73,8 @@ type FloorProps = {
 const CHUNK_SIZE = 16
 
 const Floor: React.FC<FloorProps> = ({ positionX, positionY, level }) => {
+    const {notify} = useNotification()
+
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
     const chunkCoordinates = getChunkCoords(positionX, positionY, CHUNK_SIZE)
@@ -86,12 +89,24 @@ const Floor: React.FC<FloorProps> = ({ positionX, positionY, level }) => {
     const chunkBottom = useQuery(getBuildingsQuery(playerId, y + size, x, size, size))
     const chunkLeft = useQuery(getBuildingsQuery(playerId, y, x - size, size, size))
 
-    if (buildings.isError || chunkTop.isError || chunkRight.isError || chunkBottom.isError || chunkLeft.isError) {
-        return <div>Error loading.</div>
+    if (buildings.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y}`, 2000)
     }
 
-    if (buildings.isPending || chunkTop.isPending || chunkRight.isPending || chunkBottom.isPending || chunkLeft.isPending) {
-        return <div>Loading...</div>
+    if (chunkTop.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y - size}`, 2000)
+    }
+
+    if (chunkRight.isError) {
+        notify("Loading error", `Failed to load chunk x:${x + size} y:${y}`, 2000)
+    }
+
+    if (chunkBottom.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y + size}`, 2000)
+    }
+
+    if (chunkLeft.isError) {
+        notify("Loading error", `Failed to load chunk x:${x - size} y:${y}`, 2000)
     }
 
     if (buildings.isSuccess && chunkTop.isSuccess && chunkRight.isSuccess && chunkBottom.isSuccess && chunkLeft.isSuccess) {
