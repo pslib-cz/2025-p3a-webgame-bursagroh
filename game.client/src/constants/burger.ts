@@ -1,0 +1,1 @@
+export const INGREDIENCE_PIXEL_HEIGHT = 16

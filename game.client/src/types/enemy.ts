@@ -1,0 +1,1 @@
+export type EnemyType = 'zombie' | 'skeleton' | 'dragon'

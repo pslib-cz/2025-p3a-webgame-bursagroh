@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import Layer from '../components/wrappers/layer/Layer';
 import { SaveContext } from '../providers/global/SaveProvider';
 import { parseSave } from '../utils/save';
@@ -9,17 +9,18 @@ import { useMutation } from '@tanstack/react-query';
 import { loadMutation } from '../api/save';
 import { PlayerIdContext } from '../providers/global/PlayerIdProvider';
 import styles from './loadSave.module.css'
-import { screenTypeToURL } from './layouts/Game';
 import { getPlayerQuery } from '../api/player';
 import { queryClient } from '../api';
 import useNotification from '../hooks/useNotification';
 import useKeyboard from '../hooks/useKeyboard';
 import useBlur from '../hooks/useBlur';
+import useLink from '../hooks/useLink';
+import { screenTypeToPageType } from '../utils/page';
 
 const LoadSaveScreen = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
     const { genericError } = useNotification()
     const saveString = useParams().saveString!
 
@@ -47,7 +48,7 @@ const LoadSaveScreen = () => {
         await loadAsync()
 
         const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
-        navigate(screenTypeToURL(player.screenType))
+        await moveToPage(screenTypeToPageType(player.screenType))
     }
 
     const handleJustLoad = async () => {
@@ -58,11 +59,11 @@ const LoadSaveScreen = () => {
         await loadAsync()
 
         const player = queryClient.getQueryData(getPlayerQuery(playerId.playerId!).queryKey)!
-        navigate(screenTypeToURL(player.screenType))
+        await moveToPage(screenTypeToPageType(player.screenType))
     }
 
-    useKeyboard("Escape", () => {
-        navigate("/load")
+    useKeyboard("Escape", async () => {
+        await moveToPage("load")
     })
 
     return (
@@ -81,7 +82,7 @@ const LoadSaveScreen = () => {
                         </div>
                     </div>
                 </div>
-                <Link to="/load">Back</Link>
+                <Link to="load">Back</Link>
             </div>
         </Layer>
     )

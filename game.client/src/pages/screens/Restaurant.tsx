@@ -1,29 +1,28 @@
 import React, { type JSX } from "react"
 import { useMutation } from "@tanstack/react-query"
-import { updatePlayerScreenMutation } from "../../api/player"
 import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import { endRecipeMutation, getRandomRecipeMutation, startRecipeMutation } from "../../api/recipe"
 import type { IngredienceType, Recipe } from "../../types/api/models/recipe"
-import { useNavigate } from "react-router"
 import RecipesProvider, { RecipesContext } from "../../providers/game/RecipesProvider"
 import Burger from "../../components/Burger"
 import useBlur from "../../hooks/useBlur"
 import styles from './restaurant.module.css'
 import Asset from "../../components/SVG/Asset"
-import CloseIcon from "../../assets/icons/CloseIcon"
+import CloseIcon from "../../icons/CloseIcon"
 import Button from "../../components/Button"
 import LeaderboardProvider, { LeaderboardContext } from "../../providers/game/LeaderboardProvider"
 import useNotification from "../../hooks/useNotification"
 import useKeyboard from "../../hooks/useKeyboard"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
-import type { TLoadingWrapperContextState } from "../../components/wrappers/LoadingWrapper"
+import type { TLoadingWrapperContextState } from '../../types/context'
 import useLock from "../../hooks/useLock"
 import Tooltip from "../../components/Tooltip"
+import useLink from "../../hooks/useLink"
 
 const RestaurantScreenWithContext = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
     const { genericError } = useNotification()
     const handleLock = useLock()
 
@@ -31,7 +30,6 @@ const RestaurantScreenWithContext = () => {
     const recipes = React.useContext(RecipesContext)!.recipes!
     const leaderboard = React.useContext(LeaderboardContext)!.leaderboard!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
     const { mutateAsync: getRandomRecipeAsync } = useMutation(getRandomRecipeMutation(genericError))
     const { mutateAsync: startRecipeAsync } = useMutation(startRecipeMutation(playerId, genericError))
     const { mutateAsync: endRecipeAsync } = useMutation(endRecipeMutation(playerId, genericError))
@@ -41,9 +39,7 @@ const RestaurantScreenWithContext = () => {
     const [currentBurger, setCurrentBurger] = React.useState<Recipe>()
 
     const handleEscape = async () => {
-        await updatePlayerScreenAsync()
-
-        navigate("/game/city")
+        await moveToPage("city", true)
     }
 
     const handleStart = async () => {

@@ -1,32 +1,20 @@
-import React from 'react'
 import useBlur from '../../hooks/useBlur'
-import { useMutation } from '@tanstack/react-query'
-import { updatePlayerScreenMutation } from '../../api/player'
-import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
-import { useNavigate } from 'react-router'
 import styles from './lose.module.css'
 import Button from '../../components/Button'
-import useNotification from '../../hooks/useNotification'
 import useKeyboard from '../../hooks/useKeyboard'
+import useLink from '../../hooks/useLink'
 
 const LoseScreen = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
-    const {genericError} = useNotification()
-    
-    const playerId = React.useContext(PlayerIdContext)!.playerId!
-    
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
+    const moveToPage = useLink()
 
     const handleClick = async () => {
-        await updatePlayerScreenAsync()
-
-        navigate("/game/city")
+        await moveToPage("city", true)
     }
 
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
 
     return (

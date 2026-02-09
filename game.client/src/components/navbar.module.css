@@ -8,6 +8,10 @@
     box-sizing: border-box;
 }
 
+.homeContainer {
+    flex-basis: 33%;
+}
+
 .home {
     fill: var(--light);
     cursor: pointer;
@@ -19,6 +23,8 @@
     font-size: var(--h2);
     align-self: center;
     margin: 0;
+    flex-basis: 33%;
+    text-align: center;
 }
 
 .save {
@@ -33,4 +39,10 @@
     font-style: normal;
     margin: 0;
     color: var(--light);
+}
+
+.savingContainer {
+    flex-basis: 33%;
+    display: flex;
+    justify-content: flex-end;
 }

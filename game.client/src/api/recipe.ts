@@ -1,6 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query"
 import { api, queryClient } from "."
 import type { IngredienceType } from "../types/api/models/recipe"
+import { reassembleIngrediences } from "../utils/recipe"
 
 export const getRecipesQuery = () =>
     queryOptions({
@@ -25,10 +26,6 @@ export const startRecipeMutation = (playerId: string, onError?: (error: Error) =
         mutationFn: (recipeId: number) => api.patchWith204("/api/Recipe/{recipeId}/Action/start", { recipeId }, {}, { playerId }),
         onError
     })
-
-const reassembleIngrediences = (ingrediences: Array<IngredienceType>) => {
-    return ingrediences.map((ingredience) => ({type: ingredience}))
-}
 
 export const endRecipeMutation = ( playerId: string, onError?: (error: Error) => void) =>
     mutationOptions({

@@ -1,6 +1,5 @@
 import React, { type JSX } from 'react'
-import type { AssetProps } from '../../../../types'
-import TileSelector from '../../TileSelector'
+import type { AssetProps } from "../../../../types/asset"
 import Asset from '../../Asset'
 import useMine from '../../../../hooks/useMine'
 
@@ -38,7 +37,7 @@ const Block: React.FC<BlockProps> = ({ x, y, width, height, blockType, health, m
 
     return (
         <>
-            <TileSelector width={width} height={height} x={x} y={y} tileType={blockType} onClick={() => mine(x, y)} />
+            <Asset width={width} height={height} x={x} y={y} assetType={blockType} onClick={() => mine(x, y)} />
             {breakPattern}
         </>
     )

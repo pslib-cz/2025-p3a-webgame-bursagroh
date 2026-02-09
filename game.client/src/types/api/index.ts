@@ -6,11 +6,11 @@ import type { APIPlayerGenerate, APIPlayerGetById, APIPlayerInventory, APIPlayer
 import type { APIGetLeaderboard, APIGetRandomRecipe, APIGetRecipes, APIRecipeEnd, APIRecipeStart } from "./controllers/recipe"
 import type { APILoad, APISave } from "./controllers/save"
 
-export type StringifyAble = string | number
+type StringifyAble = string | number
 
 export type Param = Record<string, StringifyAble>
 export type Query = Record<string, StringifyAble>
-export type PossibleResponses = Record<number, object>
+type PossibleResponses = Record<number, object>
 
 export type APIError = {
     statusCode: number

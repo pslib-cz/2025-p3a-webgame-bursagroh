@@ -33,12 +33,12 @@ export const updatePlayerPositionMutation = (playerId: string, onError?: (error:
         onError
     })
 
-export const updatePlayerScreenMutation = (playerId: string, newScreenType: ScreenType, onError?: (error: Error) => void) =>
+export const updatePlayerScreenMutation = (onError?: (error: Error) => void) =>
     mutationOptions({
-        mutationFn: () => api.patch("/api/Player/{playerId}/Action/move-screen", { playerId }, {}, { newScreenType }),
-        onSuccess: async (data) => {
-            queryClient.setQueryData([playerId, "player"], data)
-            await queryClient.invalidateQueries({ queryKey: [playerId, "inventory"], refetchType: "active" })
+        mutationFn: ({playerId, newScreenType}: {playerId: string, newScreenType: ScreenType}) => api.patch("/api/Player/{playerId}/Action/move-screen", { playerId }, {}, { newScreenType }),
+        onSuccess: async (data, variables) => {
+            queryClient.setQueryData([variables.playerId, "player"], data)
+            await queryClient.invalidateQueries({ queryKey: [variables.playerId, "inventory"], refetchType: "active" })
         },
         onError
     })

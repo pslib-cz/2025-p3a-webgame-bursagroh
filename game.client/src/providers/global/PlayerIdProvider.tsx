@@ -3,9 +3,7 @@ import { useMutation } from "@tanstack/react-query"
 import { queryClient } from "../../api"
 import { generatePlayerMutation, getPlayerQuery } from "../../api/player"
 import styles from "./playerIdProvider.module.css"
-
-const PLAYER_ID_STORAGE_KEY = "playerId"
-const ONE_HOUR_MS = 60 * 60 * 1000
+import { ONE_HOUR_MS, PLAYER_ID_STORAGE_KEY } from "../../constants/storage"
 
 type PlayerIdContextType = {
     playerId: string | null

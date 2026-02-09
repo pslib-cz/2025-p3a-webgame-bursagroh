@@ -58,6 +58,7 @@
 .hand {
     background-color: var(--dark);
     padding: 0.5rem;
+    min-width: 8rem;
 }
 
 .text {

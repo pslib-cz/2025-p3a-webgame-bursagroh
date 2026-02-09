@@ -1,29 +1,26 @@
 import React from 'react'
-import { dropItemMutation, updatePlayerScreenMutation } from '../../api/player'
+import { dropItemMutation } from '../../api/player'
 import { useMutation } from '@tanstack/react-query'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
-import { useNavigate } from 'react-router'
-import CloseIcon from '../../assets/icons/CloseIcon'
+import CloseIcon from '../../icons/CloseIcon'
 import styles from './fountain.module.css'
 import useBlur from '../../hooks/useBlur'
 import useNotification from '../../hooks/useNotification'
 import useKeyboard from '../../hooks/useKeyboard'
+import useLink from '../../hooks/useLink'
 
 const FountainScreen = () => {
     useBlur(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
     const {genericError} = useNotification()
     
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
-    const { mutateAsync: updatePlayerScreenAsync } = useMutation(updatePlayerScreenMutation(playerId, "City", genericError))
     const { mutateAsync: dropItemAsync } = useMutation(dropItemMutation(playerId, genericError))
 
     const handleEscape = async () => {
-        await updatePlayerScreenAsync()
-
-        navigate("/game/city")
+        await moveToPage("city", true)
     }
 
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {

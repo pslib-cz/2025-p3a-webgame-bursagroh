@@ -4,6 +4,7 @@ import { saveMutation } from "../../api/save"
 import { PlayerIdContext } from "./PlayerIdProvider"
 import useStorage from "../../hooks/useStorage"
 import { SettingsContext } from "./SettingsProvider"
+import type { Save } from "../../types/save"
 
 type SaveState = "idle" | "saving" | "saved"
 
@@ -17,11 +18,6 @@ type SaveContextType = {
 type SavesStorage = {
     autosaves: Save[],
     saves: Save[]
-}
-
-export type Save = {
-    saveString: string,
-    timestamp: string
 }
 
 // eslint-disable-next-line react-refresh/only-export-components

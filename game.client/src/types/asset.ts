@@ -63,3 +63,10 @@ type BurgerAssetType = "bun_up" | "bun_down" | "meat" | "tomato" | "salad" | "ba
 type BreakPatternAssetType = "break_pattern_1" | "break_pattern_2" | "break_pattern_3" | "break_pattern_4"
 
 export type AssetType = "player" | "table_left" | "table_right" | "chest" | "minecard" | "rail_horizontal" | "rail_vertical" | "rail_corner" | BuildingAssetType | BlockAssetType | FloorAssetType | EnemyAssetType | ItemAssetType | BurgerAssetType | BreakPatternAssetType
+
+export type AssetProps = {
+    width: number
+    height: number
+    x: number
+    y: number
+}
