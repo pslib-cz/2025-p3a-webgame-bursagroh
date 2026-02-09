@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260208184933_rebase")]
-    partial class rebase
+    [Migration("20260209160200_testlol")]
+    partial class testlol
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -123,6 +123,8 @@ namespace game.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("RecipeTimeId");
+
+                    b.HasIndex("PlayerId");
 
                     b.ToTable("RecipeTimes");
 
@@ -776,41 +778,6 @@ namespace game.Server.Migrations
                             CraftingId = 27,
                             Amount = 10,
                             BlueprintId = 21,
-                            ItemId = 7
-                        },
-                        new
-                        {
-                            CraftingId = 62,
-                            Amount = 10,
-                            BlueprintId = 23,
-                            ItemId = 6
-                        },
-                        new
-                        {
-                            CraftingId = 63,
-                            Amount = 2,
-                            BlueprintId = 23,
-                            ItemId = 7
-                        },
-                        new
-                        {
-                            CraftingId = 64,
-                            Amount = 10,
-                            BlueprintId = 24,
-                            ItemId = 5
-                        },
-                        new
-                        {
-                            CraftingId = 65,
-                            Amount = 5,
-                            BlueprintId = 24,
-                            ItemId = 4
-                        },
-                        new
-                        {
-                            CraftingId = 67,
-                            Amount = 15,
-                            BlueprintId = 25,
                             ItemId = 7
                         });
                 });
@@ -1950,6 +1917,17 @@ namespace game.Server.Migrations
                     b.Navigation("ActiveInventoryItem");
 
                     b.Navigation("Floor");
+                });
+
+            modelBuilder.Entity("RecipeTime", b =>
+                {
+                    b.HasOne("Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("game.Server.Models.Block", b =>
