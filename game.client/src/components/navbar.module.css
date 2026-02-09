@@ -8,8 +8,13 @@
     box-sizing: border-box;
 }
 
+.homeContainer {
+    flex-basis: 33%;
+}
+
 .home {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .location {
@@ -18,10 +23,13 @@
     font-size: var(--h2);
     align-self: center;
     margin: 0;
+    flex-basis: 33%;
+    text-align: center;
 }
 
 .save {
     fill: var(--light);
+    cursor: pointer;
 }
 
 .saveText {
@@ -31,4 +39,26 @@
     font-style: normal;
     margin: 0;
     color: var(--light);
+}
+
+.savingContainer {
+    flex-basis: 33%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.save {
+    fill: var(--light);
+    cursor: pointer;
+    animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.noAnimate {
+    animation: none !important;
+    transition: none !important;
 }

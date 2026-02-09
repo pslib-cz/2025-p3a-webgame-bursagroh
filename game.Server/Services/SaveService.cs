@@ -83,15 +83,7 @@ public class SaveService : ISaveService
                 await LinkPlayerLocationAsync(clonedId, originalPlayer.Floor.Level, originalPlayer.PositionX, originalPlayer.PositionY, originalPlayer.ScreenType);
             }
 
-            string saveStr;
-            bool isDuplicate;
-
-            do
-            {
-                saveStr = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 5));
-                isDuplicate = await _context.Saves.AnyAsync(s => s.SaveString == saveStr);
-            } while (isDuplicate);
-
+            var saveStr = string.Join(" ", _generator.GetWords(WordGenerator.PartOfSpeech.noun, 5));
             _context.Saves.Add(new Save { PlayerId = clonedId, SaveString = saveStr });
 
             await _context.SaveChangesAsync();
@@ -147,8 +139,7 @@ public class SaveService : ISaveService
         WHERE ob.PlayerId = {0}
         AND NOT EXISTS (SELECT 1 FROM Floors nf WHERE nf.BuildingId = nb.BuildingId AND nf.Level = [of].Level)", fromId, toId);
 
-
-        var sourceData = await _context.Floors
+        var sourceFloors = await _context.Floors
             .Include(f => f.Building)
             .Include(f => f.FloorItems).ThenInclude(fi => fi.Enemy)
             .Include(f => f.FloorItems).ThenInclude(fi => fi.Chest)
@@ -162,7 +153,7 @@ public class SaveService : ISaveService
             .Where(f => f.Building.PlayerId == toId)
             .ToListAsync();
 
-        foreach (var oldFloor in sourceData)
+        foreach (var oldFloor in sourceFloors)
         {
             var newFloor = targetFloors.FirstOrDefault(f =>
                 f.Level == oldFloor.Level &&
@@ -173,12 +164,8 @@ public class SaveService : ISaveService
 
             foreach (var oldFi in oldFloor.FloorItems)
             {
-                bool alreadyExists = await _context.FloorItems.AnyAsync(fi =>
-                    fi.FloorId == newFloor.FloorId &&
-                    fi.PositionX == oldFi.PositionX &&
-                    fi.PositionY == oldFi.PositionY);
-
-                if (alreadyExists) continue;
+                if (await _context.FloorItems.AnyAsync(fi => fi.FloorId == newFloor.FloorId && fi.PositionX == oldFi.PositionX && fi.PositionY == oldFi.PositionY))
+                    continue;
 
                 var newFi = new FloorItem
                 {
@@ -190,14 +177,8 @@ public class SaveService : ISaveService
 
                 if (oldFi.Enemy != null)
                 {
-                    newFi.Enemy = new Enemy
-                    {
-                        Health = oldFi.Enemy.Health,
-                        MaxHealth = oldFi.Enemy.MaxHealth,
-                        EnemyType = oldFi.Enemy.EnemyType
-                    };
+                    newFi.Enemy = new Enemy { Health = oldFi.Enemy.Health, MaxHealth = oldFi.Enemy.MaxHealth, EnemyType = oldFi.Enemy.EnemyType };
                 }
-
                 if (oldFi.Chest != null)
                 {
                     newFi.Chest = new Chest();
@@ -205,17 +186,58 @@ public class SaveService : ISaveService
 
                 if (oldFi.ItemInstance != null)
                 {
-                    newFi.ItemInstance = new ItemInstance
-                    {
-                        ItemId = oldFi.ItemInstance.ItemId,
-                        Durability = oldFi.ItemInstance.Durability
-                    };
+                    newFi.ItemInstance = new ItemInstance { ItemId = oldFi.ItemInstance.ItemId, Durability = oldFi.ItemInstance.Durability };
                 }
 
                 _context.FloorItems.Add(newFi);
             }
         }
+        await _context.SaveChangesAsync();
+    }
 
+    private async Task TransferMineDataAsync(Guid fromId, Guid toId)
+    {
+        var hasMine = await _context.Mines.AnyAsync(m => m.PlayerId == toId);
+        if (!hasMine)
+        {
+            _context.Mines.Add(new Mine { PlayerId = toId });
+            await _context.SaveChangesAsync();
+        }
+
+        var sourceMine = await _context.Mines
+            .Include(m => m.MineLayers).ThenInclude(ml => ml.MineBlocks)
+            .FirstOrDefaultAsync(m => m.PlayerId == fromId);
+
+        var targetMine = await _context.Mines.FirstOrDefaultAsync(m => m.PlayerId == toId);
+
+        if (sourceMine == null || targetMine == null) return;
+
+        foreach (var oldLayer in sourceMine.MineLayers)
+        {
+            var newLayer = await _context.MineLayers
+                .FirstOrDefaultAsync(l => l.MineId == targetMine.MineId && l.Depth == oldLayer.Depth);
+
+            if (newLayer == null)
+            {
+                newLayer = new MineLayer { MineId = targetMine.MineId, Depth = oldLayer.Depth };
+                _context.MineLayers.Add(newLayer);
+                await _context.SaveChangesAsync();
+            }
+
+            foreach (var oldBlock in oldLayer.MineBlocks)
+            {
+                if (!await _context.MineBlocks.AnyAsync(mb => mb.MineLayerId == newLayer.MineLayerID && mb.Index == oldBlock.Index))
+                {
+                    _context.MineBlocks.Add(new MineBlock
+                    {
+                        MineLayerId = newLayer.MineLayerID,
+                        BlockId = oldBlock.BlockId,
+                        Index = oldBlock.Index,
+                        Health = oldBlock.Health
+                    });
+                }
+            }
+        }
         await _context.SaveChangesAsync();
     }
 
@@ -241,51 +263,45 @@ public class SaveService : ISaveService
             WHERE Players.PlayerId = {0}", targetPlayerId, sourcePlayerId);
     }
 
-    private async Task TransferMineDataAsync(Guid fromId, Guid toId)
-    {
-        await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO Mines (PlayerId) SELECT {1} FROM Mines WHERE PlayerId = {0}", fromId, toId);
-
-        await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO MineLayers (MineId, Depth)
-            SELECT nm.MineId, ol.Depth
-            FROM MineLayers ol
-            JOIN Mines om ON ol.MineId = om.MineId
-            JOIN Mines nm ON nm.PlayerId = {1}
-            WHERE om.PlayerId = {0}", fromId, toId);
-
-        await _context.Database.ExecuteSqlRawAsync(@"
-            INSERT INTO MineBlocks (MineLayerId, BlockId, [Index], Health)
-            SELECT nl.MineLayerID, ob.BlockId, ob.[Index], ob.Health
-            FROM MineBlocks ob
-            JOIN MineLayers ol ON ob.MineLayerId = ol.MineLayerID
-            JOIN Mines om ON ol.MineId = om.MineId
-            JOIN Mines nm ON nm.PlayerId = {1}
-            JOIN MineLayers nl ON nm.MineId = nl.MineId AND ol.Depth = nl.Depth
-            WHERE om.PlayerId = {0}", fromId, toId);
-    }
 
     private async Task TransferInventoryAsync(Guid fromId, Guid toId)
     {
-        var items = await _context.InventoryItems
+        var sourceItems = await _context.InventoryItems
             .Where(i => i.PlayerId == fromId)
             .Include(i => i.ItemInstance)
             .AsNoTracking()
             .ToListAsync();
 
-        foreach (var item in items)
-        {
-            if (item.ItemInstance == null) continue;
-            var newInst = new ItemInstance { ItemId = item.ItemInstance.ItemId, Durability = item.ItemInstance.Durability };
-            _context.ItemInstances.Add(newInst);
-            await _context.SaveChangesAsync();
+        var targetItems = await _context.InventoryItems
+            .Where(i => i.PlayerId == toId)
+            .Include(i => i.ItemInstance)
+            .ToListAsync();
 
-            _context.InventoryItems.Add(new InventoryItem
+        foreach (var sItem in sourceItems)
+        {
+            if (sItem.ItemInstance == null) continue;
+
+            bool alreadyOwned = targetItems.Any(t =>
+                t.ItemInstance.ItemId == sItem.ItemInstance.ItemId &&
+                t.IsInBank == sItem.IsInBank);
+
+            if (!alreadyOwned)
             {
-                PlayerId = toId,
-                ItemInstanceId = newInst.ItemInstanceId,
-                IsInBank = item.IsInBank
-            });
+                var newInst = new ItemInstance
+                {
+                    ItemId = sItem.ItemInstance.ItemId,
+                    Durability = sItem.ItemInstance.Durability
+                };
+                _context.ItemInstances.Add(newInst);
+                await _context.SaveChangesAsync();
+
+                _context.InventoryItems.Add(new InventoryItem
+                {
+                    PlayerId = toId,
+                    ItemInstanceId = newInst.ItemInstanceId,
+                    IsInBank = sItem.IsInBank
+                });
+            }
         }
         await _context.SaveChangesAsync();
     }

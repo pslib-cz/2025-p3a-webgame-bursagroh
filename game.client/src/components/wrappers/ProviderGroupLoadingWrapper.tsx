@@ -1,5 +1,5 @@
 import React from 'react'
-import type { TLoadingWrapperContextState } from './LoadingWrapper'
+import type { TLoadingWrapperContextState } from '../../types/context'
 import LoadingWrapper from './LoadingWrapper'
 
 type ProviderGroupLoadingWrapperProps = {

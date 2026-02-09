@@ -1,7 +1,8 @@
 import React from 'react'
 import styles from './notification.module.css'
-import CloseIcon from '../assets/icons/CloseIcon'
-import { NotificationContext, type Notification as NotificationType } from '../providers/global/NotificationProvider'
+import CloseIcon from '../icons/CloseIcon'
+import { NotificationContext } from '../providers/global/NotificationProvider'
+import { type Notification as NotificationType } from "../types/notification"
 
 const Notification: React.FC<NotificationType> = ({ heading, text, id }) => {
     const { removeNotification } = React.useContext(NotificationContext)!

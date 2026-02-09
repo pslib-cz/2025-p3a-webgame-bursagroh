@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from "./inventory.module.css"
-import CloseIcon from '../assets/icons/CloseIcon'
+import CloseIcon from '../icons/CloseIcon'
 import InventoryItem from './item/InventoryItem'
 import { groupInventoryItems, removeEquippedItemFromInventory } from '../utils/inventory'
 import { PlayerContext } from '../providers/global/PlayerProvider'
@@ -43,7 +43,7 @@ const Inventory = () => {
                     <span className={styles.heading}>Inventory</span>
                     <CloseIcon className={styles.close} width={24} height={24} onClick={handleCloseInventory} />
                 </div>
-                <div className={styles.itemContainer} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
+                <div className={styles.itemContainer} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(inventoryItems).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={Object.entries(inventoryItems).map(([itemString, items]) => (
                         <InventoryItem items={updatedInventory.filter(item => items.includes(item.inventoryItemId))!} key={itemString} />
                     ))} ifEmpty={<span className={styles.text}>Empty inventory</span>} />

@@ -2,8 +2,10 @@ using game.Server.Data;
 using game.Server.Interfaces;
 using game.Server.Services;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +27,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 builder.Services.AddScoped<IErrorService, ErrorService>();
-builder.Services.AddScoped<IMineGenerationService, MineGenerationService>();
+builder.Services.AddScoped<MineGenerationService>();
 builder.Services.AddScoped<ISaveService, SaveService>();
 builder.Services.AddScoped<IBankService, BankService>();
 builder.Services.AddScoped<ICityService, CityService>();

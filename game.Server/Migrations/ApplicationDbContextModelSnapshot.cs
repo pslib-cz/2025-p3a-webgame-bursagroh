@@ -121,6 +121,8 @@ namespace game.Server.Migrations
 
                     b.HasKey("RecipeTimeId");
 
+                    b.HasIndex("PlayerId");
+
                     b.ToTable("RecipeTimes");
 
                     b.HasData(
@@ -1912,6 +1914,17 @@ namespace game.Server.Migrations
                     b.Navigation("ActiveInventoryItem");
 
                     b.Navigation("Floor");
+                });
+
+            modelBuilder.Entity("RecipeTime", b =>
+                {
+                    b.HasOne("Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("game.Server.Models.Block", b =>

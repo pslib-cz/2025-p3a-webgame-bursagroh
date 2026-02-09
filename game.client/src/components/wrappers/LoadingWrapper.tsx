@@ -1,10 +1,6 @@
 import React from 'react'
-
-export type TLoadingWrapperContextState = {
-    isPending: boolean
-    isError: boolean
-    isSuccess: boolean
-} | null
+import styles from './loadingWrapper.module.css'
+import type { TLoadingWrapperContextState } from '../../types/context'
 
 type LoadingWrapperProps<T> = {
     context: React.Context<T>
@@ -18,11 +14,11 @@ const LoadingWrapper = <T extends TLoadingWrapperContextState>({ children, conte
     }
 
     if (ctx.isPending) {
-        return <div>Loading...</div>
+        return <span className={styles.loading}>Loading...</span>
     }
 
     if (ctx.isError) {
-        return <div>Error loading data</div>
+        return <span className={styles.loading}>Error loading data!</span>
     }
 
     if (ctx.isSuccess) {

@@ -1,9 +1,5 @@
 import type { AssetType } from "../types/asset"
 
-export const assetTypeToId = (assetType: AssetType): string => {
-    return `asset_${assetType}`
-}
-
 export const assetTypeToHref = (assetType: AssetType | undefined): string => {
     if (!assetType) {
         return ""

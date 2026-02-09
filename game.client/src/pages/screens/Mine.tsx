@@ -6,77 +6,66 @@ import { PlayerContext } from "../../providers/global/PlayerProvider"
 import GroundItem from "../../components/item/GroundItem"
 import { groupFloorItems } from "../../utils/floor"
 import ConditionalDisplay from "../../components/wrappers/ConditionalDisplay"
-import { getMineItemsQuery } from "../../api/mine"
-import { useQuery } from "@tanstack/react-query"
-import type { Player } from "../../types/api/models/player"
 import RentItem from "../../components/item/RentItem"
 import useKeyboard from "../../hooks/useKeyboard"
-import { useNavigate } from "react-router"
 import useKeyboardMove from "../../hooks/useKeyboardMove"
+import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
+import MineItemsProvider, { MineItemsContext } from "../../providers/game/MineItemsProvider"
+import type { TLoadingWrapperContextState } from '../../types/context'
+import useLink from "../../hooks/useLink"
+import { isPlayerNextToTable } from "../../utils/mine"
 
-const isPlayerNextToTable = (player: Player) => {
-    const nextToTablePositions = [
-        { x: 1, y: -2 },
-        { x: 2, y: -2 }
-    ]
-
-    return nextToTablePositions.some(pos => pos.x === player.subPositionX && pos.y === player.subPositionY)
-}
-
-const MineScreen = () => {
+const MineScreenWithContext = () => {
     useBlur(false)
     useMap("mine")
     useKeyboardMove(true)
 
-    const navigate = useNavigate()
+    const moveToPage = useLink()
 
     const player = React.useContext(PlayerContext)!.player!
+    const mineItems = React.useContext(MineItemsContext)!.mineItems!
 
-    const { data: mineItems, isError, isPending, isSuccess } = useQuery(getMineItemsQuery(player.playerId, player.mineId))
-
-    useKeyboard("Escape", () => {
-        navigate("/")
+    useKeyboard("Escape", async () => {
+        await moveToPage("root")
     })
 
-    if (isError) {
-        return <div>Error loading mine items.</div>
-    }
+    const items = mineItems.filter(item => item.positionX === player.subPositionX && item.positionY === player.subPositionY).map(item => ({ floorItemId: item.floorItemId, item: item.itemInstance }))
+    const groupedItems = groupFloorItems(items)
 
-    if (isPending) {
-        return <div>Loading mine items...</div>
-    }
-
-    if (isSuccess) {
-        const items = mineItems.filter(item => item.positionX === player.subPositionX && item.positionY === player.subPositionY).map(item => ({ floorItemId: item.floorItemId, item: item.itemInstance }))
-        const groupedItems = groupFloorItems(items)
-
-        return (
-            <>
-                <ConditionalDisplay condition={items.length > 0}>
-                    <div className={styles.container}>
-                        <div className={styles.groundContainer}>
-                            <span className={styles.heading}>Ground</span>
-                            <div className={styles.itemContainer}>
-                                {Object.entries(groupedItems).map(([itemString, itemIds]) => (
-                                    <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
-                                ))}
-                            </div>
+    return (
+        <>
+            <ConditionalDisplay condition={items.length > 0}>
+                <div className={styles.container}>
+                    <div className={styles.groundContainer}>
+                        <span className={styles.heading}>Ground</span>
+                        <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.min(Object.keys(groupedItems).length, 3)}, max-content)`}}>
+                            {Object.entries(groupedItems).map(([itemString, itemIds]) => (
+                                <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
+                            ))}
                         </div>
                     </div>
-                </ConditionalDisplay>
-                <ConditionalDisplay condition={isPlayerNextToTable(player)}>
-                    <div className={styles.container}>
-                        <div className={styles.groundContainer}>
-                            <span className={styles.heading}>Rent a PICK!</span>
-                            <div className={styles.itemContainer}>
-                                <RentItem />
-                            </div>
+                </div>
+            </ConditionalDisplay>
+            <ConditionalDisplay condition={isPlayerNextToTable(player)}>
+                <div className={styles.container}>
+                    <div className={styles.groundContainer}>
+                        <span className={styles.heading}>Rent a PICK!</span>
+                        <div className={styles.itemContainer}>
+                            <RentItem />
                         </div>
                     </div>
-                </ConditionalDisplay>
-            </>
-        )
-    }
+                </div>
+            </ConditionalDisplay>
+        </>
+    )
+}
+
+const MineScreen = () => {
+    return (
+        <ProviderGroupLoadingWrapper providers={[MineItemsProvider]} contextsToLoad={[MineItemsContext] as Array<React.Context<TLoadingWrapperContextState>>}>
+            <MineScreenWithContext />
+        </ProviderGroupLoadingWrapper>
+    )
 }
 
 export default MineScreen

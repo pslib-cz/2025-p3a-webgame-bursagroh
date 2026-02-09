@@ -10,9 +10,14 @@ import { PlayerIdContext } from '../providers/global/PlayerIdProvider'
 import useNotification from '../hooks/useNotification'
 import ProviderGroupLoadingWrapper from './wrappers/ProviderGroupLoadingWrapper'
 import FloorProvider, { FloorContext } from '../providers/game/FloorProvider'
-import type { TLoadingWrapperContextState } from './wrappers/LoadingWrapper'
+import type { TLoadingWrapperContextState } from '../types/context'
+import MineItemsProvider, { MineItemsContext } from '../providers/game/MineItemsProvider'
 
-const Map: React.FC = () => {
+type MapProps = {
+    pointerEvents?: 'auto' | 'none'
+}
+
+const Map: React.FC<MapProps> = ({ pointerEvents = 'auto' }) => {
     const {genericError} = useNotification()
     
     const mapType = React.useContext(MapContext)!.mapType
@@ -35,20 +40,22 @@ const Map: React.FC = () => {
     switch (mapType) {
         case 'city':
             return (
-                <div className={styles.container}>
+                <div className={styles.container} style={{ pointerEvents }}>
                     <CitySVG />
                 </div>
             )
         case 'mine':
             return (
-                <div className={styles.container} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
-                    <MineSVG />
-                </div>
+                <ProviderGroupLoadingWrapper providers={[MineItemsProvider]} contextsToLoad={[MineItemsContext] as Array<React.Context<TLoadingWrapperContextState>>}>
+                    <div className={styles.container} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} style={{ pointerEvents }}>
+                        <MineSVG />
+                    </div>
+                </ProviderGroupLoadingWrapper>
             )
         case 'floor':
             return (
                 <ProviderGroupLoadingWrapper providers={[FloorProvider]} contextsToLoad={[FloorContext] as Array<React.Context<TLoadingWrapperContextState>>}>
-                    <div className={styles.container} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
+                    <div className={styles.container} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} style={{ pointerEvents }}>
                         <FloorSVG />
                     </div>
                 </ProviderGroupLoadingWrapper>

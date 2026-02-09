@@ -6,61 +6,8 @@ import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import Asset from "./Asset"
 import Road from "./tiles/city/Road"
 import BuildingTile from "./tiles/city/Building"
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const mapBuildingTypeToTileType = (buildingType: BuildingType, buildingTypeTop: BuildingType | null, buildingTypeRight: BuildingType | null, buildingTypeBottom: BuildingType | null, buildingTypeLeft: BuildingType | null) => {
-    switch (buildingType) {
-        case "Fountain":
-            return "fountain"
-        case "Bank":
-            return "bank"
-        case "Restaurant":
-            return "restaurant"
-        case "Mine":
-            return "mine"
-        case "Blacksmith":
-            return "blacksmith"
-        case "Abandoned":
-            if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap")) return "abandoned-corner-bottom-left"
-            if ((buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap")) return "abandoned-corner-top-left"
-            if ((buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && (buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap")) return "abandoned-corner-top-right"
-            if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap")) return "abandoned-corner-bottom-right"
-
-            if ((buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap") && buildingTypeBottom === "Road") return "abandoned-straight-bottom"
-            if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && buildingTypeLeft === "Road") return "abandoned-straight-left"
-            if ((buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap") && buildingTypeTop === "Road") return "abandoned-straight-top"
-            return "abandoned-straight-right"
-        case "AbandonedTrap":
-            if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap")) return "abandoned-trap-corner-bottom-left"
-            if ((buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap")) return "abandoned-trap-corner-top-left"
-            if ((buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && (buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap")) return "abandoned-trap-corner-top-right"
-            if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap")) return "abandoned-trap-corner-bottom-right"
-
-            if ((buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap") && buildingTypeBottom === "Road")
-                return "abandoned-trap-straight-bottom"
-            if ((buildingTypeTop === "Abandoned" || buildingTypeTop === "AbandonedTrap") && (buildingTypeBottom === "Abandoned" || buildingTypeBottom === "AbandonedTrap") && buildingTypeLeft === "Road") return "abandoned-trap-straight-left"
-            if ((buildingTypeLeft === "Abandoned" || buildingTypeLeft === "AbandonedTrap") && (buildingTypeRight === "Abandoned" || buildingTypeRight === "AbandonedTrap") && buildingTypeTop === "Road") return "abandoned-trap-straight-top"
-            return "abandoned-trap-straight-right"
-        case "Road":
-            if (buildingTypeTop === "Road" && buildingTypeRight === "Road" && buildingTypeBottom === "Road" && buildingTypeLeft === "Road") return "road"
-            if (buildingTypeTop === "Road" && buildingTypeBottom === "Road") return "road-vertical"
-            return "road-horizontal"
-    }
-}
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const buildingToChunkPosition = (
-    building: Building,
-    chunkSize: number
-): {
-    x: number
-    y: number
-} => {
-    return {
-        x: ((building.positionX % chunkSize) + chunkSize) % chunkSize,
-        y: ((building.positionY % chunkSize) + chunkSize) % chunkSize,
-    }
-}
+import useNotification from "../../hooks/useNotification"
+import { buildingToChunkPosition, mapBuildingTypeToTileType } from "../../utils/map"
 
 type ChunkProps = {
     x: number
@@ -69,7 +16,10 @@ type ChunkProps = {
 }
 
 const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
+    const { notify } = useNotification()
+
     const playerId = React.useContext(PlayerIdContext)!.playerId!
+
     const buildings = useQuery(getBuildingsQuery(playerId, y, x, size, size))
 
     const chunkTop = useQuery(getBuildingsQuery(playerId, y - size, x, size, size))
@@ -77,12 +27,24 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
     const chunkBottom = useQuery(getBuildingsQuery(playerId, y + size, x, size, size))
     const chunkLeft = useQuery(getBuildingsQuery(playerId, y, x - size, size, size))
 
-    if (buildings.isError || chunkTop.isError || chunkRight.isError || chunkBottom.isError || chunkLeft.isError) {
-        return <div>Error loading.</div>
+     if (buildings.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y}`, 2000)
     }
 
-    if (buildings.isPending || chunkTop.isPending || chunkRight.isPending || chunkBottom.isPending || chunkLeft.isPending) {
-        return <div>Loading...</div>
+    if (chunkTop.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y - size}`, 2000)
+    }
+
+    if (chunkRight.isError) {
+        notify("Loading error", `Failed to load chunk x:${x + size} y:${y}`, 2000)
+    }
+
+    if (chunkBottom.isError) {
+        notify("Loading error", `Failed to load chunk x:${x} y:${y + size}`, 2000)
+    }
+
+    if (chunkLeft.isError) {
+        notify("Loading error", `Failed to load chunk x:${x - size} y:${y}`, 2000)
     }
 
     if (buildings.isSuccess && chunkTop.isSuccess && chunkRight.isSuccess && chunkBottom.isSuccess && chunkLeft.isSuccess) {

@@ -2,16 +2,17 @@ import React from 'react'
 import { itemIdToAssetType } from '../../utils/item'
 import Asset from '../SVG/Asset'
 import type { InventoryItem as InventoryItemType } from '../../types/api/models/player'
-import ArrowLeftIcon from '../../assets/icons/ArrowLeftIcon'
-import ArrowLeftDoubleIcon from '../../assets/icons/ArrowLeftDoubleIcon'
+import ArrowLeftIcon from '../../icons/ArrowLeftIcon'
+import ArrowLeftDoubleIcon from '../../icons/ArrowLeftDoubleIcon'
 import { useMutation } from '@tanstack/react-query'
 import { moveBankItemMutation } from '../../api/bank'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import styles from './bankItem.module.css'
-import WeightIcon from '../../assets/icons/WeightIcon'
+import WeightIcon from '../../icons/WeightIcon'
 import ConditionalDisplay from '../wrappers/ConditionalDisplay'
 import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
+import useLock from '../../hooks/useLock'
 
 type BankItemProps = {
     items: InventoryItemType[]
@@ -19,17 +20,22 @@ type BankItemProps = {
 
 const BankItem: React.FC<BankItemProps> = ({ items }) => {
     const {genericError} = useNotification()
+    const handleLock = useLock()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, genericError))
 
-    const handleSingleMove = () => {
-        moveBankItemAsync({inventoryItemIds: [items[0].inventoryItemId]})
+    const handleSingleMove = async () => {
+        await handleLock(async () => {
+            await moveBankItemAsync({inventoryItemIds: [items[0].inventoryItemId]})
+        })
     }
 
-    const handleMultipleMove = () => {
-        moveBankItemAsync({inventoryItemIds: items.map(item => item.inventoryItemId)})
+    const handleMultipleMove = async () => {
+        await handleLock(async () => {
+            await moveBankItemAsync({inventoryItemIds: items.map(item => item.inventoryItemId)})
+        })
     }
 
     return (

@@ -126,27 +126,24 @@ public class RecipeService : IRecipeService
 
     public async Task<ActionResult<List<LeaderboardDto>>> GetRecipeLeaderboardAsync()
     {
-        List<RecipeTime> completedTimes = await _context.RecipeTimes
+        var completedTimes = await _context.RecipeTimes
             .Where(rt => rt.EndTime > rt.StartTime)
             .ToListAsync();
 
-        if (completedTimes == null || completedTimes.Count == 0) return new NoContentResult();
+        if (completedTimes == null || !completedTimes.Any()) return new NoContentResult();
 
-        List<RecipeTime> validTimes = completedTimes
+        var bestTimes = completedTimes
             .Where(rt => rt.Duration > 0.01)
-            .ToList();
-
-        if (validTimes.Count == 0) return new NoContentResult();
-
-        List<RecipeTime> bestTimePerRecipe = validTimes
             .GroupBy(rt => rt.RecipeId)
-            .Select(group => group.OrderBy(rt => rt.Duration).First())
+            .SelectMany(group => group
+                .OrderBy(rt => rt.Duration)
+                .Take(3))
+            .OrderBy(rt => rt.RecipeId)
+            .ThenBy(rt => rt.Duration)
             .ToList();
 
-        List<RecipeTime> finalLeaderboard = bestTimePerRecipe
-            .OrderBy(rt => rt.Duration)
-            .ToList();
+        if (!bestTimes.Any()) return new NoContentResult();
 
-        return new OkObjectResult(_mapper.Map<List<LeaderboardDto>>(finalLeaderboard));
+        return new OkObjectResult(_mapper.Map<List<LeaderboardDto>>(bestTimes));
     }
 }

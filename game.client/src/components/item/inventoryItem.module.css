@@ -1,6 +1,7 @@
 .container {
     position: relative;
     width: min-content;
+    cursor: pointer;
 }
 
 .durability {

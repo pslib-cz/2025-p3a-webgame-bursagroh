@@ -1,7 +1,7 @@
-import OpenIcon from '../assets/icons/OpenIcon'
-import HeartIcon from '../assets/icons/HeartIcon'
-import MoneyIcon from '../assets/icons/MoneyIcon'
-import WeightIcon from '../assets/icons/WeightIcon'
+import OpenIcon from '../icons/OpenIcon'
+import HeartIcon from '../icons/HeartIcon'
+import MoneyIcon from '../icons/MoneyIcon'
+import WeightIcon from '../icons/WeightIcon'
 import styles from './playerUI.module.css'
 import React from 'react'
 import { calcInventoryWeight } from '../utils/inventory'
@@ -40,7 +40,7 @@ const PlayerUI = () => {
         <div className={styles.container}>
             <div className={styles.header}>
                 <span className={styles.heading}>Player</span>
-                <OpenIcon width={24} height={24} onClick={handleOpenInventory} />
+                <OpenIcon className={styles.open} width={24} height={24} onClick={handleOpenInventory} />
             </div>
             <div className={styles.statContainer}>
                 <div className={styles.stat}>

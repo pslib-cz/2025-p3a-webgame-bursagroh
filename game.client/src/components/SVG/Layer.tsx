@@ -1,29 +1,12 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getMineLayersQuery } from "../../api/mine"
-import type { BlockType, MineLayer } from "../../types/api/models/mine"
+import type { MineLayer } from "../../types/api/models/mine"
 import { PlayerIdContext } from "../../providers/global/PlayerIdProvider"
 import Block from "./tiles/mine/Block"
 import MineTile from "./tiles/mine/MineTile"
-
-const mapBlockTypeToTileType = (buildingType: BlockType) => {
-    switch (buildingType) {
-        case "Wooden_Frame":
-            return "wooden_frame"
-        case "Rock":
-            return "rock"
-        case "Copper_Ore":
-            return "copper_ore"
-        case "Iron_Ore":
-            return "iron_ore"
-        case "Gold_Ore":
-            return "gold_ore"
-        case "Silver_Ore":
-            return "silver_ore"
-        case "Unobtanium_Ore":
-            return "unobtainium_ore"
-    }
-}
+import useNotification from "../../hooks/useNotification"
+import { mapBlockTypeToTileType } from "../../utils/mine"
 
 type LayerProps = {
     depth: number
@@ -32,15 +15,14 @@ type LayerProps = {
 }
 
 const Layer: React.FC<LayerProps> = ({ depth, size, mineId }) => {
+    const {notify} = useNotification()
+
     const playerId = React.useContext(PlayerIdContext)!.playerId!
-    const { data, isError, isPending, isSuccess } = useQuery(getMineLayersQuery(playerId, mineId, depth, depth + size - 1))
+
+    const { data, isSuccess, isError } = useQuery(getMineLayersQuery(playerId, mineId, depth, depth + size - 1))
 
     if (isError) {
-        return <div>Error loading.</div>
-    }
-
-    if (isPending) {
-        return <div>Loading layer...</div>
+        notify("Loading error", `Failed to load mine layers ${depth} to ${depth + size - 1}`, 2000)
     }
 
     if (isSuccess) {

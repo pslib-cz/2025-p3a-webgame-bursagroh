@@ -1,4 +1,3 @@
-# Stage 1: Build the React client
 FROM node:22-alpine AS client-build
 WORKDIR /app/client
 
@@ -22,8 +21,10 @@ WORKDIR /app/server
 COPY game.Server/*.csproj ./
 RUN dotnet restore
 
+
 # Copy server source
 COPY game.Server/ ./
+
 
 # Copy built client files to wwwroot
 COPY --from=client-build /app/client/dist ./wwwroot

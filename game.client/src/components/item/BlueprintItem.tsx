@@ -8,6 +8,7 @@ import { buyBlueprintMutation } from '../../api/blueprint'
 import styles from './blueprintItem.module.css'
 import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
+import useLock from '../../hooks/useLock'
 
 type BlueprintItemProps = {
     blueprint: Blueprint
@@ -15,13 +16,16 @@ type BlueprintItemProps = {
 
 const BlueprintItem: React.FC<BlueprintItemProps> = ({ blueprint }) => {
     const {genericError} = useNotification()
+    const handleLock = useLock()
     
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     
     const { mutateAsync: buyBlueprintAsync } = useMutation(buyBlueprintMutation(playerId, blueprint.blueprintId, genericError))
 
-    const handleClick = () => {
-        buyBlueprintAsync()
+    const handleClick = async () => {
+        await handleLock(async () => {
+            await buyBlueprintAsync()
+        })
     }
 
     return (

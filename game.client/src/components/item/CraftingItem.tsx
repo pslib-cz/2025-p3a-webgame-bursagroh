@@ -5,10 +5,11 @@ import { useMutation } from '@tanstack/react-query'
 import { craftBlueprintMutation } from '../../api/blueprint'
 import { itemIdToAssetType } from '../../utils/item'
 import Asset from '../SVG/Asset'
-import WeightIcon from '../../assets/icons/WeightIcon'
+import WeightIcon from '../../icons/WeightIcon'
 import styles from './craftingItem.module.css'
 import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
+import useLock from '../../hooks/useLock'
 
 type CraftingItemProps = {
     blueprint: Blueprint
@@ -16,13 +17,16 @@ type CraftingItemProps = {
 
 const CraftingItem: React.FC<CraftingItemProps> = ({ blueprint }) => {
     const {genericError} = useNotification()
+    const handleLock = useLock()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     
     const { mutateAsync: craftBlueprintAsync } = useMutation(craftBlueprintMutation(playerId, blueprint.blueprintId, genericError))
 
-    const handleClick = () => {
-        craftBlueprintAsync()
+    const handleClick = async () => {
+        await handleLock(async () => {
+            await craftBlueprintAsync()
+        })
     }
 
     return (

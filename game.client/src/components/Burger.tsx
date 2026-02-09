@@ -1,56 +1,25 @@
 import React from 'react'
-import type { IngredienceType, Recipe } from '../types/api/models/recipe'
+import type { Recipe } from '../types/api/models/recipe'
 import Asset from './SVG/Asset'
-import type { AssetType } from '../types/asset'
 import styles from './burger.module.css'
+import { ingredienceToAssetType } from '../utils/recipe'
+import { INGREDIENCE_PIXEL_HEIGHT } from '../constants/burger'
 
 type BurgerProps = {
     burger: Recipe
 }
 
-const mapIngredienceToAssetType = (ingredienceType: IngredienceType): AssetType => {
-    switch (ingredienceType) {
-        case 'Meat':
-            return "meat"
-        case 'Salad':
-            return "salad"
-        case 'BunUp':
-            return "bun_up"
-        case 'BunDown':
-            return "bun_down"
-        case 'Tomato':
-            return "tomato"
-        case 'Sauce':
-            return "sauce"
-        case 'Bacon':
-            return "bacon"
-        case 'Cheese':
-            return "cheese"
-    }
-}
-
 const Burger: React.FC<BurgerProps> = ({ burger }) => {
-    const [offset, setOffset] = React.useState(0)
-
-    const ingrediencePixelHeight = 16
-    const height = burger.ingrediences.length * (ingrediencePixelHeight + offset) + 3 * ingrediencePixelHeight
-
-    const handleEnter = () => {
-        setOffset(64)
-    }
-
-    const handleLeave = () => {
-        setOffset(0)
-    }
+    const height = burger.ingrediences.length * INGREDIENCE_PIXEL_HEIGHT + 3 * INGREDIENCE_PIXEL_HEIGHT
 
     return (
         <div className={styles.burgerContainer}>
-            <svg onMouseEnter={handleEnter} onMouseLeave={handleLeave} width={ingrediencePixelHeight * 8} height={height} viewBox={`0 0 ${ingrediencePixelHeight * 8} ${height}`} xmlns="http://www.w3.org/2000/svg">
+            <svg width={INGREDIENCE_PIXEL_HEIGHT * 8} height={height} viewBox={`0 0 ${INGREDIENCE_PIXEL_HEIGHT * 8} ${height}`} xmlns="http://www.w3.org/2000/svg">
                 {burger.ingrediences.sort((a, b) => b.order - a.order).map((ingredience, index) => (
-                    <Asset key={index} x={0} y={height - ingrediencePixelHeight * 8 - (ingrediencePixelHeight + offset) * index} width={ingrediencePixelHeight * 8} height={ingrediencePixelHeight * 8} assetType={mapIngredienceToAssetType(ingredience.ingredienceType)} />
+                    <Asset key={index} x={0} y={height - INGREDIENCE_PIXEL_HEIGHT * 8 - INGREDIENCE_PIXEL_HEIGHT * index} width={INGREDIENCE_PIXEL_HEIGHT * 8} height={INGREDIENCE_PIXEL_HEIGHT * 8} assetType={ingredienceToAssetType(ingredience.ingredienceType)} />
                 ))}
             </svg>
-            <span onMouseEnter={handleEnter} onMouseLeave={handleLeave} className={styles.burgerName}>{burger.name}</span>
+            <span className={styles.burgerName}>{burger.name}</span>
         </div>
     )
 }

@@ -23,6 +23,11 @@
     color: var(--light);
 }
 
+.open {
+    fill: var(--light);
+    cursor: pointer;
+}
+
 .subHeading {
     font-size: var(--h4);
     font-family: "VT323", monospace;
@@ -53,6 +58,7 @@
 .hand {
     background-color: var(--dark);
     padding: 0.5rem;
+    min-width: 8rem;
 }
 
 .text {

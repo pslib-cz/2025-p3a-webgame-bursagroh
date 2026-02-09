@@ -2,16 +2,17 @@ import React from 'react'
 import { itemIdToAssetType } from '../../utils/item'
 import Asset from '../SVG/Asset'
 import type { InventoryItem as InventoryItemType } from '../../types/api/models/player'
-import ArrowRightIcon from '../../assets/icons/ArrowRightIcon'
-import ArrowRightDoubleIcon from '../../assets/icons/ArrowRightDoubleIcon'
+import ArrowRightIcon from '../../icons/ArrowRightIcon'
+import ArrowRightDoubleIcon from '../../icons/ArrowRightDoubleIcon'
 import { moveBankItemMutation } from '../../api/bank'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
 import styles from './bankInventoryItem.module.css'
 import ConditionalDisplay from '../wrappers/ConditionalDisplay'
-import WeightIcon from '../../assets/icons/WeightIcon'
+import WeightIcon from '../../icons/WeightIcon'
 import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
+import useLock from '../../hooks/useLock'
 
 type BankInventoryItemProps = {
     items: InventoryItemType[]
@@ -19,17 +20,22 @@ type BankInventoryItemProps = {
 
 const BankInventoryItem: React.FC<BankInventoryItemProps> = ({ items }) => {
     const {genericError} = useNotification()
+    const handleLock = useLock()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId!
 
     const { mutateAsync: moveBankItemAsync } = useMutation(moveBankItemMutation(playerId, genericError))
 
-    const handleSingleMove = () => {
-        moveBankItemAsync({ inventoryItemIds: [items[0].inventoryItemId] })
+    const handleSingleMove = async () => {
+        await handleLock(async () => {
+            await moveBankItemAsync({ inventoryItemIds: [items[0].inventoryItemId] })
+        })
     }
 
-    const handleMultipleMove = () => {
-        moveBankItemAsync({ inventoryItemIds: items.map(item => item.inventoryItemId) })
+    const handleMultipleMove = async () => {
+        await handleLock(async () => {
+            await moveBankItemAsync({ inventoryItemIds: items.map(item => item.inventoryItemId) })
+        })
     }
 
     return (

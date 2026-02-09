@@ -2,20 +2,24 @@ import React from 'react'
 import Asset from '../SVG/Asset'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
-import styles from './blueprintItem.module.css'
+import styles from './rentItem.module.css'
 import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
 import { rentPickMutation } from '../../api/mine'
+import useLock from '../../hooks/useLock'
 
 const RentItem: React.FC = () => {
     const {genericError} = useNotification()
+    const handleLock = useLock()
     
     const playerId = React.useContext(PlayerIdContext)!.playerId!
     
     const { mutateAsync: rentPickAsync } = useMutation(rentPickMutation(playerId, 1, genericError))
 
-    const handleClick = () => {
-        rentPickAsync()
+    const handleClick = async () => {
+        await handleLock(async () => {
+            await rentPickAsync()
+        })
     }
 
     return (

@@ -2,21 +2,8 @@ import React from 'react'
 import useMove from './useMove'
 import { PlayerContext } from '../providers/global/PlayerProvider'
 import useKeyboard from './useKeyboard'
-
-type Direction = "up" | "down" | "left" | "right"
-
-const getTargetPosition = (direction: Direction, positionX: number, positionY: number) => {
-    switch (direction) {
-        case "up":
-            return { x: positionX, y: positionY - 1 }
-        case "down":
-            return { x: positionX, y: positionY + 1 }
-        case "left":
-            return { x: positionX - 1, y: positionY }
-        case "right":
-            return { x: positionX + 1, y: positionY }
-    }
-}
+import { getTargetPosition } from '../utils/map'
+import { type Direction } from "../types/map"
 
 const useKeyboardMove = (isSubMove: boolean) => {
     const move = useMove()
@@ -25,7 +12,7 @@ const useKeyboardMove = (isSubMove: boolean) => {
 
     const handleMove = async (direction: Direction) => {
         const targetPosition = getTargetPosition(direction, isSubMove ? player.subPositionX : player.positionX, isSubMove ? player.subPositionY : player.positionY)
-        await move(targetPosition.x, targetPosition.y, isSubMove)
+        await move(targetPosition.x, targetPosition.y)
     }
 
     useKeyboard("ArrowUp", async () => {
