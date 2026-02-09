@@ -1,11 +1,88 @@
 # 2025-p3a-webgame-bursagroh
 Odkaz na figmu: https://www.figma.com/design/Mtsedc7KYgaIreFrquDKqu/bursagroh-team-library?node-id=3313-2&t=raORM9mkjraROVin-1
-Odkaz na příběh: https://gemini.google.com/share/24ba23099813
+
+## Popis hry
+
+Hra je 2D RPG zasazené do opuštěného města, kde se hráč jako poslední přeživší snaží přežít v prostředí plném monster a nebezpečí. Hlavním cílem je získat vzácné suroviny a vykovat legendární meč, který následně přinese do fontány, což znamená vítězství ve hře.
+
+### Herní svět
+
+Město je rozděleno do pravidelného gridu, po kterém se hráč pohybuje kliknutím na jednotlivá políčka. Ve městě se nacházejí dva typy budov:
+
+**Centrální (bezpečné) budovy:**
+- **Restaurace** - Zde hráč vydělává peníze pomocí minihry (skládání burgerů). Toto je první místo, kam by měl hráč zajít, protože na začátku nemá žádné peníze ani vybavení. Minihra může být opakována neomezeně.
+- **Banka** - Bezpečné uložiště pro peníze a předměty. Vše, co je v bance, se neztratí při smrti hráče.
+- **Důl** - Místo pro těžbu surovin. Hráč potřebuje krumpáč (lze vypůjčit za peníze nebo vycraftit). Důl má nekonečnou hloubku a čím hlouběji hráč kopá, tím vzácnější suroviny najde.
+- **Kovárna** - Zde hráč vyrábí předměty ze surovin podle plánků (blueprintů), které si musí nejdříve zakoupit.
+- **Fontána** - Místo, kam hráč musí přinést legendární meč pro vítězství.
+
+**Opuštěné (nebezpečné) budovy:**
+- Náhodně generované budovy s různým počtem pater (8x8 políček každé patro)
+- Obsahují monstra, loot chestky a na nejvyšším patře bosse s hodnotnou truhlou
+- Běžné budovy lze kdykoliv opustit
+- **Trap budovy** (označené červeně) se po vstupu uzamknou a lze je opustit pouze po zabití bosse, ale nabízejí lepší odměny
+
+### Herní mechaniky
+
+**Průzkum budov:**
+- Hráč se pohybuje po 8x8 gridu jen na sousední políčka
+- Na políčkách může narazit na: schody, chestky, předměty nebo monstra
+- Chestky se otevřou automaticky a jejich obsah vypadne do okolí
+- Monstra se po každé akci hráče pohybují směrem k němu
+- Když se hráč a monstrum setkají, začíná combat
+
+**Combat systém:**
+- Tahová soubojová mechanika (střídají se hráč a nepřítel)
+- Možné akce: útok pěstí, útok zbraní, odpočinek, použití předmětu (např. healing potion)
+- Při nepřátelském útoku se zobrazí timer, během kterého může hráč uskočit, blokovat nebo nic
+- Po porážce monstra z něj vypadne loot
+- Bosové po porážce zanechají speciální loot chestku
+
+**Inventář a management:**
+- Hráč má omezený inventář podle kapacity
+- Předměty mají hmotnost a durabilitu
+- Při smrti hráč ztrácí celý inventář (kromě věcí uložených v bance)
+- Po smrti lze respawnout, ale bez jakýchkoliv předmětů
+
+**Progrese:**
+1. Vydělat peníze v restauraci
+2. Pronajmout si krumpáč a těžit suroviny v dole
+3. Koupit plánky a vycraftit lepší vybavení v kovárně
+4. Prozkoumat nebezpečné budovy a získat vzácný loot
+5. Získat všechny potřebné materiály pro vytvoření legendárního meče
+6. Přinést meč do fontány a vyhrát
+
+### Ukládání hry
+
+Hra používá unikátní systém ukládání bez nutnosti registrace:
+- Při prvním připojení získá hráč unikátní ID
+- Toto ID lze zobrazit a uložit si ho
+- Při načtení ID se data zkopírují do aktuální session
+- Více hráčů může začít ze stejného save pointu
+- Data jsou uložena na serveru a nelze je měnit
+
+### Strategie přežití
+
+- **Smrt má své následky** - Při smrti ztratíte vše v inventáři, ukládejte důležité věci do banky
+- **Trap budovy jsou riziková zóna** - Červené budovy nelze opustit bez porážky bosse, vstupujte jen dobře připravení
+- **Lepší vybavení = vyšší přežití** - Nespěchejte do velkých soubojů bez kvalitních zbraní a lektvarů
+- **Crafting je klíčový** - Sbírejte vzácné materiály pro vytvoření legendárního meče
 
 ## Rozdělení
 Šimon Bursa - backend
-
 Filip Groh - frontend
+Jakub Procházka - výpomoc s assety
+
+
+
+
+
+
+
+
+
+
+
 
 ## Klíčové nápady
 - RPG
