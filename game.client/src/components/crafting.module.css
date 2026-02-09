@@ -3,19 +3,15 @@
     height: fit-content;
 }
 
+.asset {
+    width: calc(var(--item-size) / 4);
+    height: calc(var(--item-size) / 4);
+}
+
 .craftingItemContainer {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-}
-
-.craftingItemText {
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
 }
 
 .itemContainer {

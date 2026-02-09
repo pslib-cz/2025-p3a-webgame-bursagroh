@@ -1,0 +1,6 @@
+.itemContainer {
+    display: grid;
+    grid-template-columns: repeat(min(var(--item-count), var(--max-items)), var(--item-size));
+    grid-auto-rows: var(--item-size);
+    gap: 1rem;
+}

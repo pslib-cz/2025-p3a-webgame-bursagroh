@@ -5,12 +5,3 @@
     justify-content: center;
     height: calc(100vh - var(--navbar-height));
 }
-
-.heading {
-    font-size: var(--h0);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
-}

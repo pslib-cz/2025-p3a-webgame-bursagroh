@@ -14,27 +14,11 @@
     fill: var(--light);
 }
 
-.heading {
-    font-size: var(--h3);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
-}
-
 .open {
     fill: var(--light);
     cursor: pointer;
-}
-
-.subHeading {
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .statContainer {
@@ -46,26 +30,17 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
+    
+}
+
+.statIcon {
     fill: var(--light);
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .hand {
     background-color: var(--dark);
     padding: 0.5rem;
     min-width: 8rem;
-}
-
-.text {
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
 }

@@ -8,6 +8,7 @@ import useKeyboard from '../hooks/useKeyboard'
 import { PlayerIdContext } from '../providers/global/PlayerIdProvider'
 import useBlur from '../hooks/useBlur'
 import useLink from '../hooks/useLink'
+import Text from '../components/Text'
 
 const SaveScreen = () => {
     useBlur(true)
@@ -31,7 +32,7 @@ const SaveScreen = () => {
         <Layer layer={1}>
             <div className={styles.container}>
                 <div className={styles.subContainer}>
-                    <span className={styles.heading}>Save</span>
+                    <Text size='h1'>Save</Text>
                     <SaveString saveString={saveString} />
                 </div>
                 <Link to='root'>Back</Link>

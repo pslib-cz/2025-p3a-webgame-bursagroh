@@ -14,6 +14,8 @@ import MineItemsProvider, { MineItemsContext } from "../../providers/game/MineIt
 import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from "../../hooks/useLink"
 import { isPlayerNextToTable } from "../../utils/mine"
+import Text from "../../components/Text"
+import ItemContainer from "../../components/item/ItemContainer"
 
 const MineScreenWithContext = () => {
     useBlur(false)
@@ -37,11 +39,13 @@ const MineScreenWithContext = () => {
             <ConditionalDisplay condition={items.length > 0}>
                 <div className={styles.container}>
                     <div className={styles.groundContainer}>
-                        <span className={styles.heading}>Ground</span>
-                        <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.min(Object.keys(groupedItems).length, 3)}, max-content)`}}>
-                            {Object.entries(groupedItems).map(([itemString, itemIds]) => (
-                                <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
-                            ))}
+                        <Text size="h3">Ground</Text>
+                        <div className={styles.itemContainer}>
+                            <ItemContainer itemCount={Object.keys(groupedItems).length}>
+                                {Object.entries(groupedItems).map(([itemString, itemIds]) => (
+                                    <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
+                                ))}
+                            </ItemContainer>
                         </div>
                     </div>
                 </div>
@@ -49,8 +53,8 @@ const MineScreenWithContext = () => {
             <ConditionalDisplay condition={isPlayerNextToTable(player)}>
                 <div className={styles.container}>
                     <div className={styles.groundContainer}>
-                        <span className={styles.heading}>Rent a PICK!</span>
-                        <div className={styles.itemContainer}>
+                        <Text size="h3">Rent a PICK!</Text>
+                        <div className={styles.rentItemContainer}>
                             <RentItem />
                         </div>
                     </div>

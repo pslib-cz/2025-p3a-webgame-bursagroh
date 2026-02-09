@@ -5,6 +5,7 @@ import { PlayerIdContext } from "./PlayerIdProvider"
 import useStorage from "../../hooks/useStorage"
 import { SettingsContext } from "./SettingsProvider"
 import type { Save } from "../../types/save"
+import { beginSave, endSave } from "../../utils/saveLock"
 
 type SaveState = "idle" | "saving" | "saved"
 
@@ -68,14 +69,19 @@ const SaveProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
 
         setSaveState("saving")
         setIsAutosave(!!isAutosave)
+        beginSave()
 
-        await saveAsync()
-
-        setSaveState("saved")
-
-        setTimeout(() => {
+        try {
+            await saveAsync()
+            setSaveState("saved")
+            setTimeout(() => {
+                setSaveState("idle")
+            }, 10000)
+        } catch {
             setSaveState("idle")
-        }, 10000)
+        } finally {
+            endSave()
+        }
     }
 
     React.useEffect(() => {

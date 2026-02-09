@@ -3,6 +3,7 @@ import Layer from "./wrappers/layer/Layer"
 import styles from "./unsupportedResolutionLayer.module.css"
 import { MIN_SUPPORTED_HEIGHT, MIN_SUPPORTED_WIDTH } from "../constants/window"
 import { getWindowSize } from "../utils/window"
+import Text from "./Text"
 
 const UnsupportedResolutionLayer = () => {
     const [size, setSize] = React.useState(getWindowSize)
@@ -20,7 +21,7 @@ const UnsupportedResolutionLayer = () => {
     return (
         <Layer layer={5}>
             <div className={styles.container}>
-                <span className={styles.text}>Increase your window size to at least {MIN_SUPPORTED_WIDTH}x{MIN_SUPPORTED_HEIGHT}</span>
+                <Text size="h2" className={styles.text}>Increase your window size to at least {MIN_SUPPORTED_WIDTH}x{MIN_SUPPORTED_HEIGHT}</Text>
             </div>
         </Layer>
     )

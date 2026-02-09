@@ -4,12 +4,9 @@ import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
 import { craftBlueprintMutation } from '../../api/blueprint'
 import { itemIdToAssetType } from '../../utils/item'
-import Asset from '../SVG/Asset'
-import WeightIcon from '../../icons/WeightIcon'
-import styles from './craftingItem.module.css'
-import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
 import useLock from '../../hooks/useLock'
+import Item from './Item'
 
 type CraftingItemProps = {
     blueprint: Blueprint
@@ -30,17 +27,12 @@ const CraftingItem: React.FC<CraftingItemProps> = ({ blueprint }) => {
     }
 
     return (
-        <Tooltip heading={blueprint.item.name} text={blueprint.item.description}>
-            <div className={styles.container} onClick={handleClick}>
-                <svg width="128" height="128" viewBox="0 0 128 128">
-                    <Asset assetType={itemIdToAssetType(blueprint.item.itemId)} width={128} height={128} />
-                </svg>
-                <div className={styles.weight}>
-                    <WeightIcon className={styles.weightIcon} width={24} height={24} />
-                    <span className={styles.weightText}>{blueprint.item.weight}</span>
-                </div>
-            </div>
-        </Tooltip>
+        <Item tooltipHeading={blueprint.item.name}
+            tooltipText={blueprint.item.description}
+            assetType={itemIdToAssetType(blueprint.item.itemId)}
+            weight={blueprint.item.weight}
+            isWeightDown
+            onClick={handleClick} />
     )
 }
 

@@ -1,0 +1,113 @@
+.container {
+    position: relative;
+    width: min-content;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.asset {
+    width: var(--item-size);
+    height: var(--item-size);
+}
+
+.durability {
+    position: absolute;
+    bottom: 0.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.amount {
+    position: absolute;
+    top: 0;
+    right: 0.25rem;
+    text-align: center;
+}
+
+.weight {
+    position: absolute;
+    top: 0;
+    left: 0.25rem;
+    display: flex;
+    align-items: center;
+}
+
+.weightDown {
+    position: absolute;
+    bottom: 0.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+}
+
+.weightIcon {
+    fill: var(--light);
+}
+
+.price {
+    position: absolute;
+    bottom: 0.25rem;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+}
+
+.transferSingleRight {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 35%;
+    transform: translate(-50%, -50%);
+    fill: var(--light);
+    cursor: pointer;
+}
+
+.container:hover .transferSingleRight {
+    display: block;
+}
+
+.container:hover .transferMultiRight {
+    display: block;
+}
+
+.transferMultiRight {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    fill: var(--light);
+    cursor: pointer;
+}
+
+.transferSingleLeft {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 65%;
+    transform: translate(-50%, -50%);
+    fill: var(--light);
+    cursor: pointer;
+}
+
+.container:hover .transferSingleLeft {
+    display: block;
+}
+
+.container:hover .transferMultiLeft {
+    display: block;
+}
+
+.transferMultiLeft {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 35%;
+    transform: translate(-50%, -50%);
+    fill: var(--light);
+    cursor: pointer;
+}

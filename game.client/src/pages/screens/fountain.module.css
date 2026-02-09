@@ -22,32 +22,16 @@
     gap: 0.25rem;
 }
 
-.heading {
-    font-size: var(--h3);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
-}
-
 .close {
     fill: var(--light);
     cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .transferContainer {
     background-color: var(--dark);
     padding: 0.5rem;
-}
-
-.transferText {
-    color: var(--light);
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
 }
 
 .legendContainer {
@@ -65,15 +49,6 @@
     padding: 0.5rem;
 }
 
-.legendText {
-    color: var(--light);
-    font-size: var(--h5);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-}
-
 .tutorialContainer {
     display: grid;
     grid-template-columns: repeat(2, auto);
@@ -83,21 +58,14 @@
     background-color: var(--darker);
     margin-top: 1rem;
     padding: 0.5rem;
-    flex-basis: 20%;
+    flex-basis: 30%;
 }
 
 .innerTutorialContainer {
     background-color: var(--dark);
     padding: 0.5rem;
-    list-style: none;
     margin: 0;
-}
-
-.innerTutorialContainer li {
-    color: var(--light);
-    font-size: var(--h5);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }

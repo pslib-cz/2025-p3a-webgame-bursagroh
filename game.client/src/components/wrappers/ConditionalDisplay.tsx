@@ -2,11 +2,12 @@ import React from 'react'
 
 type ConditionalDisplayProps = {
     condition: boolean
+    notMet?: React.ReactNode
 }
 
-const ConditionalDisplay: React.FC<React.PropsWithChildren<ConditionalDisplayProps>> = ({ condition, children }) => {
+const ConditionalDisplay: React.FC<React.PropsWithChildren<ConditionalDisplayProps>> = ({ condition, children, notMet }) => {
     if (!condition) {
-        return null
+        return notMet
     }
 
     return children

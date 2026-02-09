@@ -2,6 +2,7 @@ import React from 'react'
 import styles from './link.module.css'
 import useLink from '../hooks/useLink'
 import { type PageType } from '../types/page'
+import Text from './Text'
 
 type LinkProps = {
     to: PageType
@@ -24,12 +25,12 @@ const Link: React.FC<LinkProps> = ({ to, onClick, disabled, children, moveScreen
 
     if (disabled) {
         return (
-            <span className={styles.disabledLink}>{children}</span>
+            <Text size="h2" className={styles.disabledLink}>{children}</Text>
         )
     }
     
     return (
-        <button onClick={handleClick} className={styles.link}>{children}</button>
+        <Text size="h2" onClick={handleClick} className={styles.link}>{children}</Text>
     )
 }
 

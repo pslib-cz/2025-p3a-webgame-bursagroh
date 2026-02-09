@@ -10,6 +10,7 @@ import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroup
 import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from "../../hooks/useLink"
 import { mapEnemyType } from "../../utils/enemy"
+import Text from "../../components/Text"
 
 const FightScreenWithContext = () => {
     useBlur(true)
@@ -35,10 +36,10 @@ const FightScreenWithContext = () => {
         return (
             <div className={styles.container}>
                 <div className={styles.entityContainer}>
-                    <svg width={512} height={512} viewBox="0 0 512 512">
-                        <Asset assetType="player" x={0} y={0} width={512} height={512} />
+                    <svg className={styles.asset} viewBox="0 0 1 1">
+                        <Asset assetType="player" x={0} y={0} width={1} height={1} />
                     </svg>
-                    <span className={styles.entityText}>{player.health} / {player.maxHealth}</span>
+                    <Text size="h1" className={styles.entityText}>{player.health} / {player.maxHealth}</Text>
                 </div>
                 <div className={styles.entityContainer} />
             </div>
@@ -48,16 +49,16 @@ const FightScreenWithContext = () => {
     return (
         <div className={styles.container}>
             <div className={styles.entityContainer}>
-                <svg width={512} height={512} viewBox="0 0 512 512">
-                    <Asset assetType="player" x={0} y={0} width={512} height={512} />
+                <svg className={styles.asset} viewBox="0 0 1 1">
+                    <Asset assetType="player" x={0} y={0} width={1} height={1} />
                 </svg>
-                <span className={styles.entityText}>{player.health} / {player.maxHealth}</span>
+                <Text size="h1" className={styles.entityText}>{player.health} / {player.maxHealth}</Text>
             </div>
             <div className={styles.entityContainer} onClick={handleClick}>
-                <svg width={512} height={512} viewBox="0 0 512 512">
-                    <Asset assetType={mapEnemyType(enemy.enemy!.enemyType)} x={0} y={0} width={512} height={512} />
+                <svg className={styles.asset} viewBox="0 0 1 1">
+                    <Asset assetType={mapEnemyType(enemy.enemy!.enemyType)} x={0} y={0} width={1} height={1} />
                 </svg>
-                <span className={styles.entityText}>{enemy.enemy!.health} / {enemy.enemy!.maxHealth}</span>
+                <Text size="h1" className={styles.entityText}>{enemy.enemy!.health} / {enemy.enemy!.maxHealth}</Text>
             </div>
         </div>
     )

@@ -10,6 +10,7 @@ import Button from "../components/Button"
 import useLink from "../hooks/useLink"
 import { screenTypeToPageType } from '../utils/page'
 import useBlur from "../hooks/useBlur"
+import Text from "../components/Text"
 
 const Root = () => {
     useBlur(true)
@@ -39,7 +40,7 @@ const Root = () => {
     return (
         <Layer layer={1}>
             <div className={styles.container}>
-                <h1 className={styles.heading}>Urban Relic</h1>
+                <Text size="h0" className={styles.heading}>Urban Relic</Text>
                 <div className={styles.linkContainer}>
                     <Link to={screenTypeToPageType(player?.player?.screenType ?? "City")} disabled={playerId.playerId === null}>Continue</Link>
                     <Button onClick={handleClick}>New Game</Button>

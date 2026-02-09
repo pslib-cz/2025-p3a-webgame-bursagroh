@@ -1,5 +1,6 @@
 import React from "react"
 import type { Notification } from "../../types/notification"
+import { NOTIFICATION_MAX_COUNT } from "../../constants/notification"
 
 type NotificationContextType = {
     notify: (heading: string, text: string, timer?: number) => void
@@ -11,7 +12,7 @@ type NotificationContextType = {
 export const NotificationContext = React.createContext<NotificationContextType | null>(null)
 
 const NotificationProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-    const [idCounter, setIdCounter] = React.useState(0)
+    const idCounterRef = React.useRef(0)
     const [notifications, setNotifications] = React.useState<Notification[]>([])
 
     const removeNotification = (id: number) => {
@@ -19,11 +20,13 @@ const NotificationProvider: React.FC<React.PropsWithChildren> = ({ children }) =
     }
 
     const notify = (heading: string, text: string, timer?: number) => {
-        setNotifications((prev) => [...prev, { id: idCounter, heading, text }])
-        setIdCounter((prev) => prev + 1)
-        if (timer) {
+        const id = idCounterRef.current++
+
+        setNotifications((prev) => [...prev, { id, heading, text }].slice(-NOTIFICATION_MAX_COUNT))
+
+        if (timer !== undefined) {
             setTimeout(() => {
-                removeNotification(idCounter)
+                removeNotification(id)
             }, timer)
         }
     }

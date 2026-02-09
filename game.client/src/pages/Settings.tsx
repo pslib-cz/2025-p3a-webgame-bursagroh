@@ -9,6 +9,7 @@ import { DEFAULT_AUTOSAVE_INTERVAL, DEFAULT_MAX_AUTOSAVE } from '../constants/se
 import { SettingsContext } from '../providers/global/SettingsProvider'
 import useKeyboard from '../hooks/useKeyboard'
 import useLink from '../hooks/useLink'
+import Text from '../components/Text'
 
 const SettingsScreen = () => {
     useBlur(true)
@@ -39,11 +40,11 @@ const SettingsScreen = () => {
     return (
         <Layer layer={1} >
             <div className={styles.container}>
-                <span className={styles.heading}>Settings</span>
+                <Text size="h1" className={styles.heading}>Settings</Text>
                 <div className={styles.settingsContainer}>
-                    <span className={styles.settingsText}>Autosave interval</span>
+                    <Text size="h3" className={styles.settingsText}>Autosave interval</Text>
                     <Input type="number" value={autosaveInterval} onChange={e => setAutosaveInterval(Number(e.target.value))} />
-                    <span className={styles.settingsText}>Max autosave</span>
+                    <Text size="h3" className={styles.settingsText}>Max autosave</Text>
                     <Input type="number" value={maxAutosave} onChange={e => setMaxAutosave(Number(e.target.value))} />
                     <Button disabled={autosaveInterval === autosave.autosaveInterval && maxAutosave === autosave.maxAutosave} onClick={handleSave}>Save</Button>
                 </div>

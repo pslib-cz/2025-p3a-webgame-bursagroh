@@ -1,18 +1,12 @@
 import React from 'react'
 import { itemIdToAssetType } from '../../utils/item'
-import Asset from '../SVG/Asset'
 import type { InventoryItem as InventoryItemType } from '../../types/api/models/player'
-import ArrowRightIcon from '../../icons/ArrowRightIcon'
-import ArrowRightDoubleIcon from '../../icons/ArrowRightDoubleIcon'
 import { moveBankItemMutation } from '../../api/bank'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
-import styles from './bankInventoryItem.module.css'
-import ConditionalDisplay from '../wrappers/ConditionalDisplay'
-import WeightIcon from '../../icons/WeightIcon'
-import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
 import useLock from '../../hooks/useLock'
+import Item from './Item'
 
 type BankInventoryItemProps = {
     items: InventoryItemType[]
@@ -39,23 +33,15 @@ const BankInventoryItem: React.FC<BankInventoryItemProps> = ({ items }) => {
     }
 
     return (
-        <Tooltip heading={items[0].itemInstance.item.name} text={items[0].itemInstance.item.description}>
-            <div className={styles.container}>
-                <svg width="128" height="128" viewBox="0 0 128 128">
-                    <Asset assetType={itemIdToAssetType(items[0].itemInstance.item.itemId)} width={128} height={128} />
-                </svg>
-                <ConditionalDisplay condition={items[0].itemInstance.durability !== 0}>
-                    <span className={styles.durability}>{items[0].itemInstance.durability}</span>
-                </ConditionalDisplay>
-                <div className={styles.weight}>
-                    <WeightIcon className={styles.weightIcon} width={24} height={24} />
-                    <span className={styles.weightText}>{items[0].itemInstance.item.weight}</span>
-                </div>
-                <span className={styles.amount}>{items.length}x</span>
-                <ArrowRightIcon className={styles.transferSingle} width={32} height={32} onClick={handleSingleMove} />
-                <ArrowRightDoubleIcon className={styles.transferMulti} width={32} height={32} onClick={handleMultipleMove} />
-            </div>
-        </Tooltip>
+        <Item tooltipHeading={items[0].itemInstance.item.name}
+            tooltipText={items[0].itemInstance.item.description}
+            assetType={itemIdToAssetType(items[0].itemInstance.item.itemId)}
+            weight={items[0].itemInstance.item.weight}
+            durability={items[0].itemInstance.durability}
+            amount={items.length}
+            onSingleMoveRight={handleSingleMove}
+            onMultipleMoveRight={handleMultipleMove}
+             />
     )
 }
 

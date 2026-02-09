@@ -8,15 +8,6 @@
     box-sizing: border-box;
 }
 
-.heading {
-    font-size: var(--h1);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
-}
-
 .subContainer {
     display: flex;
     flex-direction: column;

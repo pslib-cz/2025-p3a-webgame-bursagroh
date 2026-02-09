@@ -1,14 +1,12 @@
 import React from 'react'
 import type { Blueprint } from '../../types/api/models/blueprint'
-import Asset from '../SVG/Asset'
 import { itemIdToAssetType } from '../../utils/item'
 import { PlayerIdContext } from '../../providers/global/PlayerIdProvider'
 import { useMutation } from '@tanstack/react-query'
 import { buyBlueprintMutation } from '../../api/blueprint'
-import styles from './blueprintItem.module.css'
-import Tooltip from '../Tooltip'
 import useNotification from '../../hooks/useNotification'
 import useLock from '../../hooks/useLock'
+import Item from './Item'
 
 type BlueprintItemProps = {
     blueprint: Blueprint
@@ -29,14 +27,11 @@ const BlueprintItem: React.FC<BlueprintItemProps> = ({ blueprint }) => {
     }
 
     return (
-        <Tooltip heading={blueprint.item.name} text={blueprint.item.description}>
-            <div className={styles.container} onClick={handleClick}>
-                <svg width="128" height="128" viewBox="0 0 128 128">
-                    <Asset assetType={itemIdToAssetType(blueprint.item.itemId)} width={128} height={128} />
-                </svg>
-                <span className={styles.price}>{blueprint.price}$</span>
-            </div>
-        </Tooltip>
+        <Item tooltipHeading={blueprint.item.name}
+            tooltipText={blueprint.item.description}
+            assetType={itemIdToAssetType(blueprint.item.itemId)}
+            price={blueprint.price}
+            onClick={handleClick} />
     )
 }
 

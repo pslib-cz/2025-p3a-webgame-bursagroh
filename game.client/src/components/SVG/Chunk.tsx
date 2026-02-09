@@ -129,15 +129,15 @@ const Chunk: React.FC<ChunkProps> = ({ x, y, size }) => {
                         if (building.buildingType === "Abandoned" || building.buildingType === "AbandonedTrap") {
                             if (building.isBossDefeated) {
                                 text = (
-                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">x</text>
+                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} pointerEvents="none" fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">x</text>
                                 )
                             } else if (building.reachedHeight === building.height) {
                                 text = (
-                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">{building.height}</text>
+                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} pointerEvents="none" fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">{building.height}</text>
                                 )
                             } else if (building.reachedHeight !== 0) {
                                 text = (
-                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">{building.reachedHeight}/?</text>
+                                    <text x={building.positionX + 0.5} y={building.positionY + 0.5} pointerEvents="none" fontFamily="VT323, monospace" fontSize="0.25" fill="var(--light)" textAnchor="middle" dominantBaseline="central">{building.reachedHeight}/?</text>
                                 )
                             }
                         }

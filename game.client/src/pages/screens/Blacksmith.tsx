@@ -11,6 +11,9 @@ import BlueprintProvider, { BlueprintContext } from "../../providers/game/Bluepr
 import PlayerBlueprintsProvider, { PlayerBlueprintsContext } from "../../providers/game/PlayerBlueprintsProvider"
 import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from "../../hooks/useLink"
+import Text from "../../components/Text"
+import ConditionalDisplay from "../../components/wrappers/ConditionalDisplay"
+import ItemContainer from "../../components/item/ItemContainer"
 
 const BlacksmithScreenWithContext = () => {
     useBlur(true)
@@ -31,19 +34,23 @@ const BlacksmithScreenWithContext = () => {
     return (
         <div className={styles.container}>
             <div className={styles.blacksmithContainer}>
-                <span className={styles.heading}>Crafting</span>
-                <span className={styles.heading}>Blueprint</span>
-                <div className={styles.craftingContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(playerBlueprints).length, 5), 1)}, max-content)`}}>
+                <Text size="h3" className={styles.heading}>Crafting</Text>
+                <Text size="h3" className={styles.heading}>Blueprint</Text>
+                <div className={styles.craftingContainer} style={{ gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(playerBlueprints).length, 5), 1)}, max-content)` }}>
                     <ArrayDisplay elements={playerBlueprints.map((blueprint) => (
                         <Crafting blueprint={blueprint} key={blueprint.blueprintId} />
-                    ))} ifEmpty={<span className={styles.text}>No blueprints available</span>} />
+                    ))} ifEmpty={<Text size="h4">No craftings available</Text>} />
                 </div>
-                <div className={styles.blueprintContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(blueprintsToBuy).length, 5), 1)}, max-content)`}}>
-                    <ArrayDisplay elements={blueprintsToBuy.map((blueprint) => (
-                        <BlueprintItem blueprint={blueprint} key={blueprint.blueprintId} />
-                    ))} ifEmpty={<span className={styles.text}>No blueprints available</span>} />
+                <div className={styles.blueprintContainer}>
+                    <ConditionalDisplay condition={blueprintsToBuy.length > 0} notMet={<Text size="h4">No blueprints available</Text>}>
+                        <ItemContainer itemCount={blueprintsToBuy.length}>
+                            {blueprintsToBuy.map((blueprint) => (
+                                <BlueprintItem blueprint={blueprint} key={blueprint.blueprintId} />
+                            ))}
+                        </ItemContainer>
+                    </ConditionalDisplay>
                 </div>
-                <CloseIcon className={styles.close} onClick={handleEscape} width={24} height={24} />
+                <CloseIcon className={styles.close} onClick={handleEscape} />
             </div>
         </div>
     )

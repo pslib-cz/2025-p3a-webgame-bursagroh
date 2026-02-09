@@ -15,11 +15,10 @@
 }
 
 .entityText {
-    font-size: var(--h1);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
     text-align: center;
+}
+
+.asset {
+    width: calc(var(--item-size) * 4);
+    height: calc(var(--item-size) * 4);
 }
