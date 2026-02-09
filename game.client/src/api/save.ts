@@ -5,6 +5,7 @@ import type { API } from "../types/api"
 export const saveMutation = (playerId: string, onSuccess: (data: API["post"]["/api/Save"]["res"][200]) => void, onError?: (error: Error) => void) =>
     mutationOptions({
         mutationFn: () => api.post("/api/Save", {}, { playerId }, {}),
+        meta: { skipSaveLock: true },
         onSuccess,
         onError
     })

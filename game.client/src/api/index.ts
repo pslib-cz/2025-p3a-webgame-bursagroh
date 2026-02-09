@@ -1,9 +1,17 @@
-import { QueryClient } from "@tanstack/react-query"
+import { MutationCache, QueryClient } from "@tanstack/react-query"
 import type { API, APIError, NoContentURL, Param, Query } from "../types/api"
+import { waitForSaveIdle } from "../utils/saveLock"
 
 const SERVER_URL = import.meta.env.VITE_SERVER_URL as string
 
-export const queryClient = new QueryClient()
+export const queryClient = new QueryClient({
+    mutationCache: new MutationCache({
+        onMutate: async (_vars, mutation) => {
+            if (mutation.options.meta?.skipSaveLock) return
+            await waitForSaveIdle()
+        }
+    })
+})
 
 const formatURL = (url: string, params: Param, query: Query) => {
     let formattedURL = SERVER_URL + url

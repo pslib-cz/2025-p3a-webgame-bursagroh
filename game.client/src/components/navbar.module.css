@@ -45,6 +45,7 @@
     flex-basis: 33%;
     display: flex;
     justify-content: flex-end;
+    overflow: hidden;
 }
 
 .save {

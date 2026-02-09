@@ -15,6 +15,7 @@ const NavBar = () => {
 
     useEffect(() => {
         if (saveState === "saving") {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setShowIcon(false)
         }
     }, [saveState])
