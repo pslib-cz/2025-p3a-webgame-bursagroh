@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260208141034_test")]
-    partial class test
+    [Migration("20260209160200_testlol")]
+    partial class testlol
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -123,6 +123,8 @@ namespace game.Server.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("RecipeTimeId");
+
+                    b.HasIndex("PlayerId");
 
                     b.ToTable("RecipeTimes");
 
@@ -1915,6 +1917,17 @@ namespace game.Server.Migrations
                     b.Navigation("ActiveInventoryItem");
 
                     b.Navigation("Floor");
+                });
+
+            modelBuilder.Entity("RecipeTime", b =>
+                {
+                    b.HasOne("Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("game.Server.Models.Block", b =>

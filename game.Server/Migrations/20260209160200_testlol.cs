@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace game.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class test : Migration
+    public partial class testlol : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -75,22 +75,6 @@ namespace game.Server.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Recipes", x => x.RecipeId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RecipeTimes",
-                columns: table => new
-                {
-                    RecipeTimeId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RecipeId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PlayerId = table.Column<Guid>(type: "TEXT", nullable: false),
-                    StartTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RecipeTimes", x => x.RecipeTimeId);
                 });
 
             migrationBuilder.CreateTable(
@@ -448,6 +432,28 @@ namespace game.Server.Migrations
                         principalColumn: "InventoryItemId");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "RecipeTimes",
+                columns: table => new
+                {
+                    RecipeTimeId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    RecipeId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PlayerId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    StartTime = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    EndTime = table.Column<DateTime>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecipeTimes", x => x.RecipeTimeId);
+                    table.ForeignKey(
+                        name: "FK_RecipeTimes_Players_PlayerId",
+                        column: x => x.PlayerId,
+                        principalTable: "Players",
+                        principalColumn: "PlayerId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Buildings",
                 columns: new[] { "BuildingId", "BuildingType", "Height", "IsBossDefeated", "PlayerId", "PositionX", "PositionY", "ReachedHeight" },
@@ -502,11 +508,6 @@ namespace game.Server.Migrations
                 table: "Players",
                 columns: new[] { "PlayerId", "ActiveInventoryItemId", "BankBalance", "Capacity", "FloorId", "Health", "LastModified", "MaxHealth", "MineId", "Money", "Name", "PositionX", "PositionY", "ScreenType", "Seed", "SubPositionX", "SubPositionY" },
                 values: new object[] { new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), null, 0, 10, null, 20, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 20, 0, 100, "Seeded Player", 0, 0, 0, 252, 0, 0 });
-
-            migrationBuilder.InsertData(
-                table: "RecipeTimes",
-                columns: new[] { "RecipeTimeId", "EndTime", "PlayerId", "RecipeId", "StartTime" },
-                values: new object[] { 1, new DateTime(2025, 12, 13, 11, 0, 0, 0, DateTimeKind.Utc), new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), 1, new DateTime(2025, 12, 13, 10, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 table: "Recipes",
@@ -644,6 +645,11 @@ namespace game.Server.Migrations
                 table: "MineLayers",
                 columns: new[] { "MineLayerID", "Depth", "MineId" },
                 values: new object[] { 1, 0, 1 });
+
+            migrationBuilder.InsertData(
+                table: "RecipeTimes",
+                columns: new[] { "RecipeTimeId", "EndTime", "PlayerId", "RecipeId", "StartTime" },
+                values: new object[] { 1, new DateTime(2025, 12, 13, 11, 0, 0, 0, DateTimeKind.Utc), new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), 1, new DateTime(2025, 12, 13, 10, 0, 0, 0, DateTimeKind.Utc) });
 
             migrationBuilder.InsertData(
                 table: "Craftings",
@@ -807,6 +813,11 @@ namespace game.Server.Migrations
                 name: "IX_Players_FloorId",
                 table: "Players",
                 column: "FloorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecipeTimes_PlayerId",
+                table: "RecipeTimes",
+                column: "PlayerId");
 
             migrationBuilder.AddForeignKey(
                 name: "FK_BlueprintPlayers_Players_PlayerId",
