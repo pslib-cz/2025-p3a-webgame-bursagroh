@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import HomeIcon from '../icons/HomeIcon'
 import styles from './navbar.module.css'
 import { PlayerContext } from '../providers/global/PlayerProvider'
@@ -9,9 +9,19 @@ import useLink from '../hooks/useLink'
 
 const NavBar = () => {
     const moveToPage = useLink()
-
     const player = React.useContext(PlayerContext)!.player!
-    const {save, saveState, saveString} = React.useContext(SaveContext)!
+    const { save, saveState, saveString } = React.useContext(SaveContext)!
+    const [showIcon, setShowIcon] = useState(true)
+
+    useEffect(() => {
+        if (saveState === "saving") {
+            setShowIcon(false)
+        }
+    }, [saveState])
+
+    const handleSaveFinished = () => {
+        setShowIcon(true)
+    }
 
     const handleClick = async () => {
         await moveToPage("root")
@@ -22,11 +32,22 @@ const NavBar = () => {
             <div className={styles.homeContainer}>
                 <HomeIcon className={styles.home} width={64} height={64} onClick={handleClick} />
             </div>
+            
             <span className={styles.location}>{player.screenType}</span>
+            
             <div className={styles.savingContainer}>
-                {saveState === "idle" && <SaveIcon className={styles.save} width={64} height={64} onClick={() => save()} />}
+                {saveState === "idle" && showIcon && (
+                    <SaveIcon className={styles.save} width={64} height={64} onClick={() => save()} />
+                )}
+
                 {saveState === "saving" && <span className={styles.saveText}>Saving...</span>}
-                {saveState === "saved" && <SaveString saveString={saveString!} />}
+
+                {saveState === "saved" && (
+                    <SaveString 
+                        saveString={saveString!} 
+                        onFinished={handleSaveFinished} 
+                    />
+                )}
             </div>
         </div>
     )
