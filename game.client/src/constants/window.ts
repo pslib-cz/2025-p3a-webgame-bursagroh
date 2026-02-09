@@ -1,2 +1,2 @@
-export const MIN_SUPPORTED_WIDTH = 1600
-export const MIN_SUPPORTED_HEIGHT = 750
+export const MIN_SUPPORTED_WIDTH = 1500
+export const MIN_SUPPORTED_HEIGHT = 700
