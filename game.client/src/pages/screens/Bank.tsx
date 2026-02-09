@@ -20,6 +20,7 @@ import type { TLoadingWrapperContextState } from '../../types/context'
 import ArrayDisplay from "../../components/wrappers/ArrayDisplay"
 import useLock from "../../hooks/useLock"
 import useLink from "../../hooks/useLink"
+import Text from "../../components/Text"
 
 const BankScreenWithContext = () => {
     useBlur(true)
@@ -64,12 +65,12 @@ const BankScreenWithContext = () => {
     return (
         <div className={styles.container}>
             <div className={styles.bankContainer}>
-                <span className={styles.heading}>Player</span>
-                <span className={styles.heading}>Bank</span>
+                <Text size="h3" className={styles.heading}>Player</Text>
+                <Text size="h3" className={styles.heading}>Bank</Text>
                 <div className={styles.transferContainer}>
                     <Input type="number" placeholder="Amount" value={toBankAmount} onChange={(e) => setToBankAmount(Number.parseInt(e.target.value))} />
                     <div className={styles.transferSubContainer}>
-                        <span className={styles.balance}>/ {player.money} $</span>
+                        <Text size="h3">/ {player.money} $</Text>
                     </div>
                     <SendIcon className={styles.sendIcon} width={32} height={32} onClick={handleTransferToBank} />
                 </div>
@@ -77,18 +78,18 @@ const BankScreenWithContext = () => {
                     <SendIcon className={styles.sendIconFlipped} width={32} height={32} onClick={handleTransferToPlayer} />
                     <Input type="number" placeholder="Amount" value={toPlayerAmount} onChange={(e) => setToPlayerAmount(Number.parseInt(e.target.value))} />
                     <div className={styles.transferSubContainer}>
-                        <span className={styles.balance}>/ {player.bankBalance} $</span>
+                        <Text size="h3">/ {player.bankBalance} $</Text>
                     </div>
                 </div>
                 <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(inventoryItems).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={Object.entries(inventoryItems).map(([itemString, inventoryItems]) => (
                         <BankInventoryItem key={itemString} items={inventory.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
-                    ))} ifEmpty={<span className={styles.text}>Empty inventory</span>} />
+                    ))} ifEmpty={<Text size="h4">Empty inventory</Text>} />
                 </div>
                 <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(bankItems).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={Object.entries(bankItems).map(([itemString, inventoryItems]) => (
                         <BankItem key={itemString} items={bank.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
-                    ))} ifEmpty={<span className={styles.text}>Empty bank</span>} />
+                    ))} ifEmpty={<Text size="h4">Empty bank</Text>} />
                 </div>
                 <CloseIcon width={24} height={24} className={styles.close} onClick={handleEscape} />
             </div>

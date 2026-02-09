@@ -13,6 +13,7 @@ import HandItem from './item/HandItem'
 import { IsOpenInventoryContext } from '../providers/game/IsOpenInventoryProvider'
 import ArrayDisplay from './wrappers/ArrayDisplay'
 import useNotification from '../hooks/useNotification'
+import Text from './Text'
 
 const PlayerUI = () => {
     const {genericError} = useNotification()
@@ -39,30 +40,30 @@ const PlayerUI = () => {
     return (
         <div className={styles.container}>
             <div className={styles.header}>
-                <span className={styles.heading}>Player</span>
+                <Text size="h3">Player</Text>
                 <OpenIcon className={styles.open} width={24} height={24} onClick={handleOpenInventory} />
             </div>
             <div className={styles.statContainer}>
                 <div className={styles.stat}>
                     <HeartIcon width={24} height={24} />
-                    <span>{player.health} / {player.maxHealth}</span>
+                    <Text size="h4">{player.health} / {player.maxHealth}</Text>
                 </div>
                 <div className={styles.stat}>
                     <MoneyIcon width={24} height={24} />
-                    <span>{player.money}</span>
+                    <Text size="h4">{player.money}</Text>
                 </div>
                 <div className={styles.stat}>
                     <WeightIcon width={24} height={24} />
-                    <span>{calcInventoryWeight(inventory)} / {player.capacity}</span>
+                    <Text size="h4">{calcInventoryWeight(inventory)} / {player.capacity}</Text>
                 </div>
             </div>
             <div className={styles.subHeader}>
-                <span className={styles.subHeading}>Hand</span>
+                <Text size="h4">Hand</Text>
             </div>
             <div className={styles.hand} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
                 <ArrayDisplay elements={inventory.filter(item => item.inventoryItemId === player.activeInventoryItemId).map(item => (
                     <HandItem item={item} key={item.inventoryItemId} />
-                ))} ifEmpty={<span className={styles.text}>Empty hand</span>} />
+                ))} ifEmpty={<Text size="h4">Empty hand</Text>} />
             </div>
         </div>
     )

@@ -18,11 +18,7 @@
 }
 
 .location {
-    color: var(--light);
-    font-family: 'VT323', monospace;
-    font-size: var(--h2);
     align-self: center;
-    margin: 0;
     flex-basis: 33%;
     text-align: center;
 }
@@ -30,15 +26,6 @@
 .save {
     fill: var(--light);
     cursor: pointer;
-}
-
-.saveText {
-    font-size: var(--h3);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
 }
 
 .savingContainer {

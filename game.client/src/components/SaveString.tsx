@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import CopyIcon from '../icons/CopyIcon'
 import styles from './saveString.module.css'
+import Text from './Text'
 
 const SaveString = ({ saveString, onFinished }: { saveString: string, onFinished: () => void }) => {
     const [isExiting, setIsExiting] = useState(false)
@@ -21,7 +22,7 @@ const SaveString = ({ saveString, onFinished }: { saveString: string, onFinished
 
     return (
         <div className={`${styles.container} ${isExiting ? styles.exit : ''}`}>
-            <span className={styles.text}>{saveString}</span>
+            <Text size="h3">{saveString}</Text>
             <CopyIcon className={styles.copy} width={32} height={32} onClick={handleCopy} />
         </div>
     )

@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from './loadingWrapper.module.css'
 import type { TLoadingWrapperContextState } from '../../types/context'
+import Text from '../Text'
 
 type LoadingWrapperProps<T> = {
     context: React.Context<T>
@@ -14,11 +15,11 @@ const LoadingWrapper = <T extends TLoadingWrapperContextState>({ children, conte
     }
 
     if (ctx.isPending) {
-        return <span className={styles.loading}>Loading...</span>
+        return <Text size="h2" className={styles.loading}>Loading...</Text>
     }
 
     if (ctx.isError) {
-        return <span className={styles.loading}>Error loading data!</span>
+        return <Text size="h2" className={styles.loading}>Error loading data!</Text>
     }
 
     if (ctx.isSuccess) {

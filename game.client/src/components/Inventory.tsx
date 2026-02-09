@@ -11,6 +11,7 @@ import ArrayDisplay from './wrappers/ArrayDisplay'
 import { useMutation } from '@tanstack/react-query'
 import { equipItemMutation } from '../api/player'
 import useNotification from '../hooks/useNotification'
+import Text from './Text'
 
 const Inventory = () => {
     const {genericError} = useNotification()
@@ -40,13 +41,13 @@ const Inventory = () => {
         <ConditionalDisplay condition={isOpen}>
             <div className={styles.container}>
                 <div className={styles.header}>
-                    <span className={styles.heading}>Inventory</span>
+                    <Text size="h3">Inventory</Text>
                     <CloseIcon className={styles.close} width={24} height={24} onClick={handleCloseInventory} />
                 </div>
                 <div className={styles.itemContainer} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(inventoryItems).length, 5), 1)}, max-content)`}}>
                     <ArrayDisplay elements={Object.entries(inventoryItems).map(([itemString, items]) => (
                         <InventoryItem items={updatedInventory.filter(item => items.includes(item.inventoryItemId))!} key={itemString} />
-                    ))} ifEmpty={<span className={styles.text}>Empty inventory</span>} />
+                    ))} ifEmpty={<Text size="h4">Empty inventory</Text>} />
                 </div>
             </div>
         </ConditionalDisplay>

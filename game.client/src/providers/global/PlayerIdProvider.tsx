@@ -4,6 +4,7 @@ import { queryClient } from "../../api"
 import { generatePlayerMutation, getPlayerQuery } from "../../api/player"
 import styles from "./playerIdProvider.module.css"
 import { ONE_HOUR_MS, PLAYER_ID_STORAGE_KEY } from "../../constants/storage"
+import Text from "../../components/Text"
 
 type PlayerIdContextType = {
     playerId: string | null
@@ -73,15 +74,15 @@ const PlayerIdProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
     }, [generatePlayerAsync])
 
     if (isRestoring) {
-        return <span className={styles.loading}>Restoring player...</span>
+        return <Text size="h2" className={styles.loading}>Restoring player...</Text>
     }
 
     if (isError) {
-        return <span className={styles.loading}>Error generating player!</span>
+        return <Text size="h2" className={styles.loading}>Error generating player!</Text>
     }
 
     if (isPending) {
-        return <span className={styles.loading}>Generating player...</span>
+        return <Text size="h2" className={styles.loading}>Generating player...</Text>
     }
 
     return <PlayerIdContext.Provider value={{ playerId, setPlayerId, generatePlayerIdAsync }}>{children}</PlayerIdContext.Provider>

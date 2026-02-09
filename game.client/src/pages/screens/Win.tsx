@@ -5,6 +5,7 @@ import styles from './win.module.css'
 import useKeyboard from '../../hooks/useKeyboard'
 import Button from '../../components/Button'
 import useLink from '../../hooks/useLink'
+import Text from '../../components/Text'
 
 const WinScreen = () => {
     useBlur(true)
@@ -24,7 +25,7 @@ const WinScreen = () => {
 
     return (
         <div className={styles.container}>
-            <span className={styles.heading}>Win</span>
+            <Text size="h0">You Win</Text>
             <Button onClick={handleClick}>New Game</Button>
         </div>
     )

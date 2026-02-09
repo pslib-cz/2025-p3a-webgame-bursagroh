@@ -18,6 +18,7 @@ import type { TLoadingWrapperContextState } from '../../types/context'
 import useLock from "../../hooks/useLock"
 import Tooltip from "../../components/Tooltip"
 import useLink from "../../hooks/useLink"
+import Text from "../../components/Text"
 
 const RestaurantScreenWithContext = () => {
     useBlur(true)
@@ -73,7 +74,7 @@ const RestaurantScreenWithContext = () => {
     if (isMaking) {
         cookingSection = (
             <div className={styles.innerCookingContainer}>
-                <span className={styles.burgerName}>{currentBurger?.name}</span>
+                <Text size="h2" className={styles.burgerName}>{currentBurger?.name}</Text>
                 <Burger burger={{ recipeId: currentBurger?.recipeId ?? -1, name: "", ingrediences: currentBurgerStack.map((ingredienceType, index) => ({ order: index, ingredienceType })) }} />
                 <div className={styles.ingredienceButtons}>
                     <Tooltip heading="Ingredience" text="Bun down">
@@ -136,15 +137,15 @@ const RestaurantScreenWithContext = () => {
     return (
         <div className={styles.container}>
             <div className={styles.recipesLeaderboardContainer}>
-                <span className={styles.heading}>Recipes</span>
-                <span className={styles.heading}>Leaderboard</span>
+                <Text size="h3" className={styles.heading}>Recipes</Text>
+                <Text size="h3" className={styles.heading}>Leaderboard</Text>
                 <div className={styles.recipesContainer}>
                     {recipes.map((recipe) => (
                         <div key={recipe.recipeId} className={styles.burgerContainer}>
                             <Burger burger={recipe} />
                             <div className={styles.ingrediencesList}>
                                 {recipe.ingrediences.sort((a, b) => a.order - b.order).map((ingredience) => (
-                                    <span key={ingredience.order} className={styles.ingredienceText}>{ingredience.ingredienceType}</span>
+                                    <Text key={ingredience.order} size="h4">{ingredience.ingredienceType}</Text>
                                 ))}
                             </div>
                         </div>
@@ -156,7 +157,7 @@ const RestaurantScreenWithContext = () => {
                             <Burger burger={recipe} />
                             <div className={styles.leaderboard}>
                                 {Array.from({ length: 3 }, (_, i) => i + 1).map((position) => (
-                                    <span key={position} className={styles.leaderboardText}>{position}. {leaderboard.filter(entry => entry.recipeId === recipe.recipeId).sort((a, b) => a.duration - b.duration)[position - 1] ? Math.round(leaderboard.filter(entry => entry.recipeId === recipe.recipeId).sort((a, b) => a.duration - b.duration)[position - 1].duration * 1000) + "ms" : "N/A"}</span>
+                                    <Text key={position} size="h4" className={styles.leaderboardText}>{position}. {leaderboard.filter(entry => entry.recipeId === recipe.recipeId).sort((a, b) => a.duration - b.duration)[position - 1] ? Math.round(leaderboard.filter(entry => entry.recipeId === recipe.recipeId).sort((a, b) => a.duration - b.duration)[position - 1].duration * 1000) + "ms" : "N/A"}</Text>
                                 ))}
                             </div>
                         </div>
@@ -164,7 +165,7 @@ const RestaurantScreenWithContext = () => {
                 </div>
             </div>
             <div className={styles.cookingContainer}>
-                <span className={styles.cookingHeading}>Cooking</span>
+                <Text size="h3" className={styles.heading}>Cooking</Text>
                 <CloseIcon className={styles.close} onClick={handleEscape} width={24} height={24} />
                 {cookingSection}
             </div>

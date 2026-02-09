@@ -6,6 +6,7 @@ import { SaveContext } from '../providers/global/SaveProvider'
 import SaveString from './SaveString'
 import SaveIcon from '../icons/SaveIcon'
 import useLink from '../hooks/useLink'
+import Text from './Text'
 
 const NavBar = () => {
     const moveToPage = useLink()
@@ -34,14 +35,14 @@ const NavBar = () => {
                 <HomeIcon className={styles.home} width={64} height={64} onClick={handleClick} />
             </div>
             
-            <span className={styles.location}>{player.screenType}</span>
+            <Text size="h2" className={styles.location}>{player.screenType}</Text>
             
             <div className={styles.savingContainer}>
                 {saveState === "idle" && showIcon && (
                     <SaveIcon className={styles.save} width={64} height={64} onClick={() => save()} />
                 )}
 
-                {saveState === "saving" && <span className={styles.saveText}>Saving...</span>}
+                {saveState === "saving" && <Text size="h3">Saving...</Text>}
 
                 {saveState === "saved" && (
                     <SaveString 

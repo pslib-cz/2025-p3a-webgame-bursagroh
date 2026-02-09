@@ -20,22 +20,7 @@
 }
 
 .heading {
-    font-size: var(--h3);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
     text-align: center;
-}
-
-.cookingHeading {
-    font-size: var(--h3);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
 }
 
 .cookingContainer {
@@ -70,15 +55,6 @@
     gap: 0.25rem;
 }
 
-.ingredienceText {
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
-}
-
 .burgerContainer {
     display: flex;
     gap: 0.5rem;
@@ -111,12 +87,6 @@
 }
 
 .burgerName {
-    font-size: var(--h2);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
     text-align: center;
 }
 
@@ -145,11 +115,5 @@
 }
 
 .leaderboardText {
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
     width: max-content;
 }

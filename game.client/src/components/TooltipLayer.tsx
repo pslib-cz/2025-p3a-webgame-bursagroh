@@ -2,6 +2,7 @@ import React from 'react'
 import Layer from './wrappers/layer/Layer'
 import { TooltipContext } from '../providers/global/TooltipProvider'
 import styles from './tooltipLayer.module.css'
+import Text from './Text'
 
 const TooltipLayer = () => {
     const { tooltip } = React.useContext(TooltipContext)!
@@ -41,9 +42,9 @@ const TooltipLayer = () => {
     return (
         <Layer layer={4}>
             <div ref={tooltipRef} className={styles.container} style={{ left: pos.x, top: pos.y }}>
-                <span className={styles.heading}>{tooltip.heading}</span>
+                <Text size="h4">{tooltip.heading}</Text>
                 <div className={styles.innerContainer}>
-                    <span className={styles.text}>{tooltip.text}</span>
+                    <Text size="h5">{tooltip.text}</Text>
                 </div>
             </div>
         </Layer>

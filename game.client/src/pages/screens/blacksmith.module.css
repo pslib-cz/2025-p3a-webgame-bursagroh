@@ -19,12 +19,6 @@
 }
 
 .heading {
-    font-size: var(--h3);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
     text-align: center;
 }
 
@@ -51,13 +45,4 @@
     grid-auto-rows: max-content;
     gap: 1rem;
     min-width: 10rem;
-}
-
-.text {
-    font-size: var(--h4);
-    font-family: "VT323", monospace;
-    font-weight: 400;
-    font-style: normal;
-    margin: 0;
-    color: var(--light);
 }

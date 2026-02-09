@@ -16,6 +16,7 @@ import useKeyboard from '../hooks/useKeyboard';
 import useBlur from '../hooks/useBlur';
 import useLink from '../hooks/useLink';
 import { screenTypeToPageType } from '../utils/page';
+import Text from '../components/Text';
 
 const LoadSaveScreen = () => {
     useBlur(true)
@@ -70,11 +71,11 @@ const LoadSaveScreen = () => {
         <Layer layer={1}>
             <div className={styles.container}>
                 <div className={styles.subContainer}>
-                    <span className={styles.heading}>Load</span>
+                    <Text size="h1">Load</Text>
                     <div className={styles.saveContainer}>
                         <div className={styles.saveTextContainer}>
-                            <span className={styles.saveText}>Loading save:</span>
-                            <span className={styles.saveText}>{displaySaveString}</span>
+                            <Text size="h3">Loading save:</Text>
+                            <Text size="h3">{displaySaveString}</Text>
                         </div>
                         <div className={styles.buttonContainer}>
                             <Button onClick={handleSaveAndLoad} disabled={playerId.playerId === null}>Save and Load</Button>

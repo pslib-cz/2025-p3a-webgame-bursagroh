@@ -4,6 +4,7 @@ import Asset from './SVG/Asset'
 import styles from './burger.module.css'
 import { ingredienceToAssetType } from '../utils/recipe'
 import { INGREDIENCE_PIXEL_HEIGHT } from '../constants/burger'
+import Text from './Text'
 
 type BurgerProps = {
     burger: Recipe
@@ -19,7 +20,7 @@ const Burger: React.FC<BurgerProps> = ({ burger }) => {
                     <Asset key={index} x={0} y={height - INGREDIENCE_PIXEL_HEIGHT * 8 - INGREDIENCE_PIXEL_HEIGHT * index} width={INGREDIENCE_PIXEL_HEIGHT * 8} height={INGREDIENCE_PIXEL_HEIGHT * 8} assetType={ingredienceToAssetType(ingredience.ingredienceType)} />
                 ))}
             </svg>
-            <span className={styles.burgerName}>{burger.name}</span>
+            <Text size="h4" className={styles.burgerName}>{burger.name}</Text>
         </div>
     )
 }

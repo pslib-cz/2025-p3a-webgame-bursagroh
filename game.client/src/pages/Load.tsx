@@ -9,6 +9,7 @@ import SendIcon from '../icons/SendIcon'
 import useKeyboard from '../hooks/useKeyboard'
 import useBlur from '../hooks/useBlur'
 import useLink from '../hooks/useLink'
+import Text from '../components/Text'
 
 const LoadScreen = () => {
     useBlur(true)
@@ -31,7 +32,7 @@ const LoadScreen = () => {
         <Layer layer={1}>
             <div className={styles.container}>
                 <div className={styles.subContainer}>
-                    <span className={styles.heading}>Load</span>
+                    <Text size="h1">Load</Text>
                     <div className={styles.savesContainer}>
                         <div className={styles.savesLinkContainer}>
                             {saves.autosaves.map((save, index) => (
