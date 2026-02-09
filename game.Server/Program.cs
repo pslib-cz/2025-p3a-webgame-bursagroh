@@ -62,6 +62,7 @@ app.UseForwardedHeaders();
 
 app.UseDefaultFiles();
 app.MapStaticAssets();
+app.MapFallbackToFile("index.html");
 
 if (app.Environment.IsDevelopment())
 {

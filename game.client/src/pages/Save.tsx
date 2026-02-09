@@ -33,7 +33,7 @@ const SaveScreen = () => {
             <div className={styles.container}>
                 <div className={styles.subContainer}>
                     <Text size='h1'>Save</Text>
-                    <SaveString saveString={saveString} onFinished={() => {}} />
+                    <SaveString saveString={saveString} />
                 </div>
                 <Link to='root'>Back</Link>
             </div>

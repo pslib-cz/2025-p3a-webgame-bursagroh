@@ -17,6 +17,8 @@
 .open {
     fill: var(--light);
     cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .statContainer {
@@ -28,7 +30,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    
+}
+
+.statIcon {
     fill: var(--light);
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .hand {

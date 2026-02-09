@@ -6,6 +6,11 @@
     align-items: start;
 }
 
+.asset {
+    width: var(--item-size);
+    height: var(--item-size);
+}
+
 .recipesLeaderboardContainer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -47,6 +52,8 @@
     right: 0.25rem;
     fill: var(--light);
     cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .ingrediencesList {

@@ -1,8 +1,9 @@
 import React from 'react'
 import styles from './text.module.css'
+import type { TextSize } from '../types/text'
 
 type TextProps = {
-    size: "h0" | "h1" | "h2" | "h3" | "h4" | "h5"
+    size: TextSize
 } & React.HTMLAttributes<HTMLSpanElement>
 
 const Text: React.FC<React.PropsWithChildren<TextProps>> = ({ size, children, className, ...props }) => {

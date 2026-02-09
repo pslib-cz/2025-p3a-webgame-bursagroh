@@ -17,3 +17,8 @@
 .entityText {
     text-align: center;
 }
+
+.asset {
+    width: calc(var(--item-size) * 4);
+    height: calc(var(--item-size) * 4);
+}

@@ -32,14 +32,14 @@ const NavBar = () => {
     return (
         <div className={styles.container}>
             <div className={styles.homeContainer}>
-                <HomeIcon className={styles.home} width={64} height={64} onClick={handleClick} />
+                <HomeIcon className={styles.home} onClick={handleClick} />
             </div>
             
             <Text size="h2" className={styles.location}>{player.screenType}</Text>
             
             <div className={styles.savingContainer}>
                 {saveState === "idle" && showIcon && (
-                    <SaveIcon className={styles.save} width={64} height={64} onClick={() => save()} />
+                    <SaveIcon className={styles.save} onClick={() => save()} />
                 )}
 
                 {saveState === "saving" && <Text size="h3">Saving...</Text>}

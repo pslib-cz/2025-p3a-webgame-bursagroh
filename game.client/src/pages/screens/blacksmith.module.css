@@ -28,6 +28,8 @@
     right: 0.25rem;
     fill: var(--light);
     cursor: pointer;
+    width: 1.5rem;
+    height: 1.5rem;
 }
 
 .craftingContainer {
@@ -40,9 +42,6 @@
 
 .blueprintContainer {
     background-color: var(--dark);
-    padding: 1rem;
-    display: grid;
-    grid-auto-rows: max-content;
-    gap: 1rem;
     min-width: 10rem;
+    padding: 1rem;
 }

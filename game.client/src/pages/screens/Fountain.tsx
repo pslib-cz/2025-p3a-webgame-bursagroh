@@ -49,7 +49,7 @@ const FountainScreen = () => {
             <div className={styles.fountainContainer}>
                 <div className={styles.header}>
                     <Text size="h3">Fountain of Sacrifice</Text>
-                    <CloseIcon width={24} height={24} className={styles.close} onClick={handleEscape} />
+                    <CloseIcon className={styles.close} onClick={handleEscape} />
                 </div>
                 <div className={styles.transferContainer} onDrop={handleDrop} onDragOver={(e) => e.preventDefault()}>
                     <Text size="h4">Throw here the mythical sword</Text>

@@ -41,19 +41,19 @@ const PlayerUI = () => {
         <div className={styles.container}>
             <div className={styles.header}>
                 <Text size="h3">Player</Text>
-                <OpenIcon className={styles.open} width={24} height={24} onClick={handleOpenInventory} />
+                <OpenIcon className={styles.open} onClick={handleOpenInventory} />
             </div>
             <div className={styles.statContainer}>
                 <div className={styles.stat}>
-                    <HeartIcon width={24} height={24} />
+                    <HeartIcon className={styles.statIcon} />
                     <Text size="h4">{player.health} / {player.maxHealth}</Text>
                 </div>
                 <div className={styles.stat}>
-                    <MoneyIcon width={24} height={24} />
+                    <MoneyIcon className={styles.statIcon} />
                     <Text size="h4">{player.money}</Text>
                 </div>
                 <div className={styles.stat}>
-                    <WeightIcon width={24} height={24} />
+                    <WeightIcon className={styles.statIcon} />
                     <Text size="h4">{calcInventoryWeight(inventory)} / {player.capacity}</Text>
                 </div>
             </div>

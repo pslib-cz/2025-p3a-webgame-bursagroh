@@ -17,16 +17,17 @@ import useNotification from "../../hooks/useNotification"
 import useKeyboard from "../../hooks/useKeyboard"
 import ProviderGroupLoadingWrapper from "../../components/wrappers/ProviderGroupLoadingWrapper"
 import type { TLoadingWrapperContextState } from '../../types/context'
-import ArrayDisplay from "../../components/wrappers/ArrayDisplay"
 import useLock from "../../hooks/useLock"
 import useLink from "../../hooks/useLink"
 import Text from "../../components/Text"
+import ConditionalDisplay from "../../components/wrappers/ConditionalDisplay"
+import ItemContainer from "../../components/item/ItemContainer"
 
 const BankScreenWithContext = () => {
     useBlur(true)
-    
+
     const moveToPage = useLink()
-    const {genericError} = useNotification()
+    const { genericError } = useNotification()
     const handleLock = useLock()
 
     const playerId = React.useContext(PlayerIdContext)!.playerId!
@@ -72,26 +73,34 @@ const BankScreenWithContext = () => {
                     <div className={styles.transferSubContainer}>
                         <Text size="h3">/ {player.money} $</Text>
                     </div>
-                    <SendIcon className={styles.sendIcon} width={32} height={32} onClick={handleTransferToBank} />
+                    <SendIcon className={styles.sendIcon} onClick={handleTransferToBank} />
                 </div>
                 <div className={styles.transferContainer}>
-                    <SendIcon className={styles.sendIconFlipped} width={32} height={32} onClick={handleTransferToPlayer} />
+                    <SendIcon className={styles.sendIconFlipped} onClick={handleTransferToPlayer} />
                     <Input type="number" placeholder="Amount" value={toPlayerAmount} onChange={(e) => setToPlayerAmount(Number.parseInt(e.target.value))} />
                     <div className={styles.transferSubContainer}>
                         <Text size="h3">/ {player.bankBalance} $</Text>
                     </div>
                 </div>
-                <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(inventoryItems).length, 5), 1)}, max-content)`}}>
-                    <ArrayDisplay elements={Object.entries(inventoryItems).map(([itemString, inventoryItems]) => (
-                        <BankInventoryItem key={itemString} items={inventory.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
-                    ))} ifEmpty={<Text size="h4">Empty inventory</Text>} />
+                <div className={styles.itemContainer}>
+                    <ConditionalDisplay condition={Object.keys(inventoryItems).length > 0} notMet={<Text size="h4">Empty inventory</Text>}>
+                        <ItemContainer itemCount={Object.keys(inventoryItems).length}>
+                            {Object.entries(inventoryItems).map(([itemString, inventoryItems]) => (
+                                <BankInventoryItem key={itemString} items={inventory.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
+                            ))}
+                        </ItemContainer>
+                    </ConditionalDisplay>
                 </div>
-                <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.max(Math.min(Object.keys(bankItems).length, 5), 1)}, max-content)`}}>
-                    <ArrayDisplay elements={Object.entries(bankItems).map(([itemString, inventoryItems]) => (
-                        <BankItem key={itemString} items={bank.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
-                    ))} ifEmpty={<Text size="h4">Empty bank</Text>} />
+                <div className={styles.itemContainer}>
+                    <ConditionalDisplay condition={Object.keys(bankItems).length > 0} notMet={<Text size="h4">Empty bank</Text>}>
+                        <ItemContainer itemCount={Object.keys(bankItems).length}>
+                            {Object.entries(bankItems).map(([itemString, inventoryItems]) => (
+                                <BankItem key={itemString} items={bank.filter(item => inventoryItems.includes(item.inventoryItemId))!} />
+                            ))}
+                        </ItemContainer>
+                    </ConditionalDisplay>
                 </div>
-                <CloseIcon width={24} height={24} className={styles.close} onClick={handleEscape} />
+                <CloseIcon className={styles.close} onClick={handleEscape} />
             </div>
         </div>
     )

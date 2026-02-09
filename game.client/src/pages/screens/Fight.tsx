@@ -36,8 +36,8 @@ const FightScreenWithContext = () => {
         return (
             <div className={styles.container}>
                 <div className={styles.entityContainer}>
-                    <svg width={512} height={512} viewBox="0 0 512 512">
-                        <Asset assetType="player" x={0} y={0} width={512} height={512} />
+                    <svg className={styles.asset} viewBox="0 0 1 1">
+                        <Asset assetType="player" x={0} y={0} width={1} height={1} />
                     </svg>
                     <Text size="h1" className={styles.entityText}>{player.health} / {player.maxHealth}</Text>
                 </div>
@@ -49,14 +49,14 @@ const FightScreenWithContext = () => {
     return (
         <div className={styles.container}>
             <div className={styles.entityContainer}>
-                <svg width={512} height={512} viewBox="0 0 512 512">
-                    <Asset assetType="player" x={0} y={0} width={512} height={512} />
+                <svg className={styles.asset} viewBox="0 0 1 1">
+                    <Asset assetType="player" x={0} y={0} width={1} height={1} />
                 </svg>
                 <Text size="h1" className={styles.entityText}>{player.health} / {player.maxHealth}</Text>
             </div>
             <div className={styles.entityContainer} onClick={handleClick}>
-                <svg width={512} height={512} viewBox="0 0 512 512">
-                    <Asset assetType={mapEnemyType(enemy.enemy!.enemyType)} x={0} y={0} width={512} height={512} />
+                <svg className={styles.asset} viewBox="0 0 1 1">
+                    <Asset assetType={mapEnemyType(enemy.enemy!.enemyType)} x={0} y={0} width={1} height={1} />
                 </svg>
                 <Text size="h1" className={styles.entityText}>{enemy.enemy!.health} / {enemy.enemy!.maxHealth}</Text>
             </div>

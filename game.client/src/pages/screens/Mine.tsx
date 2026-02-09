@@ -15,6 +15,7 @@ import type { TLoadingWrapperContextState } from '../../types/context'
 import useLink from "../../hooks/useLink"
 import { isPlayerNextToTable } from "../../utils/mine"
 import Text from "../../components/Text"
+import ItemContainer from "../../components/item/ItemContainer"
 
 const MineScreenWithContext = () => {
     useBlur(false)
@@ -39,10 +40,12 @@ const MineScreenWithContext = () => {
                 <div className={styles.container}>
                     <div className={styles.groundContainer}>
                         <Text size="h3">Ground</Text>
-                        <div className={styles.itemContainer} style={{gridTemplateColumns: `repeat(${Math.min(Object.keys(groupedItems).length, 3)}, max-content)`}}>
-                            {Object.entries(groupedItems).map(([itemString, itemIds]) => (
-                                <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
-                            ))}
+                        <div className={styles.itemContainer}>
+                            <ItemContainer itemCount={Object.keys(groupedItems).length}>
+                                {Object.entries(groupedItems).map(([itemString, itemIds]) => (
+                                    <GroundItem items={items.filter(item => itemIds.includes(item.floorItemId))!} key={itemString} />
+                                ))}
+                            </ItemContainer>
                         </div>
                     </div>
                 </div>
@@ -51,7 +54,7 @@ const MineScreenWithContext = () => {
                 <div className={styles.container}>
                     <div className={styles.groundContainer}>
                         <Text size="h3">Rent a PICK!</Text>
-                        <div className={styles.itemContainer}>
+                        <div className={styles.rentItemContainer}>
                             <RentItem />
                         </div>
                     </div>

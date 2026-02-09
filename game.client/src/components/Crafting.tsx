@@ -19,8 +19,8 @@ const Crafting: React.FC<CraftingProps> = ({ blueprint }) => {
                 {blueprint.craftings.map((crafting) => (
                     <div className={styles.craftingItemContainer} key={crafting.item.itemId}>
                         <Tooltip heading="Material" text={crafting.item.name}>
-                            <svg width="32" height="32" viewBox="0 0 128 128">
-                                <Asset assetType={itemIdToAssetType(crafting.item.itemId)} width={128} height={128} />
+                            <svg className={styles.asset} viewBox="0 0 1 1">
+                                <Asset assetType={itemIdToAssetType(crafting.item.itemId)} width={1} height={1} />
                             </svg>
                         </Tooltip>
                         <Text size="h4" className={styles.craftingItemText}>{crafting.amount}x</Text>

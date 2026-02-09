@@ -2,6 +2,9 @@
     display: flex;
     gap: 1rem;
     align-items: center;
+}
+
+.containerAnimated {
     animation: slideIn 0.5s ease-out forwards;
 }
 
@@ -13,6 +16,8 @@
     fill: var(--light);
     cursor: pointer;
     transition: transform 0.2s;
+    width: 2rem;
+    height: 2rem;
 }
 
 .copy:active {

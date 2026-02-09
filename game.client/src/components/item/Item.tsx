@@ -33,8 +33,8 @@ const Item: React.FC<ItemProps> = ({ tooltipHeading, tooltipText, assetType, dur
     return (
         <Tooltip heading={tooltipHeading} text={tooltipText}>
             <div className={`${styles.container} ${onClick ? styles.clickable : ''}`} draggable={draggable} onDragStart={onDragStart} onClick={onClick}>
-                <svg width="128" height="128" viewBox="0 0 128 128">
-                    <Asset assetType={assetType} width={128} height={128} />
+                <svg className={styles.asset} viewBox="0 0 1 1">
+                    <Asset assetType={assetType} width={1} height={1} />
                 </svg>
                 <ConditionalDisplay condition={durability !== undefined && durability !== 0}>
                     <Text size="h3" className={styles.durability}>{durability}</Text>

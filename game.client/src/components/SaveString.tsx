@@ -1,12 +1,19 @@
-import { useState, useEffect } from 'react'
+import React from 'react'
 import CopyIcon from '../icons/CopyIcon'
 import styles from './saveString.module.css'
 import Text from './Text'
 
-const SaveString = ({ saveString, onFinished }: { saveString: string, onFinished: () => void }) => {
-    const [isExiting, setIsExiting] = useState(false)
+type SaveStringProps = {
+    saveString: string
+    onFinished?: () => void
+}
 
-    useEffect(() => {
+const SaveString: React.FC<SaveStringProps> = ({ saveString, onFinished }) => {
+    const [isExiting, setIsExiting] = React.useState(false)
+
+    React.useEffect(() => {
+        if (onFinished === undefined) return
+
         const exitTimer = setTimeout(() => setIsExiting(true), 9000)
         const totalTimer = setTimeout(() => onFinished(), 9500) 
 
@@ -21,9 +28,9 @@ const SaveString = ({ saveString, onFinished }: { saveString: string, onFinished
     }
 
     return (
-        <div className={`${styles.container} ${isExiting ? styles.exit : ''}`}>
+        <div className={`${styles.container} ${onFinished === undefined ? '' : styles.containerAnimated} ${isExiting ? styles.exit : ''}`}>
             <Text size="h3">{saveString}</Text>
-            <CopyIcon className={styles.copy} width={32} height={32} onClick={handleCopy} />
+            <CopyIcon className={styles.copy} onClick={handleCopy} />
         </div>
     )
 }

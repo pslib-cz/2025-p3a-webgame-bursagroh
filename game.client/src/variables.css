@@ -19,6 +19,42 @@
     --h5: 1rem;
 
     --navbar-height: 6rem;
+    --item-size: 8rem;
+    --max-items: 4;
+}
+
+@media (max-width: 1200px) {
+    :root {
+        font-size: 14px;
+
+        --h0: 10rem;
+        --h1: 4rem;
+        --h2: 3rem;
+        --h3: 2rem;
+        --h4: 1.5rem;
+        --h5: 1rem;
+
+        --navbar-height: 5rem;
+        --item-size: 6rem;
+        --max-items: 3;
+    }
+}
+
+@media (max-width: 875px) {
+    :root {
+        font-size: 14px;
+
+        --h0: 10rem;
+        --h1: 4rem;
+        --h2: 3rem;
+        --h3: 2rem;
+        --h4: 1.5rem;
+        --h5: 1rem;
+
+        --navbar-height: 4rem;
+        --item-size: 4rem;
+        --max-items: 2;
+    }
 }
 
 body {

@@ -18,7 +18,7 @@ const Notification: React.FC<NotificationType> = ({ heading, text, id }) => {
             <div className={styles.innerContainer}>
                 <Text size="h5">{text}</Text>
             </div>
-            <CloseIcon className={styles.close} width={24} height={24} onClick={handleClose} />
+            <CloseIcon className={styles.close} onClick={handleClose} />
         </div>
     )
 }

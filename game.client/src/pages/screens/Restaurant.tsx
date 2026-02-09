@@ -78,43 +78,43 @@ const RestaurantScreenWithContext = () => {
                 <Burger burger={{ recipeId: currentBurger?.recipeId ?? -1, name: "", ingrediences: currentBurgerStack.map((ingredienceType, index) => ({ order: index, ingredienceType })) }} />
                 <div className={styles.ingredienceButtons}>
                     <Tooltip heading="Ingredience" text="Bun down">
-                        <svg className={styles.button} onClick={() => addIngredience("BunDown")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="bun_down" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("BunDown")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="bun_down" />
                         </svg>
                     </Tooltip>
                     <Tooltip heading="Ingredience" text="Meat">
-                        <svg className={styles.button} onClick={() => addIngredience("Meat")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="meat" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("Meat")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="meat" />
                         </svg>
                     </Tooltip>
                     <Tooltip heading="Ingredience" text="Cheese">
-                        <svg className={styles.button} onClick={() => addIngredience("Cheese")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="cheese" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("Cheese")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="cheese" />
                         </svg>
                     </Tooltip>
                     <Tooltip heading="Ingredience" text="Salad">
-                        <svg className={styles.button} onClick={() => addIngredience("Salad")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="salad" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("Salad")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="salad" />
                         </svg>
                     </Tooltip>
                     <Tooltip heading="Ingredience" text="Tomato">
-                        <svg className={styles.button} onClick={() => addIngredience("Tomato")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="tomato" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("Tomato")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="tomato" />
                         </svg>
                     </Tooltip>
                     <Tooltip heading="Ingredience" text="Bacon">
-                        <svg className={styles.button} onClick={() => addIngredience("Bacon")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="bacon" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("Bacon")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="bacon" />
                         </svg>
                     </Tooltip>
                     <Tooltip heading="Ingredience" text="Sauce">
-                        <svg className={styles.button} onClick={() => addIngredience("Sauce")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="sauce" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("Sauce")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="sauce" />
                         </svg>
                     </Tooltip>
                     <Tooltip heading="Ingredience" text="Bun up">
-                        <svg className={styles.button} onClick={() => addIngredience("BunUp")} width={128} height={128} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                            <Asset x={0} y={0} width={32} height={32} assetType="bun_up" />
+                        <svg className={`${styles.button} ${styles.asset}`} onClick={() => addIngredience("BunUp")} viewBox="0 0 1 1" xmlns="http://www.w3.org/2000/svg">
+                            <Asset x={0} y={0} width={1} height={1} assetType="bun_up" />
                         </svg>
                     </Tooltip>
                 </div>
@@ -166,7 +166,7 @@ const RestaurantScreenWithContext = () => {
             </div>
             <div className={styles.cookingContainer}>
                 <Text size="h3" className={styles.heading}>Cooking</Text>
-                <CloseIcon className={styles.close} onClick={handleEscape} width={24} height={24} />
+                <CloseIcon className={styles.close} onClick={handleEscape} />
                 {cookingSection}
             </div>
         </div>
