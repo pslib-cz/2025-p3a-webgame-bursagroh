@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260210091048_dfgsgfds")]
-    partial class dfgsgfds
+    [Migration("20260210091524_trdfgd")]
+    partial class trdfgd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,6 +82,26 @@ namespace game.Server.Migrations
                     b.HasIndex("FloorId");
 
                     b.ToTable("Players");
+
+                    b.HasData(
+                        new
+                        {
+                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
+                            BankBalance = 0,
+                            Capacity = 10,
+                            Health = 20,
+                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            MaxHealth = 20,
+                            MineId = 0,
+                            Money = 100,
+                            Name = "Seeded Player",
+                            PositionX = 0,
+                            PositionY = 0,
+                            ScreenType = 0,
+                            Seed = 252,
+                            SubPositionX = 0,
+                            SubPositionY = 0
+                        });
                 });
 
             modelBuilder.Entity("RecipeTime", b =>
@@ -107,6 +127,16 @@ namespace game.Server.Migrations
                     b.HasIndex("PlayerId");
 
                     b.ToTable("RecipeTimes");
+
+                    b.HasData(
+                        new
+                        {
+                            RecipeTimeId = 1,
+                            EndTime = new DateTime(2025, 12, 13, 11, 0, 0, 0, DateTimeKind.Utc),
+                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
+                            RecipeId = 1,
+                            StartTime = new DateTime(2025, 12, 13, 10, 0, 0, 0, DateTimeKind.Utc)
+                        });
                 });
 
             modelBuilder.Entity("Save", b =>
@@ -423,6 +453,17 @@ namespace game.Server.Migrations
                     b.HasKey("BuildingId");
 
                     b.ToTable("Buildings");
+
+                    b.HasData(
+                        new
+                        {
+                            BuildingId = 69,
+                            BuildingType = 0,
+                            IsBossDefeated = false,
+                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
+                            PositionX = 0,
+                            PositionY = 0
+                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Chest", b =>
@@ -852,6 +893,14 @@ namespace game.Server.Migrations
                     b.HasIndex("BuildingId");
 
                     b.ToTable("Floors");
+
+                    b.HasData(
+                        new
+                        {
+                            FloorId = 6,
+                            BuildingId = 69,
+                            Level = 0
+                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.FloorItem", b =>
@@ -882,6 +931,16 @@ namespace game.Server.Migrations
                     b.HasIndex("ItemInstanceId");
 
                     b.ToTable("FloorItems");
+
+                    b.HasData(
+                        new
+                        {
+                            FloorItemId = 85,
+                            FloorId = 6,
+                            FloorItemType = 0,
+                            PositionX = 0,
+                            PositionY = 0
+                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Ingredience", b =>
@@ -1773,6 +1832,13 @@ namespace game.Server.Migrations
                     b.HasKey("MineId");
 
                     b.ToTable("Mines");
+
+                    b.HasData(
+                        new
+                        {
+                            MineId = 1,
+                            PlayerId = new Guid("00000000-0000-0000-0000-000000000000")
+                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.MineBlock", b =>
@@ -1819,6 +1885,14 @@ namespace game.Server.Migrations
                     b.HasIndex("MineId");
 
                     b.ToTable("MineLayers");
+
+                    b.HasData(
+                        new
+                        {
+                            MineLayerID = 1,
+                            Depth = 0,
+                            MineId = 1
+                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Recipe", b =>

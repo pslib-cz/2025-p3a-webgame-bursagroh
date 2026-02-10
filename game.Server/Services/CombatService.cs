@@ -38,13 +38,15 @@ namespace game.Server.Services
                     return _errorService.CreateErrorResponse(404, 5001, "Player not found.", "Not Found");
                 }
 
-                ItemInstance? activeInstance = player.ActiveInventoryItem?.ItemInstance;
-                Item? itemData = activeInstance?.Item;
+                var activeInvItem = player.ActiveInventoryItem;
+                var activeInstance = activeInvItem?.ItemInstance;
+                var itemData = activeInstance?.Item;
 
+  
                 bool isWeapon = itemData == null ||
-                               itemData.ItemType == ItemTypes.Sword ||
-                               itemData.ItemType == ItemTypes.Axe ||
-                               itemData.ItemType == ItemTypes.Pickaxe;
+                                itemData.ItemType == ItemTypes.Sword ||
+                                itemData.ItemType == ItemTypes.Axe ||
+                                itemData.ItemType == ItemTypes.Pickaxe;
 
                 if (isWeapon)
                 {
@@ -70,17 +72,17 @@ namespace game.Server.Services
                     var enemy = floorItem.Enemy;
                     var rng = new Random();
 
-                    int playerDamage = itemData?.Damage ?? 1;
-                    enemy.Health -= playerDamage;
+                    enemy.Health -= itemData?.Damage ?? 1;
 
                     if (activeInstance != null)
                     {
                         activeInstance.Durability -= 1;
                         if (activeInstance.Durability <= 0)
                         {
-                            var activeInvItem = player.ActiveInventoryItem!;
                             player.ActiveInventoryItemId = null;
-                            _context.InventoryItems.Remove(activeInvItem);
+                            player.ActiveInventoryItem = null;
+
+                            _context.InventoryItems.Remove(activeInvItem!);
                             _context.ItemInstances.Remove(activeInstance);
                         }
                     }
@@ -97,11 +99,9 @@ namespace game.Server.Services
                                 player.Health = 0;
                                 player.ScreenType = ScreenTypes.Lose;
 
-                                if (player.PlayerId.ToString() != GameConstants.ProtectedPlayerId)
-                                {
-                                    var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
-                                    if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
-                                }
+                                var itemsToRemove = player.InventoryItems.Where(ii => !ii.IsInBank).ToList();
+                                if (itemsToRemove.Any()) _context.InventoryItems.RemoveRange(itemsToRemove);
+                                
 
                                 await _context.SaveChangesAsync();
                                 await transaction.CommitAsync();
@@ -157,16 +157,17 @@ namespace game.Server.Services
                     else if (itemData.ItemId == GameConstants.ItemIdHealthUpgrade)
                     {
                         player.MaxHealth += GameConstants.HealthUpgradeAmount;
-                        player.Health += GameConstants.HealthUpgradeAmount; 
+                        player.Health += GameConstants.HealthUpgradeAmount;
                     }
                     else if (itemData.ItemId == GameConstants.ItemIdCapacityUpgrade)
                     {
                         player.Capacity += GameConstants.CapacityUpgradeAmount;
                     }
 
-                    var activeItem = player.ActiveInventoryItem!;
                     player.ActiveInventoryItemId = null;
-                    _context.InventoryItems.Remove(activeItem);
+                    player.ActiveInventoryItem = null;
+
+                    _context.InventoryItems.Remove(activeInvItem!);
                     _context.ItemInstances.Remove(activeInstance!);
 
                     await _context.SaveChangesAsync();

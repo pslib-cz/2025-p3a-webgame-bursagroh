@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace game.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class dfgsgfds : Migration
+    public partial class trdfgd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -466,6 +466,11 @@ namespace game.Server.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Buildings",
+                columns: new[] { "BuildingId", "BuildingType", "Height", "IsBossDefeated", "PlayerId", "PositionX", "PositionY", "ReachedHeight" },
+                values: new object[] { 69, 0, null, false, new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), 0, 0, null });
+
+            migrationBuilder.InsertData(
                 table: "Items",
                 columns: new[] { "ItemId", "ChangeOfGenerating", "Damage", "Description", "ItemType", "MaxDurability", "Name", "Weight" },
                 values: new object[,]
@@ -504,6 +509,16 @@ namespace game.Server.Migrations
                     { 42, 0, 1, "+5 inventory space", 3, 1, "Muscle Potion", 1 },
                     { 100, 0, 100, "Drop this into fountain to win", 0, 1000000, "Mythical Sword", 1 }
                 });
+
+            migrationBuilder.InsertData(
+                table: "Mines",
+                columns: new[] { "MineId", "PlayerId" },
+                values: new object[] { 1, new Guid("00000000-0000-0000-0000-000000000000") });
+
+            migrationBuilder.InsertData(
+                table: "Players",
+                columns: new[] { "PlayerId", "ActiveInventoryItemId", "BankBalance", "Capacity", "FloorId", "Health", "LastModified", "MaxHealth", "MineId", "Money", "Name", "PositionX", "PositionY", "ScreenType", "Seed", "SubPositionX", "SubPositionY" },
+                values: new object[] { new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), null, 0, 10, null, 20, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 20, 0, 100, "Seeded Player", 0, 0, 0, 252, 0, 0 });
 
             migrationBuilder.InsertData(
                 table: "Recipes",
@@ -570,6 +585,11 @@ namespace game.Server.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "Floors",
+                columns: new[] { "FloorId", "BuildingId", "Level" },
+                values: new object[] { 6, 69, 0 });
+
+            migrationBuilder.InsertData(
                 table: "Ingrediences",
                 columns: new[] { "IngredienceId", "IngredienceType", "Order", "RecipeId" },
                 values: new object[,]
@@ -633,6 +653,16 @@ namespace game.Server.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "MineLayers",
+                columns: new[] { "MineLayerID", "Depth", "MineId" },
+                values: new object[] { 1, 0, 1 });
+
+            migrationBuilder.InsertData(
+                table: "RecipeTimes",
+                columns: new[] { "RecipeTimeId", "EndTime", "PlayerId", "RecipeId", "StartTime" },
+                values: new object[] { 1, new DateTime(2025, 12, 13, 11, 0, 0, 0, DateTimeKind.Utc), new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"), 1, new DateTime(2025, 12, 13, 10, 0, 0, 0, DateTimeKind.Utc) });
+
+            migrationBuilder.InsertData(
                 table: "Craftings",
                 columns: new[] { "CraftingId", "Amount", "BlueprintId", "ItemId" },
                 values: new object[,]
@@ -686,6 +716,11 @@ namespace game.Server.Migrations
                     { 67, 10, 25, 6 },
                     { 68, 5, 25, 5 }
                 });
+
+            migrationBuilder.InsertData(
+                table: "FloorItems",
+                columns: new[] { "FloorItemId", "FloorId", "FloorItemType", "ItemInstanceId", "PositionX", "PositionY" },
+                values: new object[] { 85, 6, 0, null, 0, 0 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Blocks_ItemId",
