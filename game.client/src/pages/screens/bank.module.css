@@ -65,4 +65,6 @@
     fill: var(--light);
     transform: rotate(180deg);
     cursor: pointer;
+    width: 2rem;
+    height: 2rem;
 }
