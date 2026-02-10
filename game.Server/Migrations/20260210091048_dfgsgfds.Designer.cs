@@ -11,8 +11,8 @@ using game.Server.Data;
 namespace game.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260209214211_rebase")]
-    partial class rebase
+    [Migration("20260210091048_dfgsgfds")]
+    partial class dfgsgfds
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,26 +82,6 @@ namespace game.Server.Migrations
                     b.HasIndex("FloorId");
 
                     b.ToTable("Players");
-
-                    b.HasData(
-                        new
-                        {
-                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
-                            BankBalance = 0,
-                            Capacity = 10,
-                            Health = 20,
-                            LastModified = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            MaxHealth = 20,
-                            MineId = 0,
-                            Money = 100,
-                            Name = "Seeded Player",
-                            PositionX = 0,
-                            PositionY = 0,
-                            ScreenType = 0,
-                            Seed = 252,
-                            SubPositionX = 0,
-                            SubPositionY = 0
-                        });
                 });
 
             modelBuilder.Entity("RecipeTime", b =>
@@ -127,16 +107,6 @@ namespace game.Server.Migrations
                     b.HasIndex("PlayerId");
 
                     b.ToTable("RecipeTimes");
-
-                    b.HasData(
-                        new
-                        {
-                            RecipeTimeId = 1,
-                            EndTime = new DateTime(2025, 12, 13, 11, 0, 0, 0, DateTimeKind.Utc),
-                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
-                            RecipeId = 1,
-                            StartTime = new DateTime(2025, 12, 13, 10, 0, 0, 0, DateTimeKind.Utc)
-                        });
                 });
 
             modelBuilder.Entity("Save", b =>
@@ -453,17 +423,6 @@ namespace game.Server.Migrations
                     b.HasKey("BuildingId");
 
                     b.ToTable("Buildings");
-
-                    b.HasData(
-                        new
-                        {
-                            BuildingId = 69,
-                            BuildingType = 0,
-                            IsBossDefeated = false,
-                            PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
-                            PositionX = 0,
-                            PositionY = 0
-                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Chest", b =>
@@ -779,6 +738,69 @@ namespace game.Server.Migrations
                             Amount = 10,
                             BlueprintId = 21,
                             ItemId = 7
+                        },
+                        new
+                        {
+                            CraftingId = 60,
+                            Amount = 2,
+                            BlueprintId = 22,
+                            ItemId = 1
+                        },
+                        new
+                        {
+                            CraftingId = 61,
+                            Amount = 1,
+                            BlueprintId = 22,
+                            ItemId = 5
+                        },
+                        new
+                        {
+                            CraftingId = 62,
+                            Amount = 3,
+                            BlueprintId = 23,
+                            ItemId = 6
+                        },
+                        new
+                        {
+                            CraftingId = 63,
+                            Amount = 1,
+                            BlueprintId = 23,
+                            ItemId = 5
+                        },
+                        new
+                        {
+                            CraftingId = 64,
+                            Amount = 5,
+                            BlueprintId = 24,
+                            ItemId = 2
+                        },
+                        new
+                        {
+                            CraftingId = 65,
+                            Amount = 2,
+                            BlueprintId = 24,
+                            ItemId = 4
+                        },
+                        new
+                        {
+                            CraftingId = 66,
+                            Amount = 10,
+                            BlueprintId = 25,
+                            ItemId = 7
+                        },
+                        new
+                        {
+                            CraftingId = 67,
+                            Amount = 10,
+                            BlueprintId = 25,
+                            ItemId = 6
+                        },
+                        new
+                        {
+                            CraftingId = 68,
+                            Amount = 5,
+                            BlueprintId = 25,
+                            ItemId = 5
                         });
                 });
 
@@ -830,14 +852,6 @@ namespace game.Server.Migrations
                     b.HasIndex("BuildingId");
 
                     b.ToTable("Floors");
-
-                    b.HasData(
-                        new
-                        {
-                            FloorId = 6,
-                            BuildingId = 69,
-                            Level = 0
-                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.FloorItem", b =>
@@ -868,16 +882,6 @@ namespace game.Server.Migrations
                     b.HasIndex("ItemInstanceId");
 
                     b.ToTable("FloorItems");
-
-                    b.HasData(
-                        new
-                        {
-                            FloorItemId = 85,
-                            FloorId = 6,
-                            FloorItemType = 0,
-                            PositionX = 0,
-                            PositionY = 0
-                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Ingredience", b =>
@@ -1434,7 +1438,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 10,
                             ChangeOfGenerating = 0,
-                            Damage = 1,
+                            Damage = 2,
                             Description = "Wooden Sword",
                             ItemType = 0,
                             MaxDurability = 20,
@@ -1445,7 +1449,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 11,
                             ChangeOfGenerating = 0,
-                            Damage = 2,
+                            Damage = 3,
                             Description = "Rock Sword",
                             ItemType = 0,
                             MaxDurability = 40,
@@ -1456,7 +1460,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 12,
                             ChangeOfGenerating = 0,
-                            Damage = 3,
+                            Damage = 4,
                             Description = "Copper Sword",
                             ItemType = 0,
                             MaxDurability = 60,
@@ -1500,7 +1504,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 16,
                             ChangeOfGenerating = 0,
-                            Damage = 7,
+                            Damage = 10,
                             Description = "Unobtainium Sword",
                             ItemType = 0,
                             MaxDurability = 240,
@@ -1511,7 +1515,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 20,
                             ChangeOfGenerating = 0,
-                            Damage = 1,
+                            Damage = 2,
                             Description = "Wooden Axe",
                             ItemType = 1,
                             MaxDurability = 20,
@@ -1522,7 +1526,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 21,
                             ChangeOfGenerating = 0,
-                            Damage = 2,
+                            Damage = 3,
                             Description = "Rock Axe",
                             ItemType = 1,
                             MaxDurability = 40,
@@ -1533,7 +1537,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 22,
                             ChangeOfGenerating = 0,
-                            Damage = 3,
+                            Damage = 4,
                             Description = "Copper Axe",
                             ItemType = 1,
                             MaxDurability = 60,
@@ -1577,7 +1581,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 26,
                             ChangeOfGenerating = 0,
-                            Damage = 7,
+                            Damage = 10,
                             Description = "Unobtainium Axe",
                             ItemType = 1,
                             MaxDurability = 240,
@@ -1621,7 +1625,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 33,
                             ChangeOfGenerating = 0,
-                            Damage = 4,
+                            Damage = 3,
                             Description = "Iron Pickaxe",
                             ItemType = 2,
                             MaxDurability = 80,
@@ -1632,7 +1636,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 34,
                             ChangeOfGenerating = 0,
-                            Damage = 5,
+                            Damage = 4,
                             Description = "Silver Pickaxe",
                             ItemType = 2,
                             MaxDurability = 100,
@@ -1643,7 +1647,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 35,
                             ChangeOfGenerating = 0,
-                            Damage = 6,
+                            Damage = 5,
                             Description = "Gold Pickaxe",
                             ItemType = 2,
                             MaxDurability = 120,
@@ -1654,7 +1658,7 @@ namespace game.Server.Migrations
                         {
                             ItemId = 36,
                             ChangeOfGenerating = 0,
-                            Damage = 7,
+                            Damage = 10,
                             Description = "Unobtainium Pickaxe",
                             ItemType = 2,
                             MaxDurability = 240,
@@ -1769,13 +1773,6 @@ namespace game.Server.Migrations
                     b.HasKey("MineId");
 
                     b.ToTable("Mines");
-
-                    b.HasData(
-                        new
-                        {
-                            MineId = 1,
-                            PlayerId = new Guid("00000000-0000-0000-0000-000000000000")
-                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.MineBlock", b =>
@@ -1822,14 +1819,6 @@ namespace game.Server.Migrations
                     b.HasIndex("MineId");
 
                     b.ToTable("MineLayers");
-
-                    b.HasData(
-                        new
-                        {
-                            MineLayerID = 1,
-                            Depth = 0,
-                            MineId = 1
-                        });
                 });
 
             modelBuilder.Entity("game.Server.Models.Recipe", b =>
