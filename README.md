@@ -1,4 +1,4 @@
-# 2025-p3a-webgame-bursagroh
+# Urban Relic
 Odkaz na figmu: https://www.figma.com/design/Mtsedc7KYgaIreFrquDKqu/bursagroh-team-library?node-id=3313-2&t=raORM9mkjraROVin-1
 
 ## Popis hry
@@ -82,7 +82,7 @@ Jakub Procházka - výpomoc s assety
 
 
 
-
+---
 
 ## Klíčové nápady
 - RPG
