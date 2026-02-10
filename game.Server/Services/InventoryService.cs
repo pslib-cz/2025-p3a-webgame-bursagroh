@@ -61,7 +61,7 @@ namespace game.Server.Services
             {
                 if (count > player.Capacity)
                 {
-                    return _errorService.CreateErrorResponse(400, 7010, "Your inventory is full..", "Full Inventory");
+                    return _errorService.CreateErrorResponse(400, 7010, "Your inventory is full.", "Full Inventory");
                 }
                 
                 if (item.ItemInstanceId == null) continue;
