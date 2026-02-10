@@ -59,7 +59,11 @@ namespace game.Server.Services
             int count = player.InventoryItems.Count;
             foreach (var item in itemsOnGround)
             {
-                if (count >= player.Capacity) break;
+                if (count > player.Capacity)
+                {
+                    return _errorService.CreateErrorResponse(400, 7010, "Your inventory is ful..", "Full Inventory");
+                }
+                
                 if (item.ItemInstanceId == null) continue;
 
                 _context.InventoryItems.Add(new InventoryItem { PlayerId = id, ItemInstanceId = item.ItemInstanceId.Value, IsInBank = false });
