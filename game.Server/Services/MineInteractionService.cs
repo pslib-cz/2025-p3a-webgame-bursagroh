@@ -149,15 +149,21 @@ namespace game.Server.Services
 
                     int finalDamage = activeItem.Damage;
                     bool isAxe = activeItem.Name.Contains("Axe");
+                    bool isPickaxe = activeItem.Name.Contains("Pickaxe");
                     bool isWood = targetBlock.Block.ItemId == GameConstants.ItemIdWood;
 
-                    if (isAxe)
+                    if (isWood && !isAxe)
                     {
-                        if (!isWood)
-                        {
-                            return _errorService.CreateErrorResponse(400, 8015, "Axes can only be used on wood.", "Wrong Tool");
-                        }
+                        return _errorService.CreateErrorResponse(400, 8015, "You need an axe to mine wood.", "Wrong Tool");
+                    }
 
+                    if (!isWood && isAxe)
+                    {
+                        return _errorService.CreateErrorResponse(400, 8016, "Axes can only be used on wood.", "Wrong Tool");
+                    }
+
+                    if (isAxe && isWood)
+                    {
                         finalDamage *= GameConstants.AxeDamageMultiplier;
                     }
 
