@@ -73,15 +73,6 @@ Hra používá unikátní systém ukládání bez nutnosti registrace:
 Filip Groh - frontend
 Jakub Procházka - výpomoc s assety
 
-
-
-
-
-
-
-
-
-
 ---
 
 ## Klíčové nápady
@@ -118,22 +109,22 @@ Každé patro bude mít schody nahoru a schody dolu pokud není v přízemí neb
 ## Gameplay
 ### Gameplay na mapě
 Mapa je rozdělena do pravidelného gridu budov. Hráč se pohybuje clickem na políčka nebo budovy, pokud clickne na budovu, tak se přesune dovnitř.
-Na mapě budou označeny centrální budovy ikonama. Neobjevené budouvy budou označeny prázdně, pokud trap budova, tak bude označena červeně. Když hráč navštíví budovu, tak se označí na mapě čislem maximálního navštíveného patra (2/?), když hráč dorazí do boss patra, tak se změní na (5). Když hráč zabije bosse, tak se označení změní na křížek a číslo. Hráč také může použít mapu před vstupem, pro zjištění počtu pater.
+Na mapě budou centrální budovy. Neobjevené budouvy budou označeny prázdně, pokud trap budova, tak bude označena červeně. Když hráč navštíví budovu, tak se označí na mapě čislem maximálního navštíveného patra (2/?), když hráč dorazí do boss patra, tak se změní na (5). Když hráč zabije bosse, tak se označení změní na křížek a číslo.
 
 ### Gameplay v budově
 Patro je 8x8 grid, kde se hráč může pohnout pouze na sousedící políčko.
-Hráč vejde do budovy, pokud se jedná o trap budovu, tak se uzamkne východ a nebude moci odejít, pokud se nejedná o trap budovu, tak může odejít kdy chce. Hráč může přejít z patra do patra pomocí schodů i když jsou na patře enemáci, toto neplatí u boss patra, kde hráč musí nejdříve porazit bosse aby mohl odejít.
-Když se hráč pohne na políčko schody, tak se přesune do příslušného patra. Pokud se hráč přesune na políčko s loot chestkou, tak se otevře a itemy náhodně vypadnou v okolí chestky. Pokud se hráč přesune na políčko s itemem, tak ho může zvednout. Když hráč dojde na políčko s enemákem spustí se combat, po poražení enemáka z něj vypadne loot item, pokud se jedná o bosse vypadne boss loot chestka. Hráč ve svém kole může také použít item (např. healing potion). Po každé akci se enemáci přesunou blíže ke hráči, pokud se dojdou na stejné políčko jako hráč, nastane combat fáze a hráčova akce se vyruší.
+Hráč vejde do budovy, pokud se jedná o trap budovu, tak se uzamkne východ a nebude moci odejít, pokud se nejedná o trap budovu, tak může odejít kdy chce. Hráč může přejít z patra do patra pomocí schodů i když jsou na patře enemáci.
+Když se hráč pohne na políčko schody, tak se přesune do příslušného patra. Pokud se hráč přesune na políčko s loot chestkou, tak se otevře a itemy náhodně vypadnou v okolí chestky. Pokud se hráč přesune na políčko s itemem, tak ho může zvednout. Když hráč dojde na políčko s enemákem spustí se combat, po poražení enemáka z něj vypadne loot item. Hráč ve svém kole může také použít item (např. healing potion). Po každé akci se enemáci přesunou blíže ke hráči, pokud se dojdou na stejné políčko jako hráč, nastane combat fáze.
 
 ### Gameplay v restauraci
-Minihra bude spočívat ve skládání burgerů - server vybere předgenerovaný burger z databáze a úkol hráče bude jej poskládat, za což bude odměněn. Nejlepší výsledky se budou ukládat a budou veřejně dostupné - nejlepší čas bude odměněn ještě lépe.
+Minihra bude spočívat ve skládání burgerů - server vybere předgenerovaný burger z databáze a úkol hráče bude jej poskládat, za což bude odměněn. Nejlepší výsledky se budou ukládat a budou veřejně dostupné.
 Minihra bude moci být opakována do nekonečna - ze začátku totiž hra počítá, že hráč nemá žádné peníze nebo itemy - restaurace bude tedy první možnost si peníze vydělat.
 
 ### Gameplay v bance
 Jenom UI s inventářem hráče a banky. Hráč může libovolně přetahovat itemy, pokud se mu vejdou do inventáře.
 
 ### Gameplay v dole
-Náhodně se vygeneruje grid 8 široký s nekonečnou hloubkou s orečkama, hráč může orečko vytěžit. Dál v dole budou vzácnější suroviny.
+Náhodně se vygeneruje grid 8 široký s nekonečnou hloubkou s orečkama, hráč může orečko vytěžit.
 Hráč na vykopání potřebuje krumpáč, který si může za peníze vypůjčit nebo vycraftit v kovárně.
 
 ### Gameplay v kovárně
@@ -144,9 +135,7 @@ Hráč nebo enemák táhne první a pak se střídají.
 Možné akce:
 - Útok pěstí
 - Útok zbraní
-- Odpočinek
 - Použití itemu (např. heal)
-Když je hráč napaden objeví se timer kdy může hráč uhnout, blokovat nebo nic.
 
 ## Ukládání
 Když se hráč poprve napojí, tak obdrží nějaké ID, pak hráč bude hrát a měnit stav na serveru pod tímto ID. Hráč si toto ID může zobrazit a uložit. Ale když hráč načte toto ID, tak se jen zkopírují data uložená pod tímto ID do aktuálního ID. Tímto způsobem můžeme ukládat data na serveru, tak aby si je hráči nemohli upravovat a umožníme hráčům si ukládat herní stav bez nutnosti přihlášení. Také si více hráčů může načíst 1 ID a pokračovat ze stejnoho starting pointu.
