@@ -93,7 +93,7 @@ namespace game.Server.Services
 
             if (player.InventoryItems.Any(ii => ii.ItemInstance?.ItemId == GameConstants.ItemIdWoodenPickaxe))
             {
-                return _errorService.CreateErrorResponse(400, 8010, "You already own a Wooden Pickaxe.", "Purchase Denied");
+                return _errorService.CreateErrorResponse(400, 8010, "You already own a Rented Pickaxe.", "Purchase Denied");
             }
 
             if (player.Money < GameConstants.WoodenPickaxePrice)
@@ -109,7 +109,6 @@ namespace game.Server.Services
             await _context.SaveChangesAsync();
 
             _context.InventoryItems.Add(new InventoryItem { PlayerId = playerId, ItemInstanceId = instance.ItemInstanceId });
-            player.Capacity += amount;
 
             await _context.SaveChangesAsync();
             return new OkObjectResult(player);
