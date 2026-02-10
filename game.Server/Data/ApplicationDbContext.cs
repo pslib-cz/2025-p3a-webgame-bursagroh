@@ -127,11 +127,76 @@ namespace game.Server.Data
                 .Navigation(ii => ii.Item)
                 .AutoInclude();
 
+
+            modelBuilder.Entity<Player>(entity =>
+            {
+                entity.HasData(new Player
+                {
+                    PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
+                    Name = "Seeded Player",
+                    Money = 100,
+                    BankBalance = 0,
+                    ScreenType = ScreenTypes.City,
+                    Capacity = 10,
+                    Seed = 252
+                });
+            });
+
+            modelBuilder.Entity<Building>(entity =>
+            {
+                entity.HasData(new Building
+                {
+                    PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0"),
+                    BuildingId = 69
+                });
+            });
+
+            modelBuilder.Entity<Floor>(entity =>
+            {
+                entity.HasData(new Floor
+                {
+                    FloorId = 6,
+                    BuildingId = 69
+                });
+            });
+
+            modelBuilder.Entity<FloorItem>(entity =>
+            {
+                entity.HasData(new FloorItem
+                {
+                    FloorId = 6,
+                    FloorItemId = 85
+                });
+            });
+
             modelBuilder.Entity<FloorItem>()
                 .HasOne(fi => fi.ItemInstance)
                 .WithMany()
                 .HasForeignKey(fi => fi.ItemInstanceId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+
+
+
+
+            modelBuilder.Entity<Mine>(entity =>
+            {
+                entity.HasData(new Mine
+                {
+                    MineId = 1
+                });
+            });
+
+            modelBuilder.Entity<MineLayer>(entity =>
+            {
+                entity.HasData(new MineLayer
+                {
+                    MineLayerID = 1,
+                    MineId = 1
+                });
+            });
+
 
             modelBuilder.Entity<Recipe>(entity =>
             {
@@ -230,6 +295,13 @@ namespace game.Server.Data
                     new Ingredience { RecipeId = 11, IngredienceId = 54, Order = 5, IngredienceType = IngredienceTypes.Meat },
                     new Ingredience { RecipeId = 11, IngredienceId = 55, Order = 6, IngredienceType = IngredienceTypes.Bacon },
                     new Ingredience { RecipeId = 11, IngredienceId = 56, Order = 7, IngredienceType = IngredienceTypes.BunDown }
+                );
+            });
+
+            modelBuilder.Entity<RecipeTime>(entity =>
+            {
+                entity.HasData(
+                    new RecipeTime { RecipeTimeId = 1, RecipeId = 1, StartTime = new DateTime(2025, 12, 13, 10, 0, 0, DateTimeKind.Utc), EndTime = new DateTime(2025, 12, 13, 11, 0, 0, DateTimeKind.Utc), PlayerId = new Guid("4b1e8a93-7d92-4f7f-80c1-525c345b85e0") }
                 );
             });
 
